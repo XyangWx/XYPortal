@@ -3,23 +3,13 @@
     <Project Path="src/XYPortal.Application.Contracts/XYPortal.Application.Contracts.csproj" />
     <Project Path="src/XYPortal.Application/XYPortal.Application.csproj" />
     <Project Path="src/XYPortal.AuthServer/XYPortal.AuthServer.csproj" />
-    <Project Path="src/XYPortal.Blazor.Client/XYPortal.Blazor.Client.csproj" />
-    <Project Path="src/XYPortal.Blazor.Server.Tiered/XYPortal.Blazor.Server.Tiered.csproj" />
-    <Project Path="src/XYPortal.Blazor.Server/XYPortal.Blazor.Server.csproj" />
-    <Project Path="src/XYPortal.Blazor.WebApp.Client/XYPortal.Blazor.WebApp.Client.csproj" />
-    <Project Path="src/XYPortal.Blazor.WebApp.Tiered.Client/XYPortal.Blazor.WebApp.Tiered.Client.csproj" />
-    <Project Path="src/XYPortal.Blazor.WebApp.Tiered/XYPortal.Blazor.WebApp.Tiered.csproj" />
-    <Project Path="src/XYPortal.Blazor.WebApp/XYPortal.Blazor.WebApp.csproj" />
-    <Project Path="src/XYPortal.Blazor/XYPortal.Blazor.csproj" />
     <Project Path="src/XYPortal.DbMigrator/XYPortal.DbMigrator.csproj" />
     <Project Path="src/XYPortal.Domain.Shared/XYPortal.Domain.Shared.csproj" />
     <Project Path="src/XYPortal.Domain/XYPortal.Domain.csproj" />
     <Project Path="src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj" />
     <Project Path="src/XYPortal.HttpApi.Client/XYPortal.HttpApi.Client.csproj" />
     <Project Path="src/XYPortal.HttpApi.Host/XYPortal.HttpApi.Host.csproj" />
-    <Project Path="src/XYPortal.HttpApi.HostWithIds/XYPortal.HttpApi.HostWithIds.csproj" />
     <Project Path="src/XYPortal.HttpApi/XYPortal.HttpApi.csproj" />
-    <Project Path="src/XYPortal.MongoDB/XYPortal.MongoDB.csproj" />
     <Project Path="src/XYPortal.Web.Host/XYPortal.Web.Host.csproj" />
     <Project Path="src/XYPortal.Web/XYPortal.Web.csproj" />
   </Folder>
@@ -27,9 +17,6 @@
     <Project Path="test/XYPortal.Application.Tests/XYPortal.Application.Tests.csproj" />
     <Project Path="test/XYPortal.Domain.Tests/XYPortal.Domain.Tests.csproj" />
     <Project Path="test/XYPortal.EntityFrameworkCore.Tests/XYPortal.EntityFrameworkCore.Tests.csproj" />
-    <Project Path="test/XYPortal.HttpApi.Client.ConsoleTestApp/XYPortal.HttpApi.Client.ConsoleTestApp.csproj" />
-    <Project Path="test/XYPortal.MongoDB.Tests/XYPortal.MongoDB.Tests.csproj" />
     <Project Path="test/XYPortal.TestBase/XYPortal.TestBase.csproj" />
-    <Project Path="test/XYPortal.Web.Tests/XYPortal.Web.Tests.csproj" />
   </Folder>
 </Solution>

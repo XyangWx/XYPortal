@@ -1,45 +1,42 @@
-using System;
-using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using XYPortal.EntityFrameworkCore;
-using XYPortal.Localization;
-using XYPortal.MultiTenancy;
-using XYPortal.Web.Menus;
 using Microsoft.OpenApi.Models;
+using OpenIddict.Server.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
+using System;
+using System.IO;
 using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.Localization;
-using Volo.Abp.AspNetCore.Mvc.UI;
-using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
-using Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
-using Volo.Abp.Mapperly;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity.Web;
-using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
-using Volo.Abp.PermissionManagement.Web;
+using Volo.Abp.OpenIddict;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.SettingManagement.Web;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.TenantManagement.Web;
-using Volo.Abp.OpenIddict;
-using Volo.Abp.UI.Navigation.Urls;
-using Volo.Abp.UI;
 using Volo.Abp.UI.Navigation;
+using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using XYPortal.EntityFrameworkCore;
+using XYPortal.Localization;
+using XYPortal.MultiTenancy;
+using XYPortal.Web.Menus;
 
 namespace XYPortal.Web;
 
@@ -52,6 +49,7 @@ namespace XYPortal.Web;
     typeof(AbpSettingManagementWebModule),
     typeof(AbpAccountWebOpenIddictModule),
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
+    typeof(AbpFeatureManagementWebModule),
     typeof(AbpTenantManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule)
@@ -85,6 +83,12 @@ public class XYPortalWebModule : AbpModule
             });
         });
 
+        // Disable HTTPS requirement for development/HTTP mode
+        PreConfigure<OpenIddictServerBuilder>(serverBuilder =>
+        {
+            serverBuilder.UseAspNetCore().DisableTransportSecurityRequirement();
+        });
+
         if (!hostingEnvironment.IsDevelopment())
         {
             PreConfigure<AbpOpenIddictAspNetCoreOptions>(options =>
@@ -104,6 +108,26 @@ public class XYPortalWebModule : AbpModule
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
 
+        //// 这段代码用来解决使用http://后点设置菜单报错的问题
+		if (!configuration.GetValue<bool>("App:RequireHttps"))
+        {
+            context.Services.AddAntiforgery(
+                options =>
+                {
+                    options.SuppressXFrameOptionsHeader = true;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+					options.Cookie.Name = ".AspNetCore.Antiforgery.AbpXsrf";
+				});
+
+            context.Services.Configure<CookiePolicyOptions>(
+                options =>
+                {
+                    options.CheckConsentNeeded = c => false;
+                    options.MinimumSameSitePolicy = SameSiteMode.None;
+                    options.Secure = CookieSecurePolicy.None;
+                });
+        }
+        
         ConfigureAuthentication(context);
         ConfigureUrls(configuration);
         ConfigureBundles();
@@ -130,6 +154,21 @@ public class XYPortalWebModule : AbpModule
         {
             options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"];
         });
+
+        if (!configuration.GetValue<bool>("App:RequireHttps"))
+        {
+            Configure<OpenIddictServerAspNetCoreOptions>(
+                options =>
+                {
+                    options.DisableTransportSecurityRequirement = true;
+                });
+
+            Configure<ForwardedHeadersOptions>(
+                options =>
+                {
+                    options.ForwardedHeaders = ForwardedHeaders.XForwardedProto;
+                });
+        }
     }
 
     private void ConfigureBundles()

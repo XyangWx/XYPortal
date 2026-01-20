@@ -68,6 +68,12 @@ public class XYPortalAuthServerModule : AbpModule
             });
         });
 
+        // Disable HTTPS requirement for development/HTTP mode
+        PreConfigure<OpenIddictServerBuilder>(serverBuilder =>
+        {
+            serverBuilder.UseAspNetCore().DisableTransportSecurityRequirement();
+        });
+
         if (!hostingEnvironment.IsDevelopment())
         {
             PreConfigure<AbpOpenIddictAspNetCoreOptions>(options =>
@@ -108,7 +114,7 @@ public class XYPortalAuthServerModule : AbpModule
             );
         });
 
-        Configure<AbpAuditingOptions>(options =>
+		Configure<AbpAuditingOptions>(options =>
         {
                 //options.IsEnabledForGetRequests = true;
                 options.ApplicationName = "AuthServer";

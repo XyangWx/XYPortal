@@ -56,6 +56,7 @@
     <PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="10.0.2" />
     <PackageReference Include="Volo.Abp.Identity.Web" Version="10.0.2" />
     <PackageReference Include="Volo.Abp.Account.Web.OpenIddict" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.Web" Version="10.0.2" />
     <PackageReference Include="Volo.Abp.TenantManagement.Web" Version="10.0.2" />
     <PackageReference Include="Volo.Abp.SettingManagement.Web" Version="10.0.2" />
   </ItemGroup>
