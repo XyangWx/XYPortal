@@ -126,6 +126,29 @@ public class OpenIddictDataSeedContributor : IDataSeedContributor, ITransientDep
                 clientUri: swaggerRootUrl
             );
         }
+
+        // Vue Client
+        var vueClientId = configurationSection["XYPortal_Vue:ClientId"];
+        if (!vueClientId.IsNullOrWhiteSpace())
+        {
+            var vueClientRootUrl = configurationSection["XYPortal_Vue:RootUrl"]!.EnsureEndsWith('/');
+
+            await CreateApplicationAsync(
+                name: vueClientId!,
+                type: OpenIddictConstants.ClientTypes.Public,
+                consentType: OpenIddictConstants.ConsentTypes.Implicit,
+                displayName: "Vue Application",
+                secret: null,
+                grantTypes: new List<string>
+                {
+                    OpenIddictConstants.GrantTypes.AuthorizationCode
+                },
+                scopes: commonScopes,
+                redirectUri: $"{vueClientRootUrl}signin-oidc",
+                clientUri: vueClientRootUrl,
+                postLogoutRedirectUri: $"{vueClientRootUrl}signout-callback-oidc"
+            );
+        }
     }
 
     private async Task CreateApplicationAsync(
