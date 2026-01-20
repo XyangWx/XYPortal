@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
@@ -108,27 +107,12 @@ public class XYPortalWebModule : AbpModule
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
 
-        //// 这段代码用来解决使用http://后点设置菜单报错的问题
 		if (!configuration.GetValue<bool>("App:RequireHttps"))
-        {
-            context.Services.AddAntiforgery(
-                options =>
-                {
-                    options.SuppressXFrameOptionsHeader = true;
-                    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-					options.Cookie.Name = ".AspNetCore.Antiforgery.AbpXsrf";
-				});
+		{
+			context.Services.AddSameSiteCookiePolicy();
+		}
 
-            context.Services.Configure<CookiePolicyOptions>(
-                options =>
-                {
-                    options.CheckConsentNeeded = c => false;
-                    options.MinimumSameSitePolicy = SameSiteMode.None;
-                    options.Secure = CookieSecurePolicy.None;
-                });
-        }
-        
-        ConfigureAuthentication(context);
+		ConfigureAuthentication(context);
         ConfigureUrls(configuration);
         ConfigureBundles();
         ConfigureVirtualFileSystem(hostingEnvironment);
@@ -137,6 +121,40 @@ public class XYPortalWebModule : AbpModule
         ConfigureSwaggerServices(context.Services);
 
         context.Services.AddMapperlyObjectMapper<XYPortalWebModule>();
+    }
+
+    private void CheckSameSite(HttpContext httpContext, CookieOptions options)
+    {
+        if (options.SameSite == SameSiteMode.None)
+        {
+            var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+            if (DisallowsSameSiteNone(userAgent))
+            {
+                options.SameSite = SameSiteMode.Unspecified;
+            }
+        }
+    }
+
+    private bool DisallowsSameSiteNone(string userAgent)
+    {
+        if (userAgent.Contains("CPU iPhone OS 12") ||
+            userAgent.Contains("iPad; CPU OS 12"))
+        {
+            return true;
+        }
+
+        if (userAgent.Contains("Macintosh; Intel Mac OS X 10_14") &&
+            userAgent.Contains("Version/") && userAgent.Contains("Safari"))
+        {
+            return true;
+        }
+
+        if (userAgent.Contains("Chrome/5") || userAgent.Contains("Chrome/6"))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
@@ -232,6 +250,7 @@ public class XYPortalWebModule : AbpModule
     {
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
+        var configuration = context.GetConfiguration();
 
         if (env.IsDevelopment())
         {
@@ -245,6 +264,10 @@ public class XYPortalWebModule : AbpModule
             app.UseErrorPage();
         }
 
+        if (!configuration.GetValue<bool>("App:RequireHttps"))
+        {
+            app.UseCookiePolicy(); // Add this line before UseCorrelationId
+        }
         app.UseCorrelationId();
         app.MapAbpStaticAssets();
         app.UseRouting();
