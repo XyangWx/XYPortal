@@ -1,16 +1,14 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using XYPortal.Localization;
-using XYPortal.MultiTenancy;
 using Volo.Abp.Account.Localization;
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Identity.Web.Navigation;
 using Volo.Abp.SettingManagement.Web.Navigation;
 using Volo.Abp.TenantManagement.Web.Navigation;
 using Volo.Abp.UI.Navigation;
-using Volo.Abp.Users;
+using XYPortal.Localization;
+using XYPortal.MultiTenancy;
 
 namespace XYPortal.Web.Menus;
 

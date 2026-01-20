@@ -19,6 +19,7 @@ using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
+using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared.Toolbars;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.FeatureManagement;
@@ -224,7 +225,12 @@ public class XYPortalWebModule : AbpModule
         {
             options.MenuContributors.Add(new XYPortalMenuContributor());
         });
-    }
+
+		Configure<AbpToolbarOptions>(options =>
+		{
+			options.Contributors.Add(new XYPortalToolbarContributor());
+		});
+	}
 
     private void ConfigureAutoApiControllers()
     {
