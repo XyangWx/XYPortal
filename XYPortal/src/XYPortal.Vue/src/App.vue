@@ -5,15 +5,11 @@
       <a-menu v-model:selectedKeys="selectedKeys" theme="dark" mode="inline">
         <a-menu-item key="Home" @click="$router.push('/')">
           <user-outlined />
-          <span>Dashboard</span>
+          <span>主页</span>
         </a-menu-item>
-        <a-menu-item key="Nav1" @click="$router.push('/nav1')">
-          <video-camera-outlined />
-          <span>nav 1</span>
-        </a-menu-item>
-        <a-menu-item key="Nav2" @click="$router.push('/nav2')">
-          <upload-outlined />
-          <span>nav 2</span>
+        <a-menu-item key="Management" @click="$router.push('/management')">
+          <setting-outlined />
+          <span>管理</span>
         </a-menu-item>
       </a-menu>
     </a-layout-sider>
@@ -31,8 +27,10 @@
             @click="() => (collapsed = !collapsed)"
           />
           <a-breadcrumb style="margin-left: 16px">
-            <a-breadcrumb-item>Home</a-breadcrumb-item>
-            <a-breadcrumb-item>{{ $route.name }}</a-breadcrumb-item>
+            <a-breadcrumb-item>主页</a-breadcrumb-item>
+            <a-breadcrumb-item v-if="$route.name !== 'Home'">
+              {{ $route.name === 'MyAccount' ? '我的账户' : $route.name }}
+            </a-breadcrumb-item>
           </a-breadcrumb>
         </div>
         <div style="padding-right: 24px">
@@ -42,12 +40,16 @@
                 <a-avatar size="small">
                   <template #icon><UserOutlined /></template>
                 </a-avatar>
-                {{ authState.user?.profile?.name || authState.user?.profile?.preferred_username || 'User' }}
+                {{ authState.displayName }}
                 <down-outlined />
               </a-space>
             </a>
             <template #overlay>
               <a-menu>
+                <a-menu-item key="account" @click="$router.push('/my-account')">
+                  我的账户
+                </a-menu-item>
+                <a-menu-divider />
                 <a-menu-item key="logout" @click="handleLogout">
                   退出登录
                 </a-menu-item>
@@ -71,8 +73,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import {
   UserOutlined,
-  VideoCameraOutlined,
-  UploadOutlined,
+  SettingOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   DownOutlined,

@@ -1,16 +1,20 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import Home from '../views/Home.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    component: Home,
+    component: () => import('../views/Welcome.vue'),
   },
   {
     path: '/signin-oidc',
     name: 'SigninCallback',
     component: () => import('../views/SigninCallback.vue'),
+  },
+  {
+    path: '/my-account',
+    name: 'MyAccount',
+    component: () => import('../views/MyAccount.vue'),
   },
   {
     path: '/nav1',
