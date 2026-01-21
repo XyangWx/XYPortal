@@ -36,13 +36,13 @@
           </a-breadcrumb>
         </div>
         <div style="padding-right: 24px">
-          <a-dropdown v-if="isAuthenticated">
+          <a-dropdown v-if="authState.isAuthenticated">
             <a class="ant-dropdown-link" @click.prevent>
               <a-space>
                 <a-avatar size="small">
                   <template #icon><UserOutlined /></template>
                 </a-avatar>
-                {{ username }}
+                {{ authState.user?.profile?.name || authState.user?.profile?.preferred_username || 'User' }}
                 <down-outlined />
               </a-space>
             </a>
@@ -77,13 +77,11 @@ import {
   MenuFoldOutlined,
   DownOutlined,
 } from '@ant-design/icons-vue';
-import { authService } from './services/authService';
+import { authService, authState } from './services/authService';
 
 const route = useRoute();
 const selectedKeys = ref<string[]>(['Home']);
 const collapsed = ref<boolean>(false);
-const isAuthenticated = ref<boolean>(false);
-const username = ref<string>('');
 
 // 监听路由变化更新菜单选中状态
 watch(
@@ -96,11 +94,7 @@ watch(
 );
 
 onMounted(async () => {
-  const user = await authService.getUser();
-  if (user) {
-    isAuthenticated.value = true;
-    username.value = user.profile.name || user.profile.preferred_username || 'User';
-  }
+  await authService.getUser();
 });
 
 const handleLogin = async () => {

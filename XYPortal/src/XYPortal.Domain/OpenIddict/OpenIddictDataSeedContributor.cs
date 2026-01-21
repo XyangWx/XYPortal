@@ -146,7 +146,7 @@ public class OpenIddictDataSeedContributor : IDataSeedContributor, ITransientDep
                 scopes: commonScopes,
                 redirectUri: $"{vueClientRootUrl}signin-oidc",
                 clientUri: vueClientRootUrl,
-                postLogoutRedirectUri: $"{vueClientRootUrl}signout-callback-oidc"
+                postLogoutRedirectUri: vueClientRootUrl
             );
         }
     }
