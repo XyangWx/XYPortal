@@ -17,18 +17,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/MyAccount.vue'),
   },
   {
-    path: '/nav1',
-    name: 'Nav1',
-    component: () => import('../views/Placeholder.vue'),
-  },
-  {
-    path: '/nav2',
-    name: 'Nav2',
-    component: () => import('../views/Placeholder.vue'),
-  },
-  {
-    path: '/nav3',
-    name: 'Nav3',
+    path: '/management',
+    name: 'Management',
     component: () => import('../views/Placeholder.vue'),
   },
 ];

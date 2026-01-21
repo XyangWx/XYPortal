@@ -29,7 +29,7 @@
           <a-breadcrumb style="margin-left: 16px">
             <a-breadcrumb-item>主页</a-breadcrumb-item>
             <a-breadcrumb-item v-if="$route.name !== 'Home'">
-              {{ $route.name === 'MyAccount' ? '我的账户' : $route.name }}
+              {{ $route.name === 'MyAccount' ? '我的账户' : ($route.name === 'Management' ? '管理' : $route.name) }}
             </a-breadcrumb-item>
           </a-breadcrumb>
         </div>
