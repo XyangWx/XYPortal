@@ -19,7 +19,31 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/management',
     name: 'Management',
-    component: () => import('../views/Placeholder.vue'),
+    redirect: '/management/identity',
+    children: [
+      {
+        path: 'identity',
+        name: 'Identity',
+        redirect: '/management/identity/roles',
+        children: [
+          {
+            path: 'roles',
+            name: 'Roles',
+            component: () => import('../views/Placeholder.vue'),
+          },
+          {
+            path: 'users',
+            name: 'Users',
+            component: () => import('../views/Placeholder.vue'),
+          },
+        ],
+      },
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: () => import('../views/Settings.vue'),
+      },
+    ],
   },
 ];
 

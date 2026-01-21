@@ -7,10 +7,20 @@
           <user-outlined />
           <span>主页</span>
         </a-menu-item>
-        <a-menu-item key="Management" @click="$router.push('/management')">
-          <setting-outlined />
-          <span>管理</span>
-        </a-menu-item>
+        <a-sub-menu v-if="authState.isAuthenticated" key="Management">
+          <template #title>
+            <span>
+              <setting-outlined />
+              <span>管理</span>
+            </span>
+          </template>
+          <a-sub-menu key="Identity">
+            <template #title>身份认证管理</template>
+            <a-menu-item key="Roles" @click="$router.push('/management/identity/roles')">角色</a-menu-item>
+            <a-menu-item key="Users" @click="$router.push('/management/identity/users')">用户</a-menu-item>
+          </a-sub-menu>
+          <a-menu-item key="Settings" @click="$router.push('/management/settings')">设置</a-menu-item>
+        </a-sub-menu>
       </a-menu>
     </a-layout-sider>
     <a-layout>
@@ -27,10 +37,11 @@
             @click="() => (collapsed = !collapsed)"
           />
           <a-breadcrumb style="margin-left: 16px">
-            <a-breadcrumb-item>主页</a-breadcrumb-item>
-            <a-breadcrumb-item v-if="$route.name !== 'Home'">
-              {{ $route.name === 'MyAccount' ? '我的账户' : ($route.name === 'Management' ? '管理' : $route.name) }}
-            </a-breadcrumb-item>
+            <template v-if="breadcrumbItems.length > 0">
+              <a-breadcrumb-item v-for="(item, index) in breadcrumbItems" :key="index">
+                {{ item }}
+              </a-breadcrumb-item>
+            </template>
           </a-breadcrumb>
         </div>
         <div style="padding-right: 24px">
@@ -69,7 +80,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import {
   UserOutlined,
@@ -83,6 +94,43 @@ import { authService, authState } from './services/authService';
 const route = useRoute();
 const selectedKeys = ref<string[]>(['Home']);
 const collapsed = ref<boolean>(false);
+
+// 路由名称到中文的映射
+const routeNameMap: Record<string, string> = {
+  Home: '主页',
+  MyAccount: '我的账户',
+  Management: '管理',
+  Identity: '身份认证管理',
+  Roles: '角色',
+  Users: '用户',
+  Settings: '设置',
+};
+
+// 计算面包屑
+const breadcrumbItems = computed(() => {
+  const name = route.name as string;
+  
+  // Welcome 页面不显示面包屑
+  if (name === 'Home') {
+    return [];
+  }
+  
+  const items: string[] = [];
+  
+  // 根据路由层级构建面包屑
+  if (name === 'MyAccount') {
+    items.push('我的账户');
+  } else if (name === 'Roles' || name === 'Users') {
+    items.push('管理');
+    items.push('身份认证管理');
+    items.push(routeNameMap[name]);
+  } else if (name === 'Settings') {
+    items.push('管理');
+    items.push('设置');
+  }
+  
+  return items;
+});
 
 // 监听路由变化更新菜单选中状态
 watch(
