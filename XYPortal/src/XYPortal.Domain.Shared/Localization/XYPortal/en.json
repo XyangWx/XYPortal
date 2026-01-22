@@ -4,6 +4,17 @@
     "AppName": "XYPortal",
     "Menu:Home": "Home",
     "Welcome": "Welcome",
-    "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information, visit abp.io."
+    "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information, visit abp.io.",
+    "Feature:XYPortal": "XYPortal Features",
+    "Feature:Test": "Test Feature",
+    "Feature:TestDescription": "Main switch for test feature",
+    "Feature:TestEnable": "Enable Test",
+    "Feature:TestEnableDescription": "Whether to enable test feature",
+    "Feature:TestNumbValue": "Number Value",
+    "Feature:TestNumbValueDescription": "Test feature number value configuration (0-1000000)",
+    "Feature:TestDecimalValue": "Decimal Value",
+    "Feature:TestDecimalValueDescription": "Test feature decimal value configuration (0-1000000)",
+    "Feature:TestStringValue": "String Value",
+    "Feature:TestStringValueDescription": "Test feature string value configuration (max 256 characters)"
   }
 }
