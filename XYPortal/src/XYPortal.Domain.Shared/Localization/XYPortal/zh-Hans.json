@@ -1,20 +1,23 @@
 {
   "culture": "zh-Hans",
-  "texts": {
-    "AppName": "XYPortal",
-    "Menu:Home": "首页",
-    "Welcome": "欢迎",
-    "LongWelcomeMessage": "欢迎使用本应用程序。这是一个基于 ABP 框架的启动项目。更多信息,请访问 abp.io。",
-    "Feature:XYPortal": "XYPortal功能",
-    "Feature:Test": "测试功能",
-    "Feature:TestDescription": "测试功能的主开关",
-    "Feature:TestEnable": "启用测试",
-    "Feature:TestEnableDescription": "是否启用测试功能",
-    "Feature:TestNumbValue": "数字值",
-    "Feature:TestNumbValueDescription": "测试功能的数字值配置(0-1000000)",
-    "Feature:TestDecimalValue": "小数值",
-    "Feature:TestDecimalValueDescription": "测试功能的小数值配置(0-1000000)",
-    "Feature:TestStringValue": "字符串值",
-    "Feature:TestStringValueDescription": "测试功能的字符串值配置(最大256字符)"
-  }
+    "texts": {
+        "AppName": "XYPortal",
+        "Menu:Home": "首页",
+        "Welcome": "欢迎",
+        "LongWelcomeMessage": "欢迎使用本应用程序。这是一个基于 ABP 框架的启动项目。更多信息,请访问 abp.io。",
+        "Feature:XYPortal": "XYPortal功能",
+        "Feature:Test": "测试功能",
+        "Feature:TestDescription": "测试功能的主开关",
+        "Feature:TestEnable": "启用测试",
+        "Feature:TestEnableDescription": "是否启用测试功能",
+        "Feature:TestNumbValue": "数字值",
+        "Feature:TestNumbValueDescription": "测试功能的数字值配置(0-1000000)",
+        "Feature:TestDecimalValue": "小数值",
+        "Feature:TestDecimalValueDescription": "测试功能的小数值配置(0-1000000)",
+        "Feature:TestStringValue": "字符串值",
+        "Feature:TestStringValueDescription": "测试功能的字符串值配置(最大256字符)",
+        "Feature:Test_1": "测试功能 2",
+        "Feature:TestBooleanValue": "布尔值",
+        "Feature:TestBooleanValueDescription": "测试功能的布尔值" 
+    }
 }
