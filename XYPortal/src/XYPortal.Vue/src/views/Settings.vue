@@ -5,10 +5,9 @@
         <a-tab-pane key="features" tab="功能管理">
           <div class="tab-content">
             <a-typography-title :level="4">功能管理</a-typography-title>
-            <a-typography-paragraph>
-              在这里配置系统的功能开关和相关设置。
-            </a-typography-paragraph>
-            <!-- 功能管理内容区域 -->
+            <a-button type="primary" @click="openFeatureManagementDialog">
+              打开功能管理对话框
+            </a-button>
           </div>
         </a-tab-pane>
         <a-tab-pane key="email" tab="邮件">
@@ -139,12 +138,90 @@
         </a-button>
       </template>
     </a-modal>
+
+    <!-- 功能管理对话框 -->
+    <a-modal
+      v-model:open="featureManagementModalVisible"
+      title="功能管理"
+      width="800px"
+      :maskClosable="false"
+      :closable="false"
+    >
+      <a-spin :spinning="loadingFeatures">
+        <div class="feature-management-content">
+          <div v-if="!featureGroups || featureGroups.length === 0" style="text-align: center; padding: 40px;">
+            <a-empty description="暂无功能数据" />
+          </div>
+          <div v-else>
+            <a-collapse v-model:activeKey="activeFeatureGroups" :bordered="false">
+              <a-collapse-panel 
+                v-for="group in featureGroups" 
+                :key="group.name" 
+                :header="group.displayName || group.name"
+              >
+                <div 
+                  v-for="feature in (group.features || [])" 
+                  :key="feature.name" 
+                  :style="{ paddingLeft: ((feature.depth || 0) * 20) + 'px', marginBottom: '16px' }"
+                >
+                  <!-- Toggle类型 -->
+                  <div v-if="feature.valueType && feature.valueType.name === 'ToggleStringValueType'" class="feature-item">
+                    <a-switch 
+                      v-model:checked="featureValues[feature.name]"
+                      :checked-value="'true'"
+                      :un-checked-value="'false'"
+                    />
+                    <span style="margin-left: 8px; font-weight: 500;">{{ feature.displayName || feature.name }}</span>
+                    <span v-if="feature.description" style="margin-left: 8px; color: #999; font-size: 12px;">
+                      ({{ feature.description }})
+                    </span>
+                  </div>
+                  <!-- FreeText类型 -->
+                  <div v-else-if="feature.valueType && feature.valueType.name === 'FreeTextStringValueType'" class="feature-item">
+                    <div style="margin-bottom: 4px;">
+                      <span style="font-weight: 500;">{{ feature.displayName || feature.name }}</span>
+                      <span v-if="feature.description" style="margin-left: 8px; color: #999; font-size: 12px;">
+                        ({{ feature.description }})
+                      </span>
+                    </div>
+                    <a-input 
+                      v-if="feature.valueType.validator && feature.valueType.validator.name === 'NUMERIC'"
+                      v-model:value="featureValues[feature.name]"
+                      type="number"
+                      :min="feature.valueType.validator.properties?.MinValue"
+                      :max="feature.valueType.validator.properties?.MaxValue"
+                      style="width: 300px;"
+                    />
+                    <a-input 
+                      v-else
+                      v-model:value="featureValues[feature.name]"
+                      :maxlength="256"
+                      style="width: 300px;"
+                    />
+                  </div>
+                </div>
+              </a-collapse-panel>
+            </a-collapse>
+          </div>
+        </div>
+      </a-spin>
+
+      <template #footer>
+        <a-space>
+          <a-button @click="handleCancelFeatureManagement">取消</a-button>
+          <a-button @click="handleResetFeatureManagement">重置为默认值</a-button>
+          <a-button type="primary" :loading="savingFeatures" @click="handleSaveFeatureManagement">
+            保存
+          </a-button>
+        </a-space>
+      </template>
+    </a-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue';
-import { message } from 'ant-design-vue';
+import { message, Modal } from 'ant-design-vue';
 import { authService } from '../services/authService';
 import axios from 'axios';
 
@@ -155,6 +232,12 @@ const loading = ref(false);
 const emailFormRef = ref();
 const testEmailModalVisible = ref(false);
 const testEmailFormRef = ref();
+const featureManagementModalVisible = ref(false);
+const savingFeatures = ref(false);
+const loadingFeatures = ref(false);
+const featureGroups = ref<any[]>([]);
+const featureValues = reactive<Record<string, any>>({});
+const activeFeatureGroups = ref<string[]>([]);
 
 // 邮件设置表单数据
 const emailForm = reactive({
@@ -370,6 +453,144 @@ const handleCancelTestEmail = () => {
   testEmailForm.body = '';
   // 清除验证错误
   testEmailFormRef.value?.clearValidate();
+};
+
+// 获取功能列表
+const fetchFeatures = async () => {
+  try {
+    loadingFeatures.value = true;
+    const user = await authService.getUser();
+    if (!user) {
+      message.error('未登录，请先登录');
+      return;
+    }
+
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const response = await axios.get(`${baseUrl}/api/feature-management/features?providerName=T`, {
+      headers: {
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    });
+
+    featureGroups.value = response.data.groups || [];
+    
+    // 清空并重新初始化featureValues
+    Object.keys(featureValues).forEach(key => {
+      delete featureValues[key];
+    });
+    
+    featureGroups.value.forEach(group => {
+      if (group.features && Array.isArray(group.features)) {
+        group.features.forEach((feature: any) => {
+          if (feature && feature.name) {
+            featureValues[feature.name] = feature.value || '';
+          }
+        });
+      }
+    });
+    
+    // 默认展开所有分组
+    activeFeatureGroups.value = featureGroups.value.map(g => g.name);
+  } catch (error) {
+    message.error('获取功能列表失败');
+    console.error('获取功能列表失败:', error);
+  } finally {
+    loadingFeatures.value = false;
+  }
+};
+
+// 打开功能管理对话框
+const openFeatureManagementDialog = () => {
+  featureManagementModalVisible.value = true;
+  // 延迟加载数据，确保对话框先渲染
+  setTimeout(() => {
+    fetchFeatures();
+  }, 100);
+};
+
+// 取消功能管理
+const handleCancelFeatureManagement = () => {
+  featureManagementModalVisible.value = false;
+};
+
+// 重置功能为默认值
+const handleResetFeatureManagement = async () => {
+  // 显示确认对话框
+  Modal.confirm({
+    title: '确认重置',
+    content: '重置操作将恢复所有功能设置为默认值，此操作不可撤销，确定要继续吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk: async () => {
+      try {
+        savingFeatures.value = true;
+        
+        const user = await authService.getUser();
+        if (!user) {
+          message.error('未登录，请先登录');
+          return;
+        }
+
+        const baseUrl = import.meta.env.VITE_API_BASE_URL;
+        await axios.delete(
+          `${baseUrl}/api/feature-management/features?providerName=T`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.access_token}`,
+            },
+          }
+        );
+
+        message.success('已重置为默认值');
+        // 关闭功能管理对话框
+        featureManagementModalVisible.value = false;
+      } catch (error) {
+        message.error('重置失败，请重试');
+        console.error('重置功能设置失败:', error);
+      } finally {
+        savingFeatures.value = false;
+      }
+    },
+  });
+};
+
+// 保存功能管理
+const handleSaveFeatureManagement = async () => {
+  try {
+    savingFeatures.value = true;
+    
+    const user = await authService.getUser();
+    if (!user) {
+      message.error('未登录，请先登录');
+      return;
+    }
+
+    // 构建保存的数据格式
+    const features = Object.keys(featureValues).map(name => ({
+      name: name,
+      value: featureValues[name]
+    }));
+
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    await axios.put(
+      `${baseUrl}/api/feature-management/features?providerName=T`,
+      { features },
+      {
+        headers: {
+          Authorization: `Bearer ${user.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    message.success('功能设置保存成功');
+    featureManagementModalVisible.value = false;
+  } catch (error) {
+    message.error('保存失败，请重试');
+    console.error('保存功能设置失败:', error);
+  } finally {
+    savingFeatures.value = false;
+  }
 };
 </script>
 
