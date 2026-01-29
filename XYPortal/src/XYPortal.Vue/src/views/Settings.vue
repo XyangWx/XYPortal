@@ -70,7 +70,6 @@
                   <a-button type="primary" @click="saveEmailSettings" :loading="saving">
                     保存
                   </a-button>
-                  <a-button @click="resetEmailSettings">重置</a-button>
                   <a-button @click="sendTestEmail" :loading="sendingTest">
                     发送测试邮件
                   </a-button>
@@ -284,16 +283,6 @@ const testEmailRules = {
   ],
 };
 
-// 初始邮件设置（用于重置）
-const initialEmailForm = {
-  defaultFromDisplayName: '',
-  defaultFromAddress: '',
-  host: '',
-  port: 587,
-  enableSsl: false,
-  useDefaultCredentials: true,
-};
-
 // 获取邮件设置
 const fetchEmailSettings = async () => {
   try {
@@ -379,12 +368,6 @@ const saveEmailSettings = async () => {
   } finally {
     saving.value = false;
   }
-};
-
-// 重置邮件设置
-const resetEmailSettings = () => {
-  Object.assign(emailForm, initialEmailForm);
-  message.info('已重置为默认值');
 };
 
 // 发送测试邮件
