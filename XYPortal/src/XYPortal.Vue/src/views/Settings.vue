@@ -2,7 +2,7 @@
   <div class="settings">
     <a-card :bordered="false">
       <a-tabs v-model:activeKey="activeKey">
-        <a-tab-pane key="features" tab="功能管理">
+        <a-tab-pane v-if="hasFeatureManagementPermission" key="features" tab="功能管理">
           <div class="tab-content">
             <a-typography-title :level="4">功能管理</a-typography-title>
             <a-button type="primary" @click="openFeatureManagementDialog">
@@ -10,7 +10,7 @@
             </a-button>
           </div>
         </a-tab-pane>
-        <a-tab-pane key="email" tab="邮件">
+        <a-tab-pane v-if="hasEmailingPermission" key="email" tab="邮件">
           <div class="tab-content">
             <a-typography-title :level="4">邮件设置</a-typography-title>
             <!-- 邮件设置表单 -->
@@ -70,7 +70,7 @@
                   <a-button type="primary" @click="saveEmailSettings" :loading="saving">
                     保存
                   </a-button>
-                  <a-button @click="sendTestEmail" :loading="sendingTest">
+                  <a-button v-if="hasEmailingTestPermission" @click="sendTestEmail" :loading="sendingTest">
                     发送测试邮件
                   </a-button>
                 </a-space>
@@ -219,12 +219,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { message, Modal } from 'ant-design-vue';
 import { authService } from '../services/authService';
+import { permissionService, Permissions, permissionState } from '../services/permissionService';
 import axios from 'axios';
 
-const activeKey = ref('features');
+const activeKey = ref<string>('');
 const saving = ref(false);
 const sendingTest = ref(false);
 const loading = ref(false);
@@ -237,6 +238,41 @@ const loadingFeatures = ref(false);
 const featureGroups = ref<any[]>([]);
 const featureValues = reactive<Record<string, any>>({});
 const activeFeatureGroups = ref<string[]>([]);
+
+// 权限检查
+const hasFeatureManagementPermission = computed(() => {
+  // 如果权限还未加载，默认显示（避免闪烁）
+  if (!permissionState.loaded) return true;
+  return permissionService.hasPermission(Permissions.FeatureManagement.ManageHostFeatures);
+});
+
+const hasEmailingPermission = computed(() => {
+  // 如果权限还未加载，默认显示（避免闪烁）
+  if (!permissionState.loaded) return true;
+  return permissionService.hasPermission(Permissions.SettingManagement.Emailing);
+});
+
+const hasEmailingTestPermission = computed(() => {
+  // 如果权限还未加载，默认不显示测试按钮
+  if (!permissionState.loaded) return false;
+  return permissionService.hasPermission(Permissions.SettingManagement.EmailingTest);
+});
+
+// 监听权限变化，自动选中第一个可见的Tab
+watch(
+  [hasFeatureManagementPermission, hasEmailingPermission, () => permissionState.loaded],
+  () => {
+    if (permissionState.loaded && !activeKey.value) {
+      // 权限加载完成且没有选中Tab时，自动选中第一个可见的Tab
+      if (hasFeatureManagementPermission.value) {
+        activeKey.value = 'features';
+      } else if (hasEmailingPermission.value) {
+        activeKey.value = 'email';
+      }
+    }
+  },
+  { immediate: true }
+);
 
 // 邮件设置表单数据
 const emailForm = reactive({

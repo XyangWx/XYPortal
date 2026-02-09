@@ -7,19 +7,19 @@
           <user-outlined />
           <span>主页</span>
         </a-menu-item>
-        <a-sub-menu v-if="authState.isAuthenticated" key="Management">
+        <a-sub-menu v-if="hasManagementPermission" key="Management">
           <template #title>
             <span>
               <setting-outlined />
               <span>管理</span>
             </span>
           </template>
-          <a-sub-menu key="Identity">
+          <a-sub-menu v-if="hasIdentityPermission" key="Identity">
             <template #title>身份认证管理</template>
-            <a-menu-item key="Roles" @click="$router.push('/management/identity/roles')">角色</a-menu-item>
-            <a-menu-item key="Users" @click="$router.push('/management/identity/users')">用户</a-menu-item>
+            <a-menu-item v-if="hasRolesPermission" key="Roles" @click="$router.push('/management/identity/roles')">角色</a-menu-item>
+            <a-menu-item v-if="hasUsersPermission" key="Users" @click="$router.push('/management/identity/users')">用户</a-menu-item>
           </a-sub-menu>
-          <a-menu-item key="Settings" @click="$router.push('/management/settings')">设置</a-menu-item>
+          <a-menu-item v-if="hasSettingsPermission" key="Settings" @click="$router.push('/management/settings')">设置</a-menu-item>
         </a-sub-menu>
       </a-menu>
     </a-layout-sider>
@@ -90,6 +90,7 @@ import {
   DownOutlined,
 } from '@ant-design/icons-vue';
 import { authService, authState } from './services/authService';
+import { permissionService, Permissions } from './services/permissionService';
 
 const route = useRoute();
 const selectedKeys = ref<string[]>(['Home']);
@@ -132,6 +133,55 @@ const breadcrumbItems = computed(() => {
   return items;
 });
 
+// 权限检查计算属性
+// 检查是否有身份认证管理权限（角色或用户任一权限）
+const hasIdentityPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasAnyPermission(
+    Permissions.Identity.Roles,
+    Permissions.Identity.Users
+  );
+});
+
+// 检查是否有角色权限
+const hasRolesPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.Identity.Roles);
+});
+
+// 检查是否有用户权限
+const hasUsersPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.Identity.Users);
+});
+
+// 检查是否有设置权限（功能管理或邮件任一权限）
+const hasSettingsPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasAnyPermission(
+    Permissions.FeatureManagement.ManageHostFeatures,
+    Permissions.SettingManagement.Emailing
+  );
+});
+
+// 检查是否有功能管理权限
+const hasFeatureManagementPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.FeatureManagement.ManageHostFeatures);
+});
+
+// 检查是否有邮件设置权限
+const hasEmailingPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.SettingManagement.Emailing);
+});
+
+// 检查是否有管理菜单权限（身份认证或设置任一权限）
+const hasManagementPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return hasIdentityPermission.value || hasSettingsPermission.value;
+});
+
 // 监听路由变化更新菜单选中状态
 watch(
   () => route.name,
@@ -144,6 +194,10 @@ watch(
 
 onMounted(async () => {
   await authService.getUser();
+  // 获取用户权限
+  if (authState.isAuthenticated) {
+    await permissionService.getPermissions();
+  }
 });
 
 const handleLogin = async () => {
@@ -156,6 +210,8 @@ const handleLogin = async () => {
 
 const handleLogout = async () => {
   try {
+    // 清除权限
+    permissionService.clearPermissions();
     await authService.logout();
   } catch (error) {
     console.error('Logout failed:', error);
