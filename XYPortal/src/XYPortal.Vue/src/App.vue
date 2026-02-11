@@ -19,6 +19,10 @@
             <a-menu-item v-if="hasRolesPermission" key="Roles" @click="$router.push('/management/identity/roles')">角色</a-menu-item>
             <a-menu-item v-if="hasUsersPermission" key="Users" @click="$router.push('/management/identity/users')">用户</a-menu-item>
           </a-sub-menu>
+          <a-sub-menu v-if="hasOpenIddictPermission" key="OpenIddict">
+            <template #title>OpenIdDict管理</template>
+            <a-menu-item key="OpenIddictApplications" @click="$router.push('/management/openiddict/applications')">应用管理</a-menu-item>
+          </a-sub-menu>
           <a-menu-item v-if="hasSettingsPermission" key="Settings" @click="$router.push('/management/settings')">设置</a-menu-item>
         </a-sub-menu>
       </a-menu>
@@ -105,6 +109,8 @@ const routeNameMap: Record<string, string> = {
   Roles: '角色',
   Users: '用户',
   Settings: '设置',
+  OpenIddict: 'OpenIdDict管理',
+  OpenIddictApplications: '应用管理',
 };
 
 // 计算面包屑
@@ -128,6 +134,10 @@ const breadcrumbItems = computed(() => {
   } else if (name === 'Settings') {
     items.push('管理');
     items.push('设置');
+  } else if (name === 'OpenIddictApplications') {
+    items.push('管理');
+    items.push('OpenIdDict管理');
+    items.push('应用管理');
   }
   
   return items;
@@ -176,10 +186,16 @@ const hasEmailingPermission = computed(() => {
   return permissionService.hasPermission(Permissions.SettingManagement.Emailing);
 });
 
-// 检查是否有管理菜单权限（身份认证或设置任一权限）
+// 检查是否有OpenIdDict管理权限
+const hasOpenIddictPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.OpenIdDict.ApplicationManager);
+});
+
+// 检查是否有管理菜单权限（身份认证或设置或OpenIdDict任一权限）
 const hasManagementPermission = computed(() => {
   if (!authState.isAuthenticated) return false;
-  return hasIdentityPermission.value || hasSettingsPermission.value;
+  return hasIdentityPermission.value || hasSettingsPermission.value || hasOpenIddictPermission.value;
 });
 
 // 监听路由变化更新菜单选中状态

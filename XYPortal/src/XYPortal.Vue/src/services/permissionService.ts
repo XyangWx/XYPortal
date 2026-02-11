@@ -24,6 +24,13 @@ export const Permissions = {
     Emailing: 'SettingManagement.Emailing',
     EmailingTest: 'SettingManagement.Emailing.Test',
   },
+  OpenIdDict: {
+    Manager: 'XYPortal.OpenIdDictManager',
+    ApplicationManager: 'XYPortal.OpenIdDictManager.ApplicationManager',
+    ApplicationCreate: 'XYPortal.OpenIdDictManager.ApplicationManager.Create',
+    ApplicationEdit: 'XYPortal.OpenIdDictManager.ApplicationManager.Edit',
+    ApplicationDelete: 'XYPortal.OpenIdDictManager.ApplicationManager.Delete',
+  },
 };
 
 // 权限状态

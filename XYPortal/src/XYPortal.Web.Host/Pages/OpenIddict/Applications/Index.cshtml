@@ -1,0 +1,35 @@
+@page
+@using XYPortal.Permissions
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using XYPortal.Localization
+@model XYPortal.Web.Pages.OpenIddict.Applications.IndexModel
+@inject IAuthorizationService AuthorizationService
+@inject IHtmlLocalizer<XYPortalResource> L
+@section styles {
+    <abp-style src="/Pages/OpenIddict/Applications/index.css" />
+}
+@section scripts {
+    <abp-script src="/Pages/OpenIddict/Applications/index.js" />
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="card-title">@L["Menu:OpenIddictApplications"]</h5>
+            </div>
+            <div class="col-md-6 text-end">
+                @if ((await AuthorizationService.AuthorizeAsync(User, XYPortalPermissions.OpenIdDictApplicationCreate)).Succeeded)
+                {
+                    <button id="NewOpenIddictApplicationButton" class="btn btn-primary">
+                        <i class="fa fa-plus"></i> @L["NewApplication"]
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <table id="OpenIddictApplicationsTable" class="table table-striped"></table>
+    </div>
+</div>

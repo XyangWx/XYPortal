@@ -9,6 +9,7 @@ using Volo.Abp.TenantManagement.Web.Navigation;
 using Volo.Abp.UI.Navigation;
 using XYPortal.Localization;
 using XYPortal.MultiTenancy;
+using XYPortal.Permissions;
 
 namespace XYPortal.Web.Menus;
 
@@ -59,7 +60,22 @@ public class XYPortalMenuContributor : IMenuContributor
         }
 
         administration.SetSubItemOrder(IdentityMenuNames.GroupName, 2);
-        administration.SetSubItemOrder(SettingManagementMenuNames.GroupName, 3);
+        administration.SetSubItemOrder(SettingManagementMenuNames.GroupName, 4);
+
+        var openIddictMenu = new ApplicationMenuItem(
+            XYPortalMenus.OpenIddictManager,
+            l["Menu:OpenIdDictManager"],
+            icon: "fas fa-key",
+            order: 3
+        ).RequirePermissions(XYPortalPermissions.OpenIdDictApplicationManager);
+
+        openIddictMenu.AddItem(new ApplicationMenuItem(
+            XYPortalMenus.OpenIddictApplications,
+            l["Menu:OpenIddictApplications"],
+            "~/OpenIddict/Applications"
+        ).RequirePermissions(XYPortalPermissions.OpenIdDictApplicationManager));
+
+        administration.AddItem(openIddictMenu);
 
         return Task.CompletedTask;
     }
