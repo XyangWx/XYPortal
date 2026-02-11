@@ -11,6 +11,11 @@ export const Permissions = {
     RolesDelete: 'AbpIdentity.Roles.Delete',
     RolesManagePermissions: 'AbpIdentity.Roles.ManagePermissions',
     Users: 'AbpIdentity.Users',
+    UsersCreate: 'AbpIdentity.Users.Create',
+    UsersUpdate: 'AbpIdentity.Users.Update',
+    UsersDelete: 'AbpIdentity.Users.Delete',
+    UsersManagePermissions: 'AbpIdentity.Users.ManagePermissions',
+    UsersManageRoles: 'AbpIdentity.Users.Update.ManageRoles',
   },
   FeatureManagement: {
     ManageHostFeatures: 'FeatureManagement.ManageHostFeatures',

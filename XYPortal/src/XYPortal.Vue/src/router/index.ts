@@ -34,7 +34,7 @@ const routes: Array<RouteRecordRaw> = [
           {
             path: 'users',
             name: 'Users',
-            component: () => import('../views/Placeholder.vue'),
+            component: () => import('../views/Users.vue'),
           },
         ],
       },
