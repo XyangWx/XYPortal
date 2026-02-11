@@ -12,12 +12,15 @@
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { authService } from '../services/authService';
+import { permissionService } from '../services/permissionService';
 
 const router = useRouter();
 
 onMounted(async () => {
   try {
     await authService.signinCallback();
+    // 登录成功后加载权限
+    await permissionService.getPermissions();
     router.push('/');
   } catch (error) {
     console.error('Login callback failed:', error);
