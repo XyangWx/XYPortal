@@ -15,6 +15,11 @@
     "Feature:TestDecimalValue": "Decimal Value",
     "Feature:TestDecimalValueDescription": "Test feature decimal value configuration (0-1000000)",
     "Feature:TestStringValue": "String Value",
-    "Feature:TestStringValueDescription": "Test feature string value configuration (max 256 characters)"
+    "Feature:TestStringValueDescription": "Test feature string value configuration (max 256 characters)",
+    "Permission:OpenIdDictManager": "OpenIdDict Management",
+    "Permission:OpenIdDictApplicationManager": "Application Management",
+    "Permission:OpenIdDictApplicationCreate": "Create",
+    "Permission:OpenIdDictApplicationEdit": "Edit",
+    "Permission:OpenIdDictApplicationDelete": "Delete"
   }
 }

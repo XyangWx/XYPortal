@@ -18,6 +18,11 @@
         "Feature:TestStringValueDescription": "测试功能的字符串值配置(最大256字符)",
         "Feature:Test_1": "测试功能 2",
         "Feature:TestBooleanValue": "布尔值",
-        "Feature:TestBooleanValueDescription": "测试功能的布尔值" 
+        "Feature:TestBooleanValueDescription": "测试功能的布尔值",
+        "Permission:OpenIdDictManager": "OpenIdDict管理",
+        "Permission:OpenIdDictApplicationManager": "应用管理",
+        "Permission:OpenIdDictApplicationCreate": "创建",
+        "Permission:OpenIdDictApplicationEdit": "编辑",
+        "Permission:OpenIdDictApplicationDelete": "删除" 
     }
 }
