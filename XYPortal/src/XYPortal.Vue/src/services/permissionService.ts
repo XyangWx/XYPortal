@@ -6,6 +6,10 @@ import { authService } from './authService';
 export const Permissions = {
   Identity: {
     Roles: 'AbpIdentity.Roles',
+    RolesCreate: 'AbpIdentity.Roles.Create',
+    RolesUpdate: 'AbpIdentity.Roles.Update',
+    RolesDelete: 'AbpIdentity.Roles.Delete',
+    RolesManagePermissions: 'AbpIdentity.Roles.ManagePermissions',
     Users: 'AbpIdentity.Users',
   },
   FeatureManagement: {
