@@ -53,6 +53,11 @@ const routes: Array<RouteRecordRaw> = [
             name: 'OpenIddictApplications',
             component: () => import('../views/OpenIddictApplications.vue'),
           },
+          {
+            path: 'scopes',
+            name: 'OpenIddictScopes',
+            component: () => import('../views/OpenIddictScopes.vue'),
+          },
         ],
       },
     ],

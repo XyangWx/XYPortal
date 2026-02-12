@@ -8,7 +8,7 @@ public class XYPortalPermissionDefinitionProvider : PermissionDefinitionProvider
 {
     public override void Define(IPermissionDefinitionContext context)
     {
-        var myGroup = context.AddGroup(XYPortalPermissions.GroupName);
+        var myGroup = context.AddGroup(XYPortalPermissions.GroupName, L("Permission:PortalManagement"));
 
         var openIddictManager = myGroup.AddPermission(
             XYPortalPermissions.OpenIdDictManager,
@@ -29,6 +29,22 @@ public class XYPortalPermissionDefinitionProvider : PermissionDefinitionProvider
         applicationManager.AddChild(
             XYPortalPermissions.OpenIdDictApplicationDelete,
             L("Permission:OpenIdDictApplicationDelete"));
+
+        var scopeManager = openIddictManager.AddChild(
+            XYPortalPermissions.OpenIdDictScopeManager,
+            L("Permission:OpenIdDictScopeManager"));
+
+        scopeManager.AddChild(
+            XYPortalPermissions.OpenIdDictScopeCreate,
+            L("Permission:OpenIdDictScopeCreate"));
+
+        scopeManager.AddChild(
+            XYPortalPermissions.OpenIdDictScopeEdit,
+            L("Permission:OpenIdDictScopeEdit"));
+
+        scopeManager.AddChild(
+            XYPortalPermissions.OpenIdDictScopeDelete,
+            L("Permission:OpenIdDictScopeDelete"));
     }
 
     private static LocalizableString L(string name)

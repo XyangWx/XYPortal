@@ -74,9 +74,15 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label asp-for="Input.Scopes" class="form-label">@L["Scopes"]</label>
-                <textarea asp-for="Input.Scopes" class="form-control" rows="3" placeholder="@L["ScopesPlaceholder"]"></textarea>
-                <small class="text-muted">@L["OnePerLine"]</small>
+                <label class="form-label">@L["Scopes"]</label>
+                @foreach (var scope in Model.AvailableScopes)
+                {
+                    <div class="form-check">
+                        <input type="checkbox" name="Input.Scopes" value="@scope.Name"
+                               class="form-check-input" id="create_scope_@scope.Name" />
+                        <label class="form-check-label" for="create_scope_@scope.Name">@(scope.DisplayName ?? scope.Name)</label>
+                    </div>
+                }
             </div>
             <div class="mb-3">
                 <label asp-for="Input.RedirectUris" class="form-label">@L["RedirectUris"]</label>
