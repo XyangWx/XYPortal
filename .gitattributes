@@ -1,1 +1,2 @@
 XYPortal.zip filter=lfs diff=lfs merge=lfs -text
+XYPortal.LinkBoard.zip filter=lfs diff=lfs merge=lfs -text
