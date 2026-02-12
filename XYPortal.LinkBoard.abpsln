@@ -1,0 +1,9 @@
+{
+  "id": "28ec5cc6-47bf-4f7d-a84c-091b83cc9b2e",
+  "template": "empty",
+  "modules": {
+    "XYPortal.LinkBoard": {
+      "path": "Modules/XYPortal.LinkBoard.abpmdl"
+    }
+  }
+}
