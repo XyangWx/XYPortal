@@ -27,6 +27,11 @@ public class LinkCategory : FullAuditedAggregateRoot<Guid>
     /// </summary>
     public Guid? DraftOfId { get; set; }
 
+    /// <summary>
+    /// Indicates if this is a system default category that cannot be modified or deleted.
+    /// </summary>
+    public bool IsDefault { get; set; }
+
     protected LinkCategory() { }
 
     public LinkCategory(Guid id, string name, bool isPublic = false) : base(id)

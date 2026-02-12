@@ -12,6 +12,7 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using XYPortal.LinkBoard.EntityFrameworkCore;
 
 namespace XYPortal.EntityFrameworkCore;
 
@@ -73,6 +74,7 @@ public class XYPortalDbContext :
         builder.ConfigureOpenIddict();
         builder.ConfigureFeatureManagement();
         builder.ConfigureTenantManagement();
+        builder.ConfigureLinkBoard();
 
         /* Configure your own tables/entities inside here */
 

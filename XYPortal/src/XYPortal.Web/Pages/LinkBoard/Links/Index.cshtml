@@ -1,0 +1,35 @@
+@page
+@using XYPortal.LinkBoard.Permissions
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using XYPortal.Localization
+@model XYPortal.Web.Pages.LinkBoard.Links.IndexModel
+@inject IAuthorizationService AuthorizationService
+@inject IHtmlLocalizer<XYPortalResource> L
+@section styles {
+    <abp-style src="/Pages/LinkBoard/Links/index.css" />
+}
+@section scripts {
+    <abp-script src="/Pages/LinkBoard/Links/index.js" />
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="card-title">@L["Menu:LinkBoard:Links"]</h5>
+            </div>
+            <div class="col-md-6 text-end">
+                @if ((await AuthorizationService.AuthorizeAsync(User, LinkBoardPermissions.LinkCreate)).Succeeded)
+                {
+                    <button id="NewLinkButton" class="btn btn-primary">
+                        <i class="fa fa-plus"></i> @L["LinkBoard:NewLink"]
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <table id="LinksTable" class="table table-striped"></table>
+    </div>
+</div>

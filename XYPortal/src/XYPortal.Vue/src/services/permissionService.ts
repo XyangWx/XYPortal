@@ -35,6 +35,20 @@ export const Permissions = {
     ScopeEdit: 'XYPortal.OpenIdDictManager.ScopeManager.Edit',
     ScopeDelete: 'XYPortal.OpenIdDictManager.ScopeManager.Delete',
   },
+  LinkBoard: {
+    Admin: 'LinkBoard.Admin',
+    LinkCategoryReview: 'LinkBoard.Admin.LinkCategoryReview',
+    LinkReview: 'LinkBoard.Admin.LinkReview',
+    User: 'LinkBoard.User',
+    LinkCategoryManager: 'LinkBoard.User.LinkCategoryManager',
+    LinkCategoryCreate: 'LinkBoard.User.LinkCategoryManager.Create',
+    LinkCategoryModify: 'LinkBoard.User.LinkCategoryManager.Modify',
+    LinkCategoryDelete: 'LinkBoard.User.LinkCategoryManager.Delete',
+    LinkManager: 'LinkBoard.User.LinkManager',
+    LinkCreate: 'LinkBoard.User.LinkManager.Create',
+    LinkModify: 'LinkBoard.User.LinkManager.Modify',
+    LinkDelete: 'LinkBoard.User.LinkManager.Delete',
+  },
 };
 
 // 权限状态

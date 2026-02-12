@@ -12,11 +12,13 @@ using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using XYPortal.LinkBoard.EntityFrameworkCore;
 
 namespace XYPortal.EntityFrameworkCore;
 
 [DependsOn(
     typeof(XYPortalDomainModule),
+    typeof(LinkBoardEntityFrameworkCoreModule),
     typeof(AbpIdentityEntityFrameworkCoreModule),
     typeof(AbpOpenIddictEntityFrameworkCoreModule),
     typeof(AbpPermissionManagementEntityFrameworkCoreModule),

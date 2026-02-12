@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using XYPortal.LinkBoard.Entities;
@@ -11,6 +12,7 @@ using XYPortal.LinkBoard.Repositories;
 namespace XYPortal.LinkBoard.Links;
 
 [Authorize(LinkBoardPermissions.LinkReview)]
+[Route("/api/app/link-review")]
 public class LinkReviewAppService : LinkBoardAppService, ILinkReviewAppService
 {
     private readonly ILinkRepository _linkRepository;
@@ -20,6 +22,7 @@ public class LinkReviewAppService : LinkBoardAppService, ILinkReviewAppService
         _linkRepository = linkRepository;
     }
 
+    [HttpGet]
     public virtual async Task<PagedResultDto<LinkDto>> GetListAsync(GetLinkListInput input)
     {
         var totalCount = await _linkRepository.GetCountAsync(
@@ -37,7 +40,8 @@ public class LinkReviewAppService : LinkBoardAppService, ILinkReviewAppService
             items.Select(MapToDto).ToList());
     }
 
-    public virtual async Task ReviewAsync(Guid id, ReviewInput input)
+    [HttpPost("{id}/review")]
+    public virtual async Task ReviewAsync([FromRoute] Guid id, [FromBody] ReviewInput input)
     {
         var entity = await _linkRepository.GetAsync(id);
 

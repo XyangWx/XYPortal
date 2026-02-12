@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using XYPortal.LinkBoard;
 using XYPortal.MultiTenancy;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
@@ -19,6 +20,7 @@ namespace XYPortal;
 
 [DependsOn(
     typeof(XYPortalDomainSharedModule),
+    typeof(LinkBoardDomainModule),
     typeof(AbpAuditLoggingDomainModule),
     typeof(AbpBackgroundJobsDomainModule),
     typeof(AbpFeatureManagementDomainModule),

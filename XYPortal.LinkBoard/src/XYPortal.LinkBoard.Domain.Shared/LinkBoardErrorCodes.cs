@@ -9,4 +9,6 @@ public static class LinkBoardErrorCodes
     public const string UrlExistsInPublic = "LinkBoard:UrlExistsInPublic";
     public const string CategoryNameExistsInPublic = "LinkBoard:CategoryNameExistsInPublic";
     public const string PrivateNoReview = "LinkBoard:PrivateNoReview";
+    public const string CannotModifyDefaultCategory = "LinkBoard:CannotModifyDefaultCategory";
+    public const string CannotDeleteDefaultCategory = "LinkBoard:CannotDeleteDefaultCategory";
 }

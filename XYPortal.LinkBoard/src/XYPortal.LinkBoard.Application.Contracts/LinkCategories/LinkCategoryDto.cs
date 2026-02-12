@@ -14,6 +14,7 @@ public class LinkCategoryDto
     public ReviewStatus Status { get; set; }
     public string? ReviewComment { get; set; }
     public Guid? DraftOfId { get; set; }
+    public bool IsDefault { get; set; }
     public Guid? CreatorId { get; set; }
     public DateTime CreationTime { get; set; }
 }

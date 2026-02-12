@@ -15,5 +15,5 @@ public interface ILinkAppService : IApplicationService
     Task DeleteAsync(Guid id);
     Task SubmitAsync(Guid id);
     Task WithdrawAsync(Guid id);
-    Task<List<LinkDto>> GetPublicBoardAsync(Guid? categoryId);
+    Task<List<LinkDto>> GetPublicBoardAsync(GetPublicBoardInput input);
 }

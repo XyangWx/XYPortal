@@ -2,6 +2,7 @@
 @model XYPortal.Web.Pages.IndexModel
 @using Microsoft.AspNetCore.Mvc.Localization
 @using XYPortal.Localization
+@using XYPortal.Web.Components.LinkBoardWidget
 @using Volo.Abp.Users
 @inject IHtmlLocalizer<XYPortalResource> L
 @inject ICurrentUser CurrentUser
@@ -11,6 +12,12 @@
 @section scripts {
 <abp-script src="/Pages/Index.js" />
 }
+
+<div class="row mb-3">
+    <div class="col-12">
+        @await Component.InvokeAsync(typeof(LinkBoardWidgetViewComponent))
+    </div>
+</div>
 
 <div class="row mb-3">
     <div class="col-xl-6 col-12 d-flex">

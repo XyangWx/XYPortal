@@ -182,9 +182,9 @@ public class LinkAppService : LinkBoardAppService, ILinkAppService
     }
 
     [AllowAnonymous]
-    public virtual async Task<List<LinkDto>> GetPublicBoardAsync(Guid? categoryId)
+    public virtual async Task<List<LinkDto>> GetPublicBoardAsync(GetPublicBoardInput input)
     {
-        var items = await _linkRepository.GetPublicBoardListAsync(CurrentUser.Id, categoryId);
+        var items = await _linkRepository.GetPublicBoardListAsync(CurrentUser.Id, input.CategoryId);
         return items.Select(MapToDto).ToList();
     }
 

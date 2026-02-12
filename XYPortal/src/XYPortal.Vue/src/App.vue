@@ -7,6 +7,16 @@
           <user-outlined />
           <span>主页</span>
         </a-menu-item>
+        <a-sub-menu v-if="hasLinkBoardPermission" key="LinkBoard">
+          <template #title>
+            <span>
+              <link-outlined />
+              <span>链接板</span>
+            </span>
+          </template>
+          <a-menu-item v-if="hasLinkCategoryManagerPermission" key="LinkBoardCategories" @click="$router.push('/linkboard/categories')">分类管理</a-menu-item>
+          <a-menu-item v-if="hasLinkManagerPermission" key="LinkBoardLinks" @click="$router.push('/linkboard/links')">链接管理</a-menu-item>
+        </a-sub-menu>
         <a-sub-menu v-if="hasManagementPermission" key="Management">
           <template #title>
             <span>
@@ -23,6 +33,11 @@
             <template #title>OpenIdDict管理</template>
             <a-menu-item key="OpenIddictApplications" @click="$router.push('/management/openiddict/applications')">应用管理</a-menu-item>
             <a-menu-item key="OpenIddictScopes" @click="$router.push('/management/openiddict/scopes')">作用域管理</a-menu-item>
+          </a-sub-menu>
+          <a-sub-menu v-if="hasLinkBoardAdminPermission" key="LinkBoardReview">
+            <template #title>链接板审核</template>
+            <a-menu-item v-if="hasLinkCategoryReviewPermission" key="LinkBoardCategoryReview" @click="$router.push('/management/linkboard-review/categories')">分类审核</a-menu-item>
+            <a-menu-item v-if="hasLinkReviewPermission" key="LinkBoardLinkReview" @click="$router.push('/management/linkboard-review/links')">链接审核</a-menu-item>
           </a-sub-menu>
           <a-menu-item v-if="hasSettingsPermission" key="Settings" @click="$router.push('/management/settings')">设置</a-menu-item>
         </a-sub-menu>
@@ -93,6 +108,7 @@ import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   DownOutlined,
+  LinkOutlined,
 } from '@ant-design/icons-vue';
 import { authService, authState } from './services/authService';
 import { permissionService, Permissions } from './services/permissionService';
@@ -113,6 +129,12 @@ const routeNameMap: Record<string, string> = {
   OpenIddict: 'OpenIdDict管理',
   OpenIddictApplications: '应用管理',
   OpenIddictScopes: '作用域管理',
+  LinkBoard: '链接板',
+  LinkBoardCategories: '分类管理',
+  LinkBoardLinks: '链接管理',
+  LinkBoardReview: '链接板审核',
+  LinkBoardCategoryReview: '分类审核',
+  LinkBoardLinkReview: '链接审核',
 };
 
 // 计算面包屑
@@ -144,6 +166,20 @@ const breadcrumbItems = computed(() => {
     items.push('管理');
     items.push('OpenIdDict管理');
     items.push('作用域管理');
+  } else if (name === 'LinkBoardCategories') {
+    items.push('链接板');
+    items.push('分类管理');
+  } else if (name === 'LinkBoardLinks') {
+    items.push('链接板');
+    items.push('链接管理');
+  } else if (name === 'LinkBoardCategoryReview') {
+    items.push('管理');
+    items.push('链接板审核');
+    items.push('分类审核');
+  } else if (name === 'LinkBoardLinkReview') {
+    items.push('管理');
+    items.push('链接板审核');
+    items.push('链接审核');
   }
   
   return items;
@@ -201,10 +237,44 @@ const hasOpenIddictPermission = computed(() => {
   );
 });
 
-// 检查是否有管理菜单权限（身份认证或设置或OpenIdDict任一权限）
+// 检查是否有管理菜单权限（身份认证或设置或OpenIdDict或LinkBoard审核任一权限）
 const hasManagementPermission = computed(() => {
   if (!authState.isAuthenticated) return false;
-  return hasIdentityPermission.value || hasSettingsPermission.value || hasOpenIddictPermission.value;
+  return hasIdentityPermission.value || hasSettingsPermission.value || hasOpenIddictPermission.value || hasLinkBoardAdminPermission.value;
+});
+
+// LinkBoard 权限检查
+const hasLinkBoardPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasAnyPermission(
+    Permissions.LinkBoard.User,
+    Permissions.LinkBoard.Admin
+  );
+});
+
+const hasLinkCategoryManagerPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.LinkBoard.LinkCategoryManager);
+});
+
+const hasLinkManagerPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.LinkBoard.LinkManager);
+});
+
+const hasLinkBoardAdminPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.LinkBoard.Admin);
+});
+
+const hasLinkCategoryReviewPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.LinkBoard.LinkCategoryReview);
+});
+
+const hasLinkReviewPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.LinkBoard.LinkReview);
 });
 
 // 监听路由变化更新菜单选中状态

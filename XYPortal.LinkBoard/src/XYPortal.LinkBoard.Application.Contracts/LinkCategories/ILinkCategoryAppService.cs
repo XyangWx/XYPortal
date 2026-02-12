@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -9,6 +10,7 @@ public interface ILinkCategoryAppService : IApplicationService
 {
     Task<LinkCategoryDto> GetAsync(Guid id);
     Task<PagedResultDto<LinkCategoryDto>> GetListAsync(GetLinkCategoryListInput input);
+    Task<List<LinkCategoryDto>> GetPublicListAsync();
     Task<LinkCategoryDto> CreateAsync(CreateLinkCategoryDto input);
     Task<LinkCategoryDto> UpdateAsync(Guid id, UpdateLinkCategoryDto input);
     Task DeleteAsync(Guid id);

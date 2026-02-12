@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -46,6 +47,22 @@ public class LinkCategoryAppService : LinkBoardAppService, ILinkCategoryAppServi
             items.Select(MapToDto).ToList());
     }
 
+    [AllowAnonymous]
+    public virtual async Task<List<LinkCategoryDto>> GetPublicListAsync()
+    {
+        var items = await _categoryRepository.GetListAsync(
+            filter: null,
+            status: ReviewStatus.Approved,
+            isPublic: true,
+            currentUserId: null,
+            isAdmin: true,
+            sorting: nameof(LinkCategory.SortOrder),
+            skipCount: 0,
+            maxResultCount: 100);
+
+        return items.Select(MapToDto).ToList();
+    }
+
     [Authorize(LinkBoardPermissions.LinkCategoryCreate)]
     public virtual async Task<LinkCategoryDto> CreateAsync(CreateLinkCategoryDto input)
     {
@@ -86,6 +103,12 @@ public class LinkCategoryAppService : LinkBoardAppService, ILinkCategoryAppServi
         var entity = await _categoryRepository.GetAsync(id);
         EnsureOwnership(entity);
 
+        // Cannot modify default category
+        if (entity.IsDefault)
+        {
+            throw new BusinessException(LinkBoardErrorCodes.CannotModifyDefaultCategory);
+        }
+
         // If this is an approved public category (not a draft), create/update draft version
         if (entity.IsPublic && entity.Status == ReviewStatus.Approved && entity.DraftOfId == null)
         {
@@ -107,6 +130,12 @@ public class LinkCategoryAppService : LinkBoardAppService, ILinkCategoryAppServi
     {
         var entity = await _categoryRepository.GetAsync(id);
         EnsureOwnership(entity);
+
+        // Cannot delete default category
+        if (entity.IsDefault)
+        {
+            throw new BusinessException(LinkBoardErrorCodes.CannotDeleteDefaultCategory);
+        }
 
         // If deleting a draft version, just delete it
         if (entity.DraftOfId != null)
@@ -243,6 +272,7 @@ public class LinkCategoryAppService : LinkBoardAppService, ILinkCategoryAppServi
             Status = entity.Status,
             ReviewComment = entity.ReviewComment,
             DraftOfId = entity.DraftOfId,
+            IsDefault = entity.IsDefault,
             CreatorId = entity.CreatorId,
             CreationTime = entity.CreationTime
         };

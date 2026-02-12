@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using XYPortal.LinkBoard.Entities;
@@ -11,6 +12,7 @@ using XYPortal.LinkBoard.Repositories;
 namespace XYPortal.LinkBoard.LinkCategories;
 
 [Authorize(LinkBoardPermissions.LinkCategoryReview)]
+[Route("/api/app/link-category-review")]
 public class LinkCategoryReviewAppService : LinkBoardAppService, ILinkCategoryReviewAppService
 {
     private readonly ILinkCategoryRepository _categoryRepository;
@@ -20,6 +22,7 @@ public class LinkCategoryReviewAppService : LinkBoardAppService, ILinkCategoryRe
         _categoryRepository = categoryRepository;
     }
 
+    [HttpGet]
     public virtual async Task<PagedResultDto<LinkCategoryDto>> GetListAsync(GetLinkCategoryListInput input)
     {
         var totalCount = await _categoryRepository.GetCountAsync(
@@ -37,7 +40,8 @@ public class LinkCategoryReviewAppService : LinkBoardAppService, ILinkCategoryRe
             items.Select(MapToDto).ToList());
     }
 
-    public virtual async Task ReviewAsync(Guid id, ReviewInput input)
+    [HttpPost("{id}/review")]
+    public virtual async Task ReviewAsync([FromRoute] Guid id, [FromBody] ReviewInput input)
     {
         var entity = await _categoryRepository.GetAsync(id);
 
@@ -132,6 +136,7 @@ public class LinkCategoryReviewAppService : LinkBoardAppService, ILinkCategoryRe
             Status = entity.Status,
             ReviewComment = entity.ReviewComment,
             DraftOfId = entity.DraftOfId,
+            IsDefault = entity.IsDefault,
             CreatorId = entity.CreatorId,
             CreationTime = entity.CreationTime
         };

@@ -1,3 +1,4 @@
+using XYPortal.LinkBoard;
 using XYPortal.Localization;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
@@ -16,6 +17,7 @@ using Volo.Abp.VirtualFileSystem;
 namespace XYPortal;
 
 [DependsOn(
+    typeof(LinkBoardDomainSharedModule),
     typeof(AbpAuditLoggingDomainSharedModule),
     typeof(AbpBackgroundJobsDomainSharedModule),
     typeof(AbpFeatureManagementDomainSharedModule),

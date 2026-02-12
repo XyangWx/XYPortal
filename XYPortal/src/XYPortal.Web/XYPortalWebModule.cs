@@ -34,6 +34,7 @@ using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 using XYPortal.EntityFrameworkCore;
+using XYPortal.LinkBoard;
 using XYPortal.Localization;
 using XYPortal.MultiTenancy;
 using XYPortal.Web.Menus;
@@ -237,6 +238,7 @@ public class XYPortalWebModule : AbpModule
         Configure<AbpAspNetCoreMvcOptions>(options =>
         {
             options.ConventionalControllers.Create(typeof(XYPortalApplicationModule).Assembly);
+            options.ConventionalControllers.Create(typeof(LinkBoardApplicationModule).Assembly);
         });
     }
 

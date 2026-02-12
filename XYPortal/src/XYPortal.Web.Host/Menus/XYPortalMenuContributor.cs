@@ -7,6 +7,7 @@ using Volo.Abp.Identity.Web.Navigation;
 using Volo.Abp.SettingManagement.Web.Navigation;
 using Volo.Abp.TenantManagement.Web.Navigation;
 using Volo.Abp.UI.Navigation;
+using XYPortal.LinkBoard.Permissions;
 using XYPortal.Localization;
 using XYPortal.MultiTenancy;
 using XYPortal.Permissions;
@@ -82,6 +83,50 @@ public class XYPortalMenuContributor : IMenuContributor
         ).RequirePermissions(XYPortalPermissions.OpenIdDictScopeManager));
 
         administration.AddItem(openIddictMenu);
+
+        // LinkBoard User Menu
+        var linkBoardMenu = new ApplicationMenuItem(
+            XYPortalMenus.LinkBoard,
+            l["Menu:LinkBoard"],
+            icon: "fas fa-link",
+            order: 1
+        ).RequirePermissions(false, LinkBoardPermissions.User, LinkBoardPermissions.Admin);
+
+        linkBoardMenu.AddItem(new ApplicationMenuItem(
+            XYPortalMenus.LinkBoardCategories,
+            l["Menu:LinkBoard:Categories"],
+            "~/LinkBoard/Categories"
+        ).RequirePermissions(false, LinkBoardPermissions.LinkCategoryManager));
+
+        linkBoardMenu.AddItem(new ApplicationMenuItem(
+            XYPortalMenus.LinkBoardLinks,
+            l["Menu:LinkBoard:Links"],
+            "~/LinkBoard/Links"
+        ).RequirePermissions(false, LinkBoardPermissions.LinkManager));
+
+        context.Menu.AddItem(linkBoardMenu);
+
+        // LinkBoard Admin Menu
+        var linkBoardAdminMenu = new ApplicationMenuItem(
+            XYPortalMenus.LinkBoardAdmin,
+            l["Menu:LinkBoardAdmin"],
+            icon: "fas fa-clipboard-check",
+            order: 5
+        ).RequirePermissions(false, LinkBoardPermissions.Admin);
+
+        linkBoardAdminMenu.AddItem(new ApplicationMenuItem(
+            XYPortalMenus.LinkBoardCategoryReview,
+            l["Menu:LinkBoardAdmin:CategoryReview"],
+            "~/LinkBoard/CategoryReview"
+        ).RequirePermissions(false, LinkBoardPermissions.LinkCategoryReview));
+
+        linkBoardAdminMenu.AddItem(new ApplicationMenuItem(
+            XYPortalMenus.LinkBoardLinkReview,
+            l["Menu:LinkBoardAdmin:LinkReview"],
+            "~/LinkBoard/LinkReview"
+        ).RequirePermissions(false, LinkBoardPermissions.LinkReview));
+
+        administration.AddItem(linkBoardAdminMenu);
 
         return Task.CompletedTask;
     }
