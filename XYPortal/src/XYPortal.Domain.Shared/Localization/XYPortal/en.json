@@ -16,6 +16,7 @@
     "Feature:TestDecimalValueDescription": "Test feature decimal value configuration (0-1000000)",
     "Feature:TestStringValue": "String Value",
     "Feature:TestStringValueDescription": "Test feature string value configuration (max 256 characters)",
+    "Permission:PortalManagement": "Portal Management",
     "Permission:OpenIdDictManager": "OpenIdDict Management",
     "Permission:OpenIdDictApplicationManager": "Application Management",
     "Permission:OpenIdDictApplicationCreate": "Create",

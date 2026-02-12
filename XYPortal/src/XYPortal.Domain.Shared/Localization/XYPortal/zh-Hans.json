@@ -19,6 +19,7 @@
         "Feature:Test_1": "测试功能 2",
         "Feature:TestBooleanValue": "布尔值",
         "Feature:TestBooleanValueDescription": "测试功能的布尔值",
+        "Permission:PortalManagement": "门户管理",
         "Permission:OpenIdDictManager": "OpenIdDict管理",
         "Permission:OpenIdDictApplicationManager": "应用管理",
         "Permission:OpenIdDictApplicationCreate": "创建",

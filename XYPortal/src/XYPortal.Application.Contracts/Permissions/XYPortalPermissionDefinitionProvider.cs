@@ -8,7 +8,7 @@ public class XYPortalPermissionDefinitionProvider : PermissionDefinitionProvider
 {
     public override void Define(IPermissionDefinitionContext context)
     {
-        var myGroup = context.AddGroup(XYPortalPermissions.GroupName);
+        var myGroup = context.AddGroup(XYPortalPermissions.GroupName, L("Permission:PortalManagement"));
 
         var openIddictManager = myGroup.AddPermission(
             XYPortalPermissions.OpenIdDictManager,
