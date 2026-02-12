@@ -116,8 +116,8 @@
         <a-form-item label="作用域" required>
           <a-checkbox-group v-model:value="appForm.scopes">
             <a-row>
-              <a-col :span="8" v-for="scope in availableScopes" :key="scope">
-                <a-checkbox :value="scope" style="margin-bottom: 8px">{{ scope }}</a-checkbox>
+              <a-col :span="8" v-for="scope in availableScopes" :key="scope.name">
+                <a-checkbox :value="scope.name" style="margin-bottom: 8px">{{ scope.displayName || scope.name }}</a-checkbox>
               </a-col>
             </a-row>
           </a-checkbox-group>
@@ -198,9 +198,37 @@ const availableGrantTypes = [
   { value: 'urn:ietf:params:oauth:grant-type:device_code', label: 'Device Code' },
 ];
 
-const availableScopes = [
-  'address', 'email', 'phone', 'profile', 'roles', 'XYPortal',
-];
+const wellKnownScopes = ['openid', 'profile', 'email', 'phone', 'address', 'roles'];
+const availableScopes = ref<{ name: string; displayName?: string }[]>(
+  wellKnownScopes.map(s => ({ name: s }))
+);
+
+const fetchAvailableScopes = async () => {
+  try {
+    const user = await authService.getUser();
+    if (!user) return;
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const response = await axios.get(`${baseUrl}/api/app/open-iddict-scope`, {
+      params: { skipCount: 0, maxResultCount: 1000 },
+      headers: { Authorization: `Bearer ${user.access_token}` },
+    });
+    const dbScopes: { name: string; displayName?: string }[] = (response.data.items || [])
+      .filter((s: any) => s.name)
+      .map((s: any) => ({ name: s.name, displayName: s.displayName }));
+    const merged = wellKnownScopes.map(s => {
+      const db = dbScopes.find(d => d.name === s);
+      return db || { name: s };
+    });
+    for (const db of dbScopes) {
+      if (!wellKnownScopes.includes(db.name)) {
+        merged.push(db);
+      }
+    }
+    availableScopes.value = merged;
+  } catch (error) {
+    console.error('获取可用作用域失败:', error);
+  }
+};
 
 // 对话框
 const appModalVisible = ref(false);
@@ -407,7 +435,8 @@ const handleSave = async () => {
     fetchList();
   } catch (error: any) {
     if (error.errorFields) return;
-    message.error(editingApp.value ? '更新失败' : '创建失败');
+    const detail = error.response?.data?.error?.message || error.response?.data?.error?.details;
+    message.error(detail || (editingApp.value ? '更新失败' : '创建失败'));
     console.error('保存失败:', error);
   } finally {
     appModalLoading.value = false;
@@ -416,6 +445,7 @@ const handleSave = async () => {
 
 onMounted(() => {
   fetchList();
+  fetchAvailableScopes();
 });
 </script>
 

@@ -30,6 +30,10 @@ export const Permissions = {
     ApplicationCreate: 'XYPortal.OpenIdDictManager.ApplicationManager.Create',
     ApplicationEdit: 'XYPortal.OpenIdDictManager.ApplicationManager.Edit',
     ApplicationDelete: 'XYPortal.OpenIdDictManager.ApplicationManager.Delete',
+    ScopeManager: 'XYPortal.OpenIdDictManager.ScopeManager',
+    ScopeCreate: 'XYPortal.OpenIdDictManager.ScopeManager.Create',
+    ScopeEdit: 'XYPortal.OpenIdDictManager.ScopeManager.Edit',
+    ScopeDelete: 'XYPortal.OpenIdDictManager.ScopeManager.Delete',
   },
 };
 

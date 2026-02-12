@@ -22,8 +22,13 @@
     "Permission:OpenIdDictApplicationCreate": "Create",
     "Permission:OpenIdDictApplicationEdit": "Edit",
     "Permission:OpenIdDictApplicationDelete": "Delete",
+    "Permission:OpenIdDictScopeManager": "Scope Management",
+    "Permission:OpenIdDictScopeCreate": "Create",
+    "Permission:OpenIdDictScopeEdit": "Edit",
+    "Permission:OpenIdDictScopeDelete": "Delete",
     "Menu:OpenIdDictManager": "OpenIdDict Management",
     "Menu:OpenIddictApplications": "Applications",
+    "Menu:OpenIddictScopes": "Scopes",
     "NewApplication": "New Application",
     "EditApplication": "Edit Application",
     "ClientId": "Client Id",
@@ -39,10 +44,18 @@
     "RedirectUris": "Redirect URIs",
     "PostLogoutRedirectUris": "Post Logout Redirect URIs",
     "OnePerLine": "One per line",
+    "NameNoSpacesHint": "Name cannot contain spaces",
     "ApplicationDeletionConfirmation": "Are you sure you want to delete application '{0}'?",
     "SuccessfullyDeleted": "Successfully deleted",
     "Actions": "Actions",
     "Edit": "Edit",
-    "Delete": "Delete"
+    "Delete": "Delete",
+    "NewScope": "New Scope",
+    "EditScope": "Edit Scope",
+    "Name": "Name",
+    "Description": "Description",
+    "Resources": "Resources",
+    "ResourcesPlaceholder": "resource1\nresource2",
+    "ScopeDeletionConfirmation": "Are you sure you want to delete scope '{0}'?"
   }
 }
