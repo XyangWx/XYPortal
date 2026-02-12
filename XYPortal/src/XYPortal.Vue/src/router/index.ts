@@ -43,6 +43,18 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Settings',
         component: () => import('../views/Settings.vue'),
       },
+      {
+        path: 'openiddict',
+        name: 'OpenIddict',
+        redirect: '/management/openiddict/applications',
+        children: [
+          {
+            path: 'applications',
+            name: 'OpenIddictApplications',
+            component: () => import('../views/OpenIddictApplications.vue'),
+          },
+        ],
+      },
     ],
   },
 ];

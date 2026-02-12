@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using XYPortal.Localization;
 using XYPortal.MultiTenancy;
+using XYPortal.Permissions;
+using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Identity.Web.Navigation;
 using Volo.Abp.SettingManagement.Web.Navigation;
 using Volo.Abp.TenantManagement.Web.Navigation;
@@ -44,7 +46,22 @@ public class XYPortalMenuContributor : IMenuContributor
         }
 
         administration.SetSubItemOrder(IdentityMenuNames.GroupName, 2);
-        administration.SetSubItemOrder(SettingManagementMenuNames.GroupName, 3);
+        administration.SetSubItemOrder(SettingManagementMenuNames.GroupName, 4);
+
+        var openIddictMenu = new ApplicationMenuItem(
+            XYPortalMenus.OpenIddictManager,
+            l["Menu:OpenIdDictManager"],
+            icon: "fas fa-key",
+            order: 3
+        ).RequirePermissions(false, XYPortalPermissions.OpenIdDictApplicationManager);
+
+        openIddictMenu.AddItem(new ApplicationMenuItem(
+            XYPortalMenus.OpenIddictApplications,
+            l["Menu:OpenIddictApplications"],
+            "~/OpenIddict/Applications"
+        ).RequirePermissions(false, XYPortalPermissions.OpenIdDictApplicationManager));
+
+        administration.AddItem(openIddictMenu);
 
         return Task.CompletedTask;
     }
