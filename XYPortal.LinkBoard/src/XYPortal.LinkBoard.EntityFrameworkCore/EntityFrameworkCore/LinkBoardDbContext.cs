@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
+using XYPortal.LinkBoard.Entities;
 
 namespace XYPortal.LinkBoard.EntityFrameworkCore;
 
 [ConnectionStringName(LinkBoardDbProperties.ConnectionStringName)]
 public class LinkBoardDbContext : AbpDbContext<LinkBoardDbContext>, ILinkBoardDbContext
 {
-    /* Add DbSet for each Aggregate Root here. Example:
-     * public DbSet<Question> Questions { get; set; }
-     */
+    public DbSet<LinkCategory> LinkCategories { get; set; }
+    public DbSet<Link> Links { get; set; }
 
     public LinkBoardDbContext(DbContextOptions<LinkBoardDbContext> options)
         : base(options)
