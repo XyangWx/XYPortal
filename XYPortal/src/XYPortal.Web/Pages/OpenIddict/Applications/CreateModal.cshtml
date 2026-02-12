@@ -10,7 +10,7 @@
 
 <form method="post" asp-page="/OpenIddict/Applications/CreateModal">
     <abp-modal>
-        <abp-modal-header title="@L["NewApplication"].Value" />
+        <abp-modal-header title="@L["NewApplication"].Value"></abp-modal-header>
         <abp-modal-body>
             <div class="mb-3">
                 <label asp-for="Input.ClientId" class="form-label">@L["ClientId"]</label>
@@ -89,7 +89,7 @@
                 <small class="text-muted">@L["OnePerLine"]</small>
             </div>
         </abp-modal-body>
-        <abp-modal-footer buttons="@(AbpModalButtons.Cancel | AbpModalButtons.Save)" />
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel | AbpModalButtons.Save)"></abp-modal-footer>
     </abp-modal>
 </form>
 
