@@ -1,0 +1,37 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using XYPortal.Localization
+@model XYPortal.Web.Pages.OpenIddict.Scopes.CreateModalModel
+@inject IHtmlLocalizer<XYPortalResource> L
+@{
+    Layout = null;
+}
+
+<form method="post" asp-page="/OpenIddict/Scopes/CreateModal">
+    <abp-modal>
+        <abp-modal-header title="@L["NewScope"].Value"></abp-modal-header>
+        <abp-modal-body>
+            <div class="mb-3">
+                <label asp-for="Input.Name" class="form-label">@L["Name"]</label>
+                <input asp-for="Input.Name" class="form-control" />
+                <span asp-validation-for="Input.Name" class="text-danger"></span>
+                <small class="text-muted">@L["NameNoSpacesHint"]</small>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.DisplayName" class="form-label">@L["DisplayName"]</label>
+                <input asp-for="Input.DisplayName" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Description" class="form-label">@L["Description"]</label>
+                <input asp-for="Input.Description" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Resources" class="form-label">@L["Resources"]</label>
+                <textarea asp-for="Input.Resources" class="form-control" rows="3" placeholder="@L["ResourcesPlaceholder"]"></textarea>
+                <small class="text-muted">@L["OnePerLine"]</small>
+            </div>
+        </abp-modal-body>
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel | AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

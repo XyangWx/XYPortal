@@ -20,12 +20,19 @@ public class EditModalModel : XYPortalPageModel
     [BindProperty]
     public EditViewModel Input { get; set; } = new();
 
-    private readonly IOpenIddictApplicationAppService _appService;
+    public List<OpenIddictScopeDto> AvailableScopes { get; set; } = [];
 
-    public EditModalModel(IOpenIddictApplicationAppService appService)
+    private readonly IOpenIddictApplicationAppService _appService;
+    private readonly IOpenIddictScopeAppService _scopeAppService;
+
+    public EditModalModel(IOpenIddictApplicationAppService appService, IOpenIddictScopeAppService scopeAppService)
     {
         _appService = appService;
+        _scopeAppService = scopeAppService;
     }
+
+    private static readonly string[] WellKnownScopes =
+        ["openid", "profile", "email", "phone", "address", "roles"];
 
     public async Task OnGetAsync()
     {
@@ -38,10 +45,19 @@ public class EditModalModel : XYPortalPageModel
             DisplayName = dto.DisplayName ?? string.Empty,
             ClientUri = dto.ClientUri,
             GrantTypes = dto.GrantTypes,
-            Scopes = dto.Scopes.Count > 0 ? string.Join("\n", dto.Scopes) : null,
+            Scopes = dto.Scopes,
             RedirectUris = dto.RedirectUris.Count > 0 ? string.Join("\n", dto.RedirectUris) : null,
             PostLogoutRedirectUris = dto.PostLogoutRedirectUris.Count > 0 ? string.Join("\n", dto.PostLogoutRedirectUris) : null
         };
+
+        var scopes = await _scopeAppService.GetListAsync(new GetOpenIddictScopeListInput { MaxResultCount = 1000 });
+        var dbScopes = scopes.Items.ToList();
+
+        AvailableScopes = WellKnownScopes
+            .Where(s => dbScopes.All(d => d.Name != s))
+            .Select(s => new OpenIddictScopeDto { Name = s })
+            .Concat(dbScopes)
+            .ToList();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -54,7 +70,7 @@ public class EditModalModel : XYPortalPageModel
             ClientSecret = Input.ClientSecret,
             ClientUri = Input.ClientUri,
             GrantTypes = Input.GrantTypes ?? [],
-            Scopes = SplitLines(Input.Scopes),
+            Scopes = Input.Scopes ?? [],
             RedirectUris = SplitLines(Input.RedirectUris),
             PostLogoutRedirectUris = SplitLines(Input.PostLogoutRedirectUris)
         };
@@ -88,7 +104,7 @@ public class EditModalModel : XYPortalPageModel
 
         public List<string> GrantTypes { get; set; } = [];
 
-        public string? Scopes { get; set; }
+        public List<string> Scopes { get; set; } = [];
 
         public string? RedirectUris { get; set; }
 

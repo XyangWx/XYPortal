@@ -11,4 +11,8 @@ public static class XYPortalPermissions
     public const string OpenIdDictApplicationCreate = OpenIdDictApplicationManager + ".Create";
     public const string OpenIdDictApplicationEdit = OpenIdDictApplicationManager + ".Edit";
     public const string OpenIdDictApplicationDelete = OpenIdDictApplicationManager + ".Delete";
+    public const string OpenIdDictScopeManager = OpenIdDictManager + ".ScopeManager";
+    public const string OpenIdDictScopeCreate = OpenIdDictScopeManager + ".Create";
+    public const string OpenIdDictScopeEdit = OpenIdDictScopeManager + ".Edit";
+    public const string OpenIdDictScopeDelete = OpenIdDictScopeManager + ".Delete";
 }

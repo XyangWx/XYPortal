@@ -16,16 +16,31 @@ public class CreateModalModel : XYPortalPageModel
     [BindProperty]
     public CreateViewModel Input { get; set; } = new();
 
-    private readonly IOpenIddictApplicationAppService _appService;
+    public List<OpenIddictScopeDto> AvailableScopes { get; set; } = [];
 
-    public CreateModalModel(IOpenIddictApplicationAppService appService)
+    private readonly IOpenIddictApplicationAppService _appService;
+    private readonly IOpenIddictScopeAppService _scopeAppService;
+
+    public CreateModalModel(IOpenIddictApplicationAppService appService, IOpenIddictScopeAppService scopeAppService)
     {
         _appService = appService;
+        _scopeAppService = scopeAppService;
     }
 
-    public void OnGet()
+    private static readonly string[] WellKnownScopes =
+        ["openid", "profile", "email", "phone", "address", "roles"];
+
+    public async Task OnGetAsync()
     {
         Input = new CreateViewModel();
+        var scopes = await _scopeAppService.GetListAsync(new GetOpenIddictScopeListInput { MaxResultCount = 1000 });
+        var dbScopes = scopes.Items.ToList();
+
+        AvailableScopes = WellKnownScopes
+            .Where(s => dbScopes.All(d => d.Name != s))
+            .Select(s => new OpenIddictScopeDto { Name = s })
+            .Concat(dbScopes)
+            .ToList();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -39,7 +54,7 @@ public class CreateModalModel : XYPortalPageModel
             ClientSecret = Input.ClientSecret,
             ClientUri = Input.ClientUri,
             GrantTypes = Input.GrantTypes ?? [],
-            Scopes = SplitLines(Input.Scopes),
+            Scopes = Input.Scopes ?? [],
             RedirectUris = SplitLines(Input.RedirectUris),
             PostLogoutRedirectUris = SplitLines(Input.PostLogoutRedirectUris)
         };
@@ -74,7 +89,7 @@ public class CreateModalModel : XYPortalPageModel
 
         public List<string> GrantTypes { get; set; } = [];
 
-        public string? Scopes { get; set; }
+        public List<string> Scopes { get; set; } = [];
 
         public string? RedirectUris { get; set; }
 

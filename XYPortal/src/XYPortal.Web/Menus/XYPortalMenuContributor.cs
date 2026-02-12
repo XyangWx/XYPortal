@@ -53,13 +53,19 @@ public class XYPortalMenuContributor : IMenuContributor
             l["Menu:OpenIdDictManager"],
             icon: "fas fa-key",
             order: 3
-        ).RequirePermissions(false, XYPortalPermissions.OpenIdDictApplicationManager);
+        ).RequirePermissions(false, XYPortalPermissions.OpenIdDictApplicationManager, XYPortalPermissions.OpenIdDictScopeManager);
 
         openIddictMenu.AddItem(new ApplicationMenuItem(
             XYPortalMenus.OpenIddictApplications,
             l["Menu:OpenIddictApplications"],
             "~/OpenIddict/Applications"
         ).RequirePermissions(false, XYPortalPermissions.OpenIdDictApplicationManager));
+
+        openIddictMenu.AddItem(new ApplicationMenuItem(
+            XYPortalMenus.OpenIddictScopes,
+            l["Menu:OpenIddictScopes"],
+            "~/OpenIddict/Scopes"
+        ).RequirePermissions(false, XYPortalPermissions.OpenIdDictScopeManager));
 
         administration.AddItem(openIddictMenu);
 

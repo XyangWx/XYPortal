@@ -7,4 +7,5 @@ public class XYPortalMenus
 
     public const string OpenIddictManager = Prefix + ".OpenIddictManager";
     public const string OpenIddictApplications = OpenIddictManager + ".Applications";
+    public const string OpenIddictScopes = OpenIddictManager + ".Scopes";
 }
