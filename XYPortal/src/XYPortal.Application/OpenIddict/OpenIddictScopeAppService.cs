@@ -18,6 +18,7 @@ public class OpenIddictScopeAppService : XYPortalAppService, IOpenIddictScopeApp
     private readonly IOpenIddictScopeRepository _scopeRepository;
     private readonly IOpenIddictScopeManager _scopeManager;
 
+    /// <inheritdoc />
     public OpenIddictScopeAppService(
         IOpenIddictScopeRepository scopeRepository,
         IOpenIddictScopeManager scopeManager)

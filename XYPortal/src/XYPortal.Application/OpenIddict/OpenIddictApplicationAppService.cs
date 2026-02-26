@@ -18,6 +18,7 @@ public class OpenIddictApplicationAppService : XYPortalAppService, IOpenIddictAp
     private readonly IOpenIddictApplicationRepository _applicationRepository;
     private readonly IAbpApplicationManager _applicationManager;
 
+    /// <inheritdoc />
     public OpenIddictApplicationAppService(
         IOpenIddictApplicationRepository applicationRepository,
         IAbpApplicationManager applicationManager)
@@ -118,7 +119,7 @@ public class OpenIddictApplicationAppService : XYPortalAppService, IOpenIddictAp
         await _applicationManager.DeleteAsync(entity.ToModel());
     }
 
-    private void ValidateClientTypeAndSecret(string clientType, string? clientSecret)
+    private static void ValidateClientTypeAndSecret(string clientType, string? clientSecret)
     {
         if (!string.IsNullOrEmpty(clientSecret) &&
             string.Equals(clientType, OpenIddictConstants.ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
@@ -168,8 +169,8 @@ public class OpenIddictApplicationAppService : XYPortalAppService, IOpenIddictAp
         }
 
         // Add EndSession endpoint if redirect URIs are provided
-        if ((redirectUris != null && redirectUris.Count > 0) ||
-            (postLogoutRedirectUris != null && postLogoutRedirectUris.Count > 0))
+        if (redirectUris is { Count: > 0 } ||
+            postLogoutRedirectUris is { Count: > 0 })
         {
             application.Permissions.Add(OpenIddictConstants.Permissions.Endpoints.EndSession);
         }

@@ -21,6 +21,7 @@ namespace XYPortal;
     typeof(AbpFeatureManagementApplicationModule),
     typeof(AbpSettingManagementApplicationModule)
     )]
+// ReSharper disable once InconsistentNaming
 public class XYPortalApplicationModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
