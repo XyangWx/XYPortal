@@ -22,6 +22,7 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared.Toolbars;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
+using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity.Web;
 using Volo.Abp.Modularity;
@@ -34,7 +35,6 @@ using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 using XYPortal.EntityFrameworkCore;
-using XYPortal.LinkBoard;
 using XYPortal.Localization;
 using XYPortal.MultiTenancy;
 using XYPortal.Web.Menus;
@@ -46,6 +46,7 @@ namespace XYPortal.Web;
     typeof(XYPortalApplicationModule),
     typeof(XYPortalEntityFrameworkCoreModule),
     typeof(AbpAutofacModule),
+    typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpIdentityWebModule),
     typeof(AbpSettingManagementWebModule),
     typeof(AbpAccountWebOpenIddictModule),
@@ -238,7 +239,6 @@ public class XYPortalWebModule : AbpModule
         Configure<AbpAspNetCoreMvcOptions>(options =>
         {
             options.ConventionalControllers.Create(typeof(XYPortalApplicationModule).Assembly);
-            options.ConventionalControllers.Create(typeof(LinkBoardApplicationModule).Assembly);
         });
     }
 

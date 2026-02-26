@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Features;
 using XYPortal.LinkBoard.Entities;
+using XYPortal.LinkBoard.Features;
 using XYPortal.LinkBoard.Permissions;
 using XYPortal.LinkBoard.Repositories;
 
@@ -182,10 +184,28 @@ public class LinkAppService : LinkBoardAppService, ILinkAppService
     }
 
     [AllowAnonymous]
-    public virtual async Task<List<LinkDto>> GetPublicBoardAsync(GetPublicBoardInput input)
+    public virtual async Task<PagedResultDto<LinkDto>> GetPublicBoardAsync(GetPublicBoardInput input)
     {
-        var items = await _linkRepository.GetPublicBoardListAsync(CurrentUser.Id, input.CategoryId);
-        return items.Select(MapToDto).ToList();
+        var maxLinks = await FeatureChecker.GetAsync<int>(LinkBoardFeatures.MaxLinks);
+
+        // Use MaxLinks from feature as page size if MaxResultCount not explicitly set or exceeds limit
+        var pageSize = input.MaxResultCount > 0 && input.MaxResultCount <= maxLinks
+            ? input.MaxResultCount
+            : maxLinks;
+
+        var totalCount = await _linkRepository.GetPublicBoardCountAsync(CurrentUser.Id, input.CategoryId);
+        var items = await _linkRepository.GetPublicBoardListAsync(
+            CurrentUser.Id, input.CategoryId, input.SkipCount, pageSize);
+
+        return new PagedResultDto<LinkDto>(
+            totalCount,
+            items.Select(MapToDto).ToList());
+    }
+
+    [AllowAnonymous]
+    public virtual async Task<int> GetMaxLinksAsync()
+    {
+        return await FeatureChecker.GetAsync<int>(LinkBoardFeatures.MaxLinks);
     }
 
     private async Task<LinkDto> CreateOrUpdateDraftAsync(Link original, UpdateLinkDto input)

@@ -31,7 +31,6 @@ using Volo.Abp.Modularity;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.VirtualFileSystem;
-using XYPortal.LinkBoard;
 
 namespace XYPortal;
 
@@ -98,7 +97,6 @@ public class XYPortalHttpApiHostModule : AbpModule
         Configure<AbpAspNetCoreMvcOptions>(options =>
         {
             options.ConventionalControllers.Create(typeof(XYPortalApplicationModule).Assembly);
-            options.ConventionalControllers.Create(typeof(LinkBoardApplicationModule).Assembly);
         });
     }
 

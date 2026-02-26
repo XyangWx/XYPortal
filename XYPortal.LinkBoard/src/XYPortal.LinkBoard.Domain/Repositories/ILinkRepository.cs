@@ -39,5 +39,12 @@ public interface ILinkRepository : IRepository<Link, Guid>
     Task<List<Link>> GetPublicBoardListAsync(
         Guid? currentUserId,
         Guid? categoryId,
+        int skipCount = 0,
+        int maxResultCount = 50,
+        CancellationToken cancellationToken = default);
+
+    Task<long> GetPublicBoardCountAsync(
+        Guid? currentUserId,
+        Guid? categoryId,
         CancellationToken cancellationToken = default);
 }

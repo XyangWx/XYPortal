@@ -83,10 +83,34 @@ public class LinkRepository
     public async Task<List<Link>> GetPublicBoardListAsync(
         Guid? currentUserId,
         Guid? categoryId,
+        int skipCount = 0,
+        int maxResultCount = 50,
         CancellationToken cancellationToken = default)
     {
-        var dbSet = await GetDbSetAsync();
+        var query = BuildPublicBoardQuery(await GetDbSetAsync(), currentUserId, categoryId);
 
+        return await query
+            .Include(x => x.Category)
+            .OrderBy(x => x.SortOrder)
+            .Skip(skipCount)
+            .Take(maxResultCount)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<long> GetPublicBoardCountAsync(
+        Guid? currentUserId,
+        Guid? categoryId,
+        CancellationToken cancellationToken = default)
+    {
+        var query = BuildPublicBoardQuery(await GetDbSetAsync(), currentUserId, categoryId);
+        return await query.LongCountAsync(cancellationToken);
+    }
+
+    private static IQueryable<Link> BuildPublicBoardQuery(
+        DbSet<Link> dbSet,
+        Guid? currentUserId,
+        Guid? categoryId)
+    {
         // Public approved links (excluding draft versions - DraftOfId must be null)
         var publicQuery = dbSet.Where(x => x.IsPublic && x.Status == ReviewStatus.Approved && x.DraftOfId == null);
 
@@ -97,10 +121,7 @@ public class LinkRepository
 
         if (!currentUserId.HasValue)
         {
-            return await publicQuery
-                .Include(x => x.Category)
-                .OrderBy(x => x.SortOrder)
-                .ToListAsync(cancellationToken);
+            return publicQuery;
         }
 
         // Private links of current user (excluding draft versions)
@@ -116,13 +137,7 @@ public class LinkRepository
         privateQuery = privateQuery.Where(x => !publicUrls.Contains(x.Url));
 
         // Union public + deduplicated private
-        var result = await publicQuery
-            .Union(privateQuery)
-            .Include(x => x.Category)
-            .OrderBy(x => x.SortOrder)
-            .ToListAsync(cancellationToken);
-
-        return result;
+        return publicQuery.Union(privateQuery);
     }
 
     private static IQueryable<Link> ApplyFilter(
