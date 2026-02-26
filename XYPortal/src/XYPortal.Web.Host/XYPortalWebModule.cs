@@ -38,6 +38,7 @@ using Volo.Abp.TenantManagement.Web;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using XYPortal.LinkBoard;
 using XYPortal.Localization;
 using XYPortal.MultiTenancy;
 using XYPortal.Web.Menus;
@@ -47,6 +48,7 @@ namespace XYPortal.Web;
 [DependsOn(
     typeof(XYPortalHttpApiClientModule),
     typeof(XYPortalHttpApiModule),
+    typeof(LinkBoardHttpApiClientModule),
     typeof(AbpAspNetCoreAuthenticationOpenIdConnectModule),
     typeof(AbpAspNetCoreMvcClientModule),
     typeof(AbpHttpClientWebModule),

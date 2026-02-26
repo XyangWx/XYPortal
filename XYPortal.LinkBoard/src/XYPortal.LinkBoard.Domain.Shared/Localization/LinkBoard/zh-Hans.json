@@ -1,0 +1,29 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "MyAccount": "我的账户",
+    "Permission:LinkBoard": "链接面板",
+    "Permission:LinkBoardAdmin": "链接面板管理",
+    "Permission:LinkReview": "链接审批",
+    "Permission:LinkCategoryReview": "分类审批",
+    "Permission:LinkBoardUser": "链接面板用户",
+    "Permission:LinkCategoryManager": "分类管理",
+    "Permission:LinkCategoryCreate": "创建",
+    "Permission:LinkCategoryModify": "修改",
+    "Permission:LinkCategoryDelete": "删除",
+    "Permission:LinkManager": "链接管理",
+    "Permission:LinkCreate": "创建",
+    "Permission:LinkModify": "修改",
+    "Permission:LinkDelete": "删除",
+    "Feature:LinkBoard": "链接面板",
+    "Feature:LinkBoard.MaxLinks": "最大链接数",
+    "Feature:LinkBoard.MaxLinksDescription": "链接面板挂件上每次最多显示的链接数量",
+    "LinkBoard:DuplicateCategoryName": "分类名称 '{Name}' 已存在",
+    "LinkBoard:CategoryHasLinks": "无法删除包含链接的分类",
+    "LinkBoard:InvalidStatusTransition": "无法从 {From} 变更为 {To}",
+    "LinkBoard:CategoryNotApproved": "分类尚未通过审批",
+    "LinkBoard:UrlExistsInPublic": "该链接地址已存在于公开链接中",
+    "LinkBoard:CategoryNameExistsInPublic": "该分类名称已存在于公开分类中",
+    "LinkBoard:PrivateNoReview": "私有内容无需审批"
+  }
+}

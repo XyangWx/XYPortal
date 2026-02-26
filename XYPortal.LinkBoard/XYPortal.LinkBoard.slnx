@@ -1,0 +1,23 @@
+<Solution>
+    <Configurations>
+        <Platform Name="Any CPU" />
+    </Configurations>
+
+    <Folder Name="/src/">
+        <Project Path="src/XYPortal.LinkBoard.Domain.Shared/XYPortal.LinkBoard.Domain.Shared.csproj" />
+        <Project Path="src/XYPortal.LinkBoard.Domain/XYPortal.LinkBoard.Domain.csproj" />
+        <Project Path="src/XYPortal.LinkBoard.Application.Contracts/XYPortal.LinkBoard.Application.Contracts.csproj" />
+        <Project Path="src/XYPortal.LinkBoard.Application/XYPortal.LinkBoard.Application.csproj" />
+        <Project Path="src/XYPortal.LinkBoard.EntityFrameworkCore/XYPortal.LinkBoard.EntityFrameworkCore.csproj" />
+        <Project Path="src/XYPortal.LinkBoard.HttpApi/XYPortal.LinkBoard.HttpApi.csproj" />
+        <Project Path="src/XYPortal.LinkBoard.HttpApi.Client/XYPortal.LinkBoard.HttpApi.Client.csproj" />
+        <Project Path="src/XYPortal.LinkBoard.Installer/XYPortal.LinkBoard.Installer.csproj" />
+    </Folder>
+    
+    <Folder Name="/test/">
+        <Project Path="test/XYPortal.LinkBoard.TestBase/XYPortal.LinkBoard.TestBase.csproj" />
+        <Project Path="test/XYPortal.LinkBoard.EntityFrameworkCore.Tests/XYPortal.LinkBoard.EntityFrameworkCore.Tests.csproj" />
+        <Project Path="test/XYPortal.LinkBoard.Domain.Tests/XYPortal.LinkBoard.Domain.Tests.csproj" />
+        <Project Path="test/XYPortal.LinkBoard.Application.Tests/XYPortal.LinkBoard.Application.Tests.csproj" />
+    </Folder>
+</Solution>

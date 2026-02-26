@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\XYPortal.Domain.Shared\XYPortal.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\..\XYPortal.LinkBoard\src\XYPortal.LinkBoard.Domain\XYPortal.LinkBoard.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
