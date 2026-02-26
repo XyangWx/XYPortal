@@ -16,8 +16,6 @@ using StackExchange.Redis;
 using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Web;
-using Volo.Abp.AspNetCore.Mvc.UI;
-using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
@@ -34,7 +32,6 @@ using Volo.Abp.Modularity;
 using Volo.Abp.OpenIddict;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.UI.Navigation.Urls;
-using Volo.Abp.UI;
 using Volo.Abp.VirtualFileSystem;
 using Volo.Abp.Account.Localization;
 using Microsoft.AspNetCore.Http;
@@ -52,12 +49,14 @@ namespace XYPortal;
     typeof(XYPortalEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreSerilogModule)
     )]
+// ReSharper disable once InconsistentNaming
+// ReSharper disable once ClassNeverInstantiated.Global
 public class XYPortalAuthServerModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
         var hostingEnvironment = context.Services.GetHostingEnvironment();
-        var configuration = context.Services.GetConfiguration();
+        context.Services.GetConfiguration();
 
         PreConfigure<OpenIddictBuilder>(builder =>
         {
@@ -156,7 +155,7 @@ public class XYPortalAuthServerModule : AbpModule
             dataProtectionBuilder.PersistKeysToStackExchangeRedis(redis, "XYPortal-Protection-Keys");
         }
 
-        context.Services.AddSingleton<IDistributedLockProvider>(sp =>
+        context.Services.AddSingleton<IDistributedLockProvider>(_ =>
         {
             var connection = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]!);
             return new RedisDistributedSynchronizationProvider(connection.GetDatabase());
@@ -187,15 +186,17 @@ public class XYPortalAuthServerModule : AbpModule
         });
     }
 
+    // ReSharper disable once UnusedMember.Local
     private void CheckSameSite(HttpContext httpContext, CookieOptions options)
     {
-        if (options.SameSite == SameSiteMode.None)
+        if (options.SameSite != SameSiteMode.None)
         {
-            var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
-            if (DisallowsSameSiteNone(userAgent))
-            {
-                options.SameSite = SameSiteMode.Unspecified;
-            }
+            return;
+        }
+        var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+        if (DisallowsSameSiteNone(userAgent))
+        {
+            options.SameSite = SameSiteMode.Unspecified;
         }
     }
 
@@ -246,7 +247,7 @@ public class XYPortalAuthServerModule : AbpModule
         app.UseAuthentication();
         app.UseAbpOpenIddictValidation();
 
-        if (MultiTenancyConsts.IsEnabled)
+        if (IsMultiTenancyEnabled())
         {
             app.UseMultiTenancy();
         }
@@ -258,5 +259,10 @@ public class XYPortalAuthServerModule : AbpModule
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+    }
+    
+    private static bool IsMultiTenancyEnabled()
+    {
+        return MultiTenancyConsts.IsEnabled;
     }
 }

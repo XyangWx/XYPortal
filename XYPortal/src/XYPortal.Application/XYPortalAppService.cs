@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using XYPortal.Localization;
+﻿using XYPortal.Localization;
 using Volo.Abp.Application.Services;
 
 namespace XYPortal;
