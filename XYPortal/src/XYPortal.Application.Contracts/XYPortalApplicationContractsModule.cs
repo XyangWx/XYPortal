@@ -21,6 +21,7 @@ namespace XYPortal;
     typeof(AbpTenantManagementApplicationContractsModule),
     typeof(AbpObjectExtendingModule)
 )]
+// ReSharper disable once InconsistentNaming
 public class XYPortalApplicationContractsModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
