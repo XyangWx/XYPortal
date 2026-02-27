@@ -310,7 +310,7 @@ public class XYPortalWebModule : AbpModule
         app.UseRouting();
         app.UseAuthentication();
 
-        if (MultiTenancyConsts.IsEnabled)
+        if (IsMultiTenancyEnabled())
         {
             app.UseMultiTenancy();
         }
@@ -324,5 +324,10 @@ public class XYPortalWebModule : AbpModule
         });
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+    }
+    
+    private static bool IsMultiTenancyEnabled()
+    {
+        return MultiTenancyConsts.IsEnabled;
     }
 }

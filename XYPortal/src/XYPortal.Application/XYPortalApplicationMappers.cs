@@ -1,9 +1,9 @@
 using Riok.Mapperly.Abstractions;
-using Volo.Abp.Mapperly;
 
 namespace XYPortal;
 
 [Mapper]
+// ReSharper disable once InconsistentNaming
 public partial class XYPortalApplicationMappers
 {
     /* You can configure your Mapperly mapping configuration here.

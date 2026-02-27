@@ -1,14 +1,15 @@
 @page
-@using XYPortal.LinkBoard.Permissions
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Mvc.Localization
 @using XYPortal.Localization
 @model XYPortal.Web.Pages.LinkBoard.CategoryReview.IndexModel
 @inject IAuthorizationService AuthorizationService
 @inject IHtmlLocalizer<XYPortalResource> L
+@* ReSharper disable once Razor.SectionNotResolved *@
 @section styles {
     <abp-style src="/Pages/LinkBoard/CategoryReview/index.css" />
 }
+@* ReSharper disable once Razor.SectionNotResolved *@
 @section scripts {
     <abp-script src="/Pages/LinkBoard/CategoryReview/index.js" />
 }

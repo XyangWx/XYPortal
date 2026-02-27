@@ -9,7 +9,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Server.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
-using System;
 using System.IO;
 using Volo.Abp;
 using Volo.Abp.Account.Web;
@@ -282,7 +281,7 @@ public class XYPortalWebModule : AbpModule
         app.UseAuthentication();
         app.UseAbpOpenIddictValidation();
 
-        if (MultiTenancyConsts.IsEnabled)
+        if (IsMultiTenancyEnabled())
         {
             app.UseMultiTenancy();
         }
@@ -300,5 +299,10 @@ public class XYPortalWebModule : AbpModule
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+    }
+    
+    private static bool IsMultiTenancyEnabled()
+    {
+        return MultiTenancyConsts.IsEnabled;
     }
 }

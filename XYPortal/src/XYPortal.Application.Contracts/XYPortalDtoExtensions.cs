@@ -1,9 +1,8 @@
-﻿using Volo.Abp.Identity;
-using Volo.Abp.ObjectExtending;
-using Volo.Abp.Threading;
+﻿using Volo.Abp.Threading;
 
 namespace XYPortal;
 
+// ReSharper disable once InconsistentNaming
 public static class XYPortalDtoExtensions
 {
     private static readonly OneTimeRunner OneTimeRunner = new OneTimeRunner();
@@ -13,7 +12,7 @@ public static class XYPortalDtoExtensions
         OneTimeRunner.Run(() =>
         {
                 /* You can add extension properties to DTOs
-                 * defined in the depended modules.
+                 * defined in the depended on modules.
                  *
                  * Example:
                  *

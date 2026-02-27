@@ -51,7 +51,7 @@ public class XYPortalMenuContributor : IMenuContributor
             )
         );
 
-        if (MultiTenancyConsts.IsEnabled)
+        if (IsMultiTenancyEnabled())
         {
             administration.SetSubItemOrder(TenantManagementMenuNames.GroupName, 1);
         }
@@ -142,5 +142,10 @@ public class XYPortalMenuContributor : IMenuContributor
         context.Menu.AddItem(new ApplicationMenuItem("Account.Logout", l["Logout"], url: "~/Account/Logout", icon: "fa fa-power-off", order: int.MaxValue - 1000).RequireAuthenticated());
 
         return Task.CompletedTask;
+    }
+    
+    private static bool IsMultiTenancyEnabled()
+    {
+        return MultiTenancyConsts.IsEnabled;
     }
 }

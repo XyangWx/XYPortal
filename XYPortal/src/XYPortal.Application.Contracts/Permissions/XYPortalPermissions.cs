@@ -1,5 +1,6 @@
 ﻿namespace XYPortal.Permissions;
 
+// ReSharper disable once InconsistentNaming
 public static class XYPortalPermissions
 {
     public const string GroupName = "XYPortal";

@@ -4,5 +4,9 @@ namespace XYPortal.OpenIddict;
 
 public class GetOpenIddictApplicationListInput : PagedAndSortedResultRequestDto
 {
-    public string? Filter { get; set; }
+    public string? Filter
+    {
+        get => field;
+        set => field = value;
+    }
 }

@@ -4,6 +4,7 @@ using Volo.Abp.Localization;
 
 namespace XYPortal.Permissions;
 
+// ReSharper disable once InconsistentNaming
 public class XYPortalPermissionDefinitionProvider : PermissionDefinitionProvider
 {
     public override void Define(IPermissionDefinitionContext context)

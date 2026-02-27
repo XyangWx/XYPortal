@@ -1,5 +1,4 @@
 ﻿using Volo.Abp.Account;
-using Volo.Abp.Mapperly;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
@@ -22,6 +21,7 @@ namespace XYPortal;
     typeof(AbpFeatureManagementApplicationModule),
     typeof(AbpSettingManagementApplicationModule)
     )]
+// ReSharper disable once InconsistentNaming
 public class XYPortalApplicationModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
