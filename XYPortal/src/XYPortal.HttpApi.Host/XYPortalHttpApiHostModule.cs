@@ -191,7 +191,7 @@ public class XYPortalHttpApiHostModule : AbpModule
         app.UseCors();
         app.UseAuthentication();
 
-        if (MultiTenancyConsts.IsEnabled)
+        if (IsMultiTenancyEnabled())
         {
             app.UseMultiTenancy();
         }
@@ -213,5 +213,10 @@ public class XYPortalHttpApiHostModule : AbpModule
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+    }
+    
+    private static bool IsMultiTenancyEnabled()
+    {
+        return MultiTenancyConsts.IsEnabled;
     }
 }

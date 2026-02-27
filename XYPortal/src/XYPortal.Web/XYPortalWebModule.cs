@@ -281,7 +281,7 @@ public class XYPortalWebModule : AbpModule
         app.UseAuthentication();
         app.UseAbpOpenIddictValidation();
 
-        if (MultiTenancyConsts.IsEnabled)
+        if (IsMultiTenancyEnabled())
         {
             app.UseMultiTenancy();
         }
@@ -299,5 +299,10 @@ public class XYPortalWebModule : AbpModule
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+    }
+    
+    private static bool IsMultiTenancyEnabled()
+    {
+        return MultiTenancyConsts.IsEnabled;
     }
 }

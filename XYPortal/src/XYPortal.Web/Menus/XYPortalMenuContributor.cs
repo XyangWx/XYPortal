@@ -37,7 +37,7 @@ public class XYPortalMenuContributor : IMenuContributor
             )
         );
 
-        if (MultiTenancyConsts.IsEnabled)
+        if (IsMultiTenancyEnabled())
         {
             administration.SetSubItemOrder(TenantManagementMenuNames.GroupName, 1);
         }
@@ -115,5 +115,10 @@ public class XYPortalMenuContributor : IMenuContributor
         administration.AddItem(linkBoardAdminMenu);
 
         return Task.CompletedTask;
+    }
+    
+    private static bool IsMultiTenancyEnabled()
+    {
+        return MultiTenancyConsts.IsEnabled;
     }
 }
