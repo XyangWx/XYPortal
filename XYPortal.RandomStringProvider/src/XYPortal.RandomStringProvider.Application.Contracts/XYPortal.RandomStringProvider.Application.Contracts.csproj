@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>XYPortal.RandomStringProvider</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="10.1.0" />
+    <PackageReference Include="Volo.Abp.Authorization" Version="10.1.0" />
+    <ProjectReference Include="..\XYPortal.RandomStringProvider.Domain.Shared\XYPortal.RandomStringProvider.Domain.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

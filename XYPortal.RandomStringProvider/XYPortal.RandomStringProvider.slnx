@@ -1,0 +1,24 @@
+<Solution>
+    <Configurations>
+        <Platform Name="Any CPU" />
+    </Configurations>
+
+    <Folder Name="/src/">
+        <Project Path="src/XYPortal.RandomStringProvider.Domain.Shared/XYPortal.RandomStringProvider.Domain.Shared.csproj" />
+        <Project Path="src/XYPortal.RandomStringProvider.Domain/XYPortal.RandomStringProvider.Domain.csproj" />
+        <Project Path="src/XYPortal.RandomStringProvider.Application.Contracts/XYPortal.RandomStringProvider.Application.Contracts.csproj" />
+        <Project Path="src/XYPortal.RandomStringProvider.Application/XYPortal.RandomStringProvider.Application.csproj" />
+        <Project Path="src/XYPortal.RandomStringProvider.EntityFrameworkCore/XYPortal.RandomStringProvider.EntityFrameworkCore.csproj" />
+        <Project Path="src/XYPortal.RandomStringProvider.HttpApi/XYPortal.RandomStringProvider.HttpApi.csproj" />
+        <Project Path="src/XYPortal.RandomStringProvider.HttpApi.Client/XYPortal.RandomStringProvider.HttpApi.Client.csproj" />
+        <Project Path="src/XYPortal.RandomStringProvider.Web/XYPortal.RandomStringProvider.Web.csproj" />
+        <Project Path="src/XYPortal.RandomStringProvider.Installer/XYPortal.RandomStringProvider.Installer.csproj" />
+    </Folder>
+    
+    <Folder Name="/test/">
+        <Project Path="test/XYPortal.RandomStringProvider.TestBase/XYPortal.RandomStringProvider.TestBase.csproj" />
+        <Project Path="test/XYPortal.RandomStringProvider.EntityFrameworkCore.Tests/XYPortal.RandomStringProvider.EntityFrameworkCore.Tests.csproj" />
+        <Project Path="test/XYPortal.RandomStringProvider.Domain.Tests/XYPortal.RandomStringProvider.Domain.Tests.csproj" />
+        <Project Path="test/XYPortal.RandomStringProvider.Application.Tests/XYPortal.RandomStringProvider.Application.Tests.csproj" />
+    </Folder>
+</Solution>
