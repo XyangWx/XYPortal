@@ -8,3 +8,5 @@ TOOLS.md
 USER.md
 **/yarn.lock
 **/package-lock.json
+skills/
+*.skill
