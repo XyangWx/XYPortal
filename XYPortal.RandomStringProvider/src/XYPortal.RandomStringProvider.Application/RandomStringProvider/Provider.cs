@@ -16,6 +16,7 @@ public static class Provider
             { RandomCategory.LowercaseLetters, new LowerCaseLetterPool(Random) },
             { RandomCategory.UppercaseLetters, new UpperCaseLetterPool(Random) },
             { RandomCategory.ArabicNumerals, new ArabicNumeralPool(Random) },
+            { RandomCategory.EnglishPunctuation, new EnglishPunctuationPool(Random) },
             ////TODO: 补全逻辑
         };
     }
@@ -34,6 +35,7 @@ public static class Provider
         List<char> list = [];
         var ignores = input.IgnoreChars?.ToList() ?? [];
 
+        // 第一遍，满足所有类型符号至少有一个
         foreach (var pool in pools)
         {
             char @char = pool.Get(ignores.ToArray());
@@ -49,8 +51,10 @@ public static class Provider
             list.Add(@char);
         }
 
+        // 算出还剩多少符号要生成
         int leftLength = input.Length - pools.Length;
         
+        // 第二遍，随机生成剩余的符号
         for (int i = leftLength; i > 0; i--)
         {
             int point = Random.Next(pools.Length);
@@ -70,6 +74,7 @@ public static class Provider
         
         StringBuilder sb = new StringBuilder();
 
+        // 再做一次随机，混淆排列
         for (int i = 0; i < list.ToArray().Length; i++)
         {
             var point =  Random.Next(list.ToArray().Length);
