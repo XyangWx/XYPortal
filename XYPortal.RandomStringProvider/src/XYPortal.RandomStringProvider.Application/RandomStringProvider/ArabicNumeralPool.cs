@@ -3,14 +3,13 @@ using System.Linq;
 
 namespace XYPortal.RandomStringProvider.RandomStringProvider;
 
-internal class UpperCaseLetterPool : SymbolPool
+internal class ArabicNumeralPool : SymbolPool
 {
-    private static readonly char[] Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+    private static readonly char[] Chars = "0123456789".ToCharArray();
     
-    public UpperCaseLetterPool(Random random) : base(random)
+    public ArabicNumeralPool(Random random) : base(random)
     {
     }
-
 
     public override char Get(params char[] ignores)
     {

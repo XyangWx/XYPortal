@@ -15,6 +15,7 @@ public static class Provider
         {
             { RandomCategory.LowercaseLetters, new LowerCaseLetterPool(Random) },
             { RandomCategory.UppercaseLetters, new UpperCaseLetterPool(Random) },
+            { RandomCategory.ArabicNumerals, new ArabicNumeralPool(Random) },
             ////TODO: 补全逻辑
         };
     }
