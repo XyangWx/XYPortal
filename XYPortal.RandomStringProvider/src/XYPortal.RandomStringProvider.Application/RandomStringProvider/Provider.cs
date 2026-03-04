@@ -17,7 +17,12 @@ public static class Provider
             { RandomCategory.UppercaseLetters, new UpperCaseLetterPool(Random) },
             { RandomCategory.ArabicNumerals, new ArabicNumeralPool(Random) },
             { RandomCategory.EnglishPunctuation, new EnglishPunctuationPool(Random) },
-            ////TODO: 补全逻辑
+            { RandomCategory.ChineseCapitalNumbers, new ChineseCapitalNumbersPool(Random) },
+            { RandomCategory.HeavenlyStems, new HeavenlyStemsPool(Random) },
+            { RandomCategory.EarthlyBranches, new EarthlyBranchesPool(Random) },
+            { RandomCategory.BaguaSymbols, new BaguaSymbolsPool(Random) },
+            { RandomCategory.SixtyFourHexagrams, new SixtyFourHexagramsPool(Random) },
+            { RandomCategory.UnicodeMiscellaneousSymbols, new UnicodeMiscellaneousPool(Random) },
         };
     }
     

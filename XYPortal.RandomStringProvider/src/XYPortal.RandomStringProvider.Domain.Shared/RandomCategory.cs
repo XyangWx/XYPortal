@@ -47,11 +47,11 @@ public enum RandomCategory : long
     /// <summary>
     /// 杂项Unicode符号
     /// </summary>
-    UnicodeMiscSymbols  = 1 << 9,
+    UnicodeMiscellaneousSymbols  = 1 << 9,
     /// <summary>
     /// 所有项目
     /// </summary>
-    All = LowercaseLetters | UppercaseLetters | ArabicNumerals | EnglishPunctuation | ChineseCapitalNumbers | HeavenlyStems | EarthlyBranches | BaguaSymbols | SixtyFourHexagrams | UnicodeMiscSymbols,
+    All = LowercaseLetters | UppercaseLetters | ArabicNumerals | EnglishPunctuation | ChineseCapitalNumbers | HeavenlyStems | EarthlyBranches | BaguaSymbols | SixtyFourHexagrams | UnicodeMiscellaneousSymbols,
     /// <summary>
     /// 密码选项
     /// </summary>
