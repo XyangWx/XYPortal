@@ -2,5 +2,5 @@ namespace XYPortal.RandomStringProvider.RandomStringProvider;
 
 internal interface ISymbolPool
 {
-    string Get(params string[] ignores);
+    char Get(params char[] ignores);
 }

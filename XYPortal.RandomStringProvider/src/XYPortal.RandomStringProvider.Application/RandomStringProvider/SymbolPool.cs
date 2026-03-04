@@ -21,5 +21,5 @@ internal abstract class SymbolPool : ISymbolPool
         return _random.Next(max);
     }
 
-    public abstract string Get(params string[] ignores);
+    public abstract char Get(params char[] ignores);
 }

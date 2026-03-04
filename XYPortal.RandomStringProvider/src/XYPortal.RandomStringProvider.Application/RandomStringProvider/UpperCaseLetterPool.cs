@@ -5,19 +5,19 @@ namespace XYPortal.RandomStringProvider.RandomStringProvider;
 
 internal class UpperCaseLetterPool : SymbolPool
 {
-    private static readonly char[] _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+    private static readonly char[] Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
     
     public UpperCaseLetterPool(Random random) : base(random)
     {
     }
 
 
-    public override string Get(params string[] ignores)
+    public override char Get(params char[] ignores)
     {
-        var chars = _chars.Where(C => !ignores.Any(I => I.Equals($"{C}"))).ToArray();
+        var chars = Chars.Where(c => ignores.Contains(c)).ToArray();
         
         var value = chars[Next(chars.Length)];
 
-        return $"{value}";
+        return value;
     }
 }
