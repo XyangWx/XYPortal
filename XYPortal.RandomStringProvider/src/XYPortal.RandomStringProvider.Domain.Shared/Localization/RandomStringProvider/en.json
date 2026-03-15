@@ -2,6 +2,25 @@
   "culture": "en",
   "texts": {
     "MyAccount":  "My account",
-    "SamplePageMessage": "A sample page for the RandomStringProvider module"
+    "SamplePageMessage": "A sample page for the RandomStringProvider module",
+    "RandomStringGenerator": "Random String Generator",
+    "GeneratedString": "Generated String",
+    "Copy": "Copy",
+    "Generate": "Generate",
+    "Length": "Length",
+    "UniqueCharsOnly": "Unique characters only",
+    "SymbolCategories": "Symbol Categories",
+    "LowercaseLetters": "Lowercase Letters",
+    "UppercaseLetters": "Uppercase Letters",
+    "ArabicNumerals": "Arabic Numerals",
+    "EnglishPunctuation": "English Punctuation",
+    "ChineseCapitalNumbers": "Chinese Capital Numbers",
+    "HeavenlyStems": "Heavenly Stems",
+    "EarthlyBranches": "Earthly Branches",
+    "BaguaSymbols": "Bagua Symbols",
+    "SixtyFourHexagrams": "64 Hexagrams",
+    "SelectAtLeastOneCategory": "Please select at least one category",
+    "GeneratedSuccessfully": "Generated successfully!",
+    "CopiedToClipboard": "Copied to clipboard!"
   }
 }

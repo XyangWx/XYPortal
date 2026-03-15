@@ -37,6 +37,8 @@ using XYPortal.EntityFrameworkCore;
 using XYPortal.Localization;
 using XYPortal.MultiTenancy;
 using XYPortal.Web.Menus;
+using XYPortal.RandomStringProvider.Web;
+using XYPortal.RandomStringProvider;
 
 namespace XYPortal.Web;
 
@@ -53,7 +55,9 @@ namespace XYPortal.Web;
     typeof(AbpFeatureManagementWebModule),
     typeof(AbpTenantManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(RandomStringProviderApplicationModule),
+    typeof(RandomStringProviderWebModule)
     )]
 public class XYPortalWebModule : AbpModule
 {

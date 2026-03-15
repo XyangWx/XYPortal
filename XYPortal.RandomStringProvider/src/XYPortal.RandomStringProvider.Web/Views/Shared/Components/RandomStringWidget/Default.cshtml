@@ -1,0 +1,145 @@
+@model string
+
+<div class="card" id="randomStringWidget">
+    <div class="card-header">
+        <h5 class="card-title">🎲 @L["RandomStringGenerator"]</h5>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label">@L["GeneratedString"]</label>
+            <div class="input-group">
+                <input type="text" class="form-control font-monospace" id="randomStringResult" value="@Model" readonly />
+                <button class="btn btn-outline-secondary" type="button" id="copyButton" title="@L["Copy"]">
+                    <i class="fa fa-copy"></i>
+                </button>
+                <button class="btn btn-primary" type="button" id="refreshButton" title="@L["Generate"]">
+                    <i class="fa fa-refresh"></i>
+                </button>
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">@L["Length"]</label>
+                <input type="number" class="form-control" id="lengthInput" value="12" min="1" max="100" />
+            </div>
+            <div class="col-md-6">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" id="isOnlyOnceInput" />
+                    <label class="form-check-label" for="isOnlyOnceInput">
+                        @L["UniqueCharsOnly"]
+                    </label>
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">@L["SymbolCategories"]</label>
+                <div class="row" id="categoryCheckboxes">
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="1" id="catLowercase" checked />
+                            <label class="form-check-label" for="catLowercase">@L["LowercaseLetters"]</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="2" id="catUppercase" checked />
+                            <label class="form-check-label" for="catUppercase">@L["UppercaseLetters"]</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="4" id="catNumbers" checked />
+                            <label class="form-check-label" for="catNumbers">@L["ArabicNumerals"]</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="8" id="catPunctuation" checked />
+                            <label class="form-check-label" for="catPunctuation">@L["EnglishPunctuation"]</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="16" id="catChinese" />
+                            <label class="form-check-label" for="catChinese">@L["ChineseCapitalNumbers"]</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="32" id="catHeavenly" />
+                            <label class="form-check-label" for="catHeavenly">@L["HeavenlyStems"]</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="64" id="catEarthly" />
+                            <label class="form-check-label" for="catEarthly">@L["EarthlyBranches"]</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="128" id="catBagua" />
+                            <label class="form-check-label" for="catBagua">@L["BaguaSymbols"]</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="256" id="catHexagrams" />
+                            <label class="form-check-label" for="catHexagrams">@L["SixtyFourHexagrams"]</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        var widget = $('#randomStringWidget');
+        
+        // Generate new random string
+        function generate() {
+            var length = parseInt($('#lengthInput').val()) || 12;
+            var isOnlyOnce = $('#isOnlyOnceInput').prop('checked');
+            
+            var categories = 0;
+            widget.find('.category-checkbox:checked').each(function() {
+                categories |= parseInt($(this).val());
+            });
+            
+            if (categories === 0) {
+                abp.notify.warn('@L["SelectAtLeastOneCategory"]');
+                return;
+            }
+            
+            var input = {
+                length: length,
+                isOnlyOnce: isOnlyOnce,
+                symbolCategories: categories
+            };
+            
+            abp.ajax({
+                url: '/api/app/random-string/make',
+                type: 'POST',
+                data: JSON.stringify(input),
+                contentType: 'application/json'
+            }).then(function(result) {
+                $('#randomStringResult').val(result);
+                abp.notify.success('@L["GeneratedSuccessfully"]');
+            });
+        }
+        
+        // Copy to clipboard
+        $('#copyButton').click(function() {
+            var text = $('#randomStringResult').val();
+            navigator.clipboard.writeText(text).then(function() {
+                abp.notify.success('@L["CopiedToClipboard"]');
+            });
+        });
+        
+        // Refresh button
+        $('#refreshButton').click(function() {
+            generate();
+        });
+    });
+</script>

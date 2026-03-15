@@ -2,6 +2,25 @@
   "culture": "zh-Hans",
   "texts": {
     "MyAccount": "我的账户",
-    "SamplePageMessage": "RandomStringProvider 模块的示例页面"
+    "SamplePageMessage": "RandomStringProvider 模块的示例页面",
+    "RandomStringGenerator": "随机字符串生成器",
+    "GeneratedString": "生成的字符串",
+    "Copy": "复制",
+    "Generate": "生成",
+    "Length": "长度",
+    "UniqueCharsOnly": "字符不重复",
+    "SymbolCategories": "字符类型",
+    "LowercaseLetters": "小写字母",
+    "UppercaseLetters": "大写字母",
+    "ArabicNumerals": "阿拉伯数字",
+    "EnglishPunctuation": "英文标点",
+    "ChineseCapitalNumbers": "中文大写数字",
+    "HeavenlyStems": "天干",
+    "EarthlyBranches": "地支",
+    "BaguaSymbols": "八卦符号",
+    "SixtyFourHexagrams": "六十四卦",
+    "SelectAtLeastOneCategory": "请至少选择一种字符类型",
+    "GeneratedSuccessfully": "生成成功！",
+    "CopiedToClipboard": "已复制到剪贴板！"
   }
 }

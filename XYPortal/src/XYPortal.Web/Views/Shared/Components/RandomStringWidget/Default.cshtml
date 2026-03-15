@@ -1,0 +1,165 @@
+@model string
+
+<div class="card" id="randomStringWidget">
+    <div class="card-header">
+        <h5 class="card-title">🎲 Random String Generator</h5>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label">Generated String</label>
+            <div class="input-group">
+                <input type="text" class="form-control font-monospace" id="randomStringResult" value="@Model" readonly />
+                <button class="btn btn-outline-secondary" type="button" id="copyButton" title="Copy">
+                    <i class="fa fa-copy"></i>
+                </button>
+                <button class="btn btn-primary" type="button" id="refreshButton" title="Generate">
+                    <i class="fa fa-refresh"></i>
+                </button>
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Length</label>
+                <input type="number" class="form-control" id="lengthInput" value="12" min="1" max="100" />
+            </div>
+            <div class="col-md-6">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" id="isOnlyOnceInput" />
+                    <label class="form-check-label" for="isOnlyOnceInput">
+                        Unique characters only
+                    </label>
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Symbol Categories</label>
+                <div class="row" id="categoryCheckboxes">
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="1" id="catLowercase" checked />
+                            <label class="form-check-label" for="catLowercase"> Lowercase Letters</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="2" id="catUppercase" checked />
+                            <label class="form-check-label" for="catUppercase"> Uppercase Letters</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="4" id="catNumbers" checked />
+                            <label class="form-check-label" for="catNumbers"> Arabic Numerals</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="8" id="catPunctuation" checked />
+                            <label class="form-check-label" for="catPunctuation"> English Punctuation</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="16" id="catChinese" />
+                            <label class="form-check-label" for="catChinese"> Chinese Capital Numbers</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="32" id="catHeavenly" />
+                            <label class="form-check-label" for="catHeavenly"> Heavenly Stems</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="64" id="catEarthly" />
+                            <label class="form-check-label" for="catEarthly"> Earthly Branches</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="128" id="catBagua" />
+                            <label class="form-check-label" for="catBagua"> Bagua Symbols</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="256" id="catHexagrams" />
+                            <label class="form-check-label" for="catHexagrams"> 64 Hexagrams</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    console.log('RandomStringWidget: Script loaded');
+    console.log('jQuery:', typeof jQuery);
+    console.log('abp:', typeof abp);
+    
+    function q(sel) {
+        return document.querySelector(sel);
+    }
+    
+    function qa(sel) {
+        return document.querySelectorAll(sel);
+    }
+    
+    function generate() {
+        console.log('Generate function called');
+        
+        var length = parseInt(q('#lengthInput').value) || 12;
+        var isOnlyOnce = q('#isOnlyOnceInput').checked;
+        
+        var categories = 0;
+        qa('.category-checkbox:checked').forEach(function(el) {
+            categories |= parseInt(el.value);
+        });
+        
+        console.log('Length:', length, 'Categories:', categories);
+        
+        if (categories === 0) {
+            abp.notify.warn('Please select at least one category');
+            return;
+        }
+        
+        var input = {
+            length: length,
+            isOnlyOnce: isOnlyOnce,
+            symbolCategories: categories
+        };
+        
+        console.log('Sending request:', input);
+        
+        abp.ajax({
+            url: '/api/app/random-string/make',
+            type: 'POST',
+            data: JSON.stringify(input),
+            contentType: 'application/json'
+        }).then(function(result) {
+            console.log('Success:', result);
+            q('#randomStringResult').value = result;
+            abp.notify.success('Generated successfully!');
+        }).catch(function(err) {
+            console.error('Error:', err);
+        });
+    }
+    
+    // Copy to clipboard
+    q('#copyButton').addEventListener('click', function() {
+        console.log('Copy button clicked');
+        var text = q('#randomStringResult').value;
+        navigator.clipboard.writeText(text).then(function() {
+            abp.notify.success('Copied to clipboard!');
+        });
+    });
+    
+    // Refresh button
+    q('#refreshButton').addEventListener('click', function() {
+        console.log('Refresh button clicked');
+        generate();
+    });
+    
+    console.log('Event handlers attached');
+</script>

@@ -28,13 +28,17 @@
   <ItemGroup>
     <EmbeddedResource Include="Pages\**\*.css" />
     <EmbeddedResource Include="Pages\**\*.js" />
+    <EmbeddedResource Include="Components\**\*.cs" />
     <EmbeddedResource Include="Components\**\*.js" />
     <EmbeddedResource Include="Components\**\*.css" />
+    <EmbeddedResource Include="Views\Shared\Components\**\*.cshtml" />
     <EmbeddedResource Include="wwwroot\**\*.*" />
     <Content Remove="Pages\**\*.css" />
     <Content Remove="Pages\**\*.js" />
+    <Content Remove="Components\**\*.cs" />
     <Content Remove="Components\**\*.js" />
     <Content Remove="Components\**\*.css" />
+    <Content Remove="Views\Shared\Components\**\*.cshtml" />
     <Content Remove="wwwroot\**\*.*" />
   </ItemGroup>
 
