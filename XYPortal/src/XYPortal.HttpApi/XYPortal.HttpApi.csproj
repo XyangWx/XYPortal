@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\XYPortal.Application.Contracts\XYPortal.Application.Contracts.csproj" />
     <ProjectReference Include="..\..\..\XYPortal.LinkBoard\src\XYPortal.LinkBoard.HttpApi\XYPortal.LinkBoard.HttpApi.csproj" />
+    <ProjectReference Include="..\..\..\XYPortal.RandomStringProvider\src\XYPortal.RandomStringProvider.Application.Contracts\XYPortal.RandomStringProvider.Application.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
