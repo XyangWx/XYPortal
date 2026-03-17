@@ -24,7 +24,7 @@ internal class SixtyFourHexagramsPool : SymbolPool
 
     private static char[] GetSixtyFourHexagrams()
     {
-        int start = 0x4cdc0;
+        int start = 0x4DC0;  // Unicode range for I Ching Hexagrams (䷀ to ䷿)
 
         List<char> chars = [];
 

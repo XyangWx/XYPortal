@@ -15,9 +15,6 @@ public class RandomStringProviderMenuContributor : IMenuContributor
 
     private Task ConfigureMainMenuAsync(MenuConfigurationContext context)
     {
-        //Add main menu items.
-        context.Menu.AddItem(new ApplicationMenuItem(RandomStringProviderMenus.Prefix, displayName: "RandomStringProvider", "~/RandomStringProvider", icon: "fa fa-globe"));
-
         return Task.CompletedTask;
     }
 }

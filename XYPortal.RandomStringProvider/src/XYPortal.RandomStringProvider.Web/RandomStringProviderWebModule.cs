@@ -48,7 +48,6 @@ public class RandomStringProviderWebModule : AbpModule
 
         Configure<RazorPagesOptions>(options =>
         {
-            //Configure authorization.
         });
     }
 }
