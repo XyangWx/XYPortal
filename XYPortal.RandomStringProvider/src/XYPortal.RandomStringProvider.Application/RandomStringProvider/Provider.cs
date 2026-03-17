@@ -76,16 +76,19 @@ public static class Provider
             
             list.Add(@char);
         }
-        
+
         StringBuilder sb = new StringBuilder();
 
         // 再做一次随机，混淆排列
-        for (int i = 0; i < list.ToArray().Length; i++)
+        var chars = list.ToArray();
+        int totalLength = chars.Length;
+        for (int i = 0; i < totalLength; i++)
         {
-            var point =  Random.Next(list.ToArray().Length);
-            var @char = list.ToArray()[point];
+            var point = Random.Next(chars.Length);
+            var @char = chars[point];
             sb.Append(@char);
-            list.Remove(@char);
+            // 移除已使用的字符
+            chars = chars.Where((c, idx) => idx != point).ToArray();
         }
 
         return sb.ToString();
