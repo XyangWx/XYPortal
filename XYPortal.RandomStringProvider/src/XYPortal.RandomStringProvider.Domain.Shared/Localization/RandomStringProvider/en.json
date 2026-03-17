@@ -8,6 +8,8 @@
     "Copy": "Copy",
     "Generate": "Generate",
     "Length": "Length",
+    "Prefix": "Prefix",
+    "Suffix": "Suffix",
     "UniqueCharsOnly": "Unique characters only",
     "SymbolCategories": "Symbol Categories",
     "LowercaseLetters": "Lowercase Letters",
@@ -19,6 +21,7 @@
     "EarthlyBranches": "Earthly Branches",
     "BaguaSymbols": "Bagua Symbols",
     "SixtyFourHexagrams": "64 Hexagrams",
+    "UnicodeMiscellaneousSymbols": "Unicode Miscellaneous",
     "SelectAtLeastOneCategory": "Please select at least one category",
     "GeneratedSuccessfully": "Generated successfully!",
     "CopiedToClipboard": "Copied to clipboard!"

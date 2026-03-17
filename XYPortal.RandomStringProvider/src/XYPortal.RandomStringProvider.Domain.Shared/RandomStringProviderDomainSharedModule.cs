@@ -25,7 +25,7 @@ public class RandomStringProviderDomainSharedModule : AbpModule
         Configure<AbpLocalizationOptions>(options =>
         {
             options.Resources
-                .Add<RandomStringProviderResource>("en")
+                .Add<RandomStringProviderResource>("zh-Hans")
                 .AddBaseTypes(typeof(AbpValidationResource))
                 .AddVirtualJson("/Localization/RandomStringProvider");
         });

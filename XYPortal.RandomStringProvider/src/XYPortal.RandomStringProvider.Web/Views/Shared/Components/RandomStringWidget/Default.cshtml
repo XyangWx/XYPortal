@@ -1,104 +1,154 @@
+@{
+    // Default localization (English)
+    var L = ViewBag.L as Dictionary<string, string> ?? new Dictionary<string, string>
+    {
+        ["RandomStringGenerator"] = "Random String Generator",
+        ["GeneratedString"] = "Generated String",
+        ["Copy"] = "Copy",
+        ["Generate"] = "Generate",
+        ["Length"] = "Length",
+        ["Prefix"] = "Prefix",
+        ["Suffix"] = "Suffix",
+        ["UniqueCharsOnly"] = "Unique characters only",
+        ["SymbolCategories"] = "Symbol Categories",
+        ["LowercaseLetters"] = "Lowercase Letters",
+        ["UppercaseLetters"] = "Uppercase Letters",
+        ["ArabicNumerals"] = "Arabic Numerals",
+        ["EnglishPunctuation"] = "English Punctuation",
+        ["ChineseCapitalNumbers"] = "Chinese Capital Numbers",
+        ["HeavenlyStems"] = "Heavenly Stems",
+        ["EarthlyBranches"] = "Earthly Branches",
+        ["BaguaSymbols"] = "Bagua Symbols",
+        ["SixtyFourHexagrams"] = "64 Hexagrams",
+        ["UnicodeMiscellaneousSymbols"] = "Unicode Miscellaneous",
+        ["SelectAtLeastOneCategory"] = "Please select at least one category",
+        ["GeneratedSuccessfully"] = "Generated successfully!",
+        ["CopiedToClipboard"] = "Copied to clipboard!"
+    };
+}
+
 @model string
 
-<div class="card" id="randomStringWidget">
+<div class="card" id="randomStringWidget" 
+     data-l-generated-string="@L["GeneratedString"]"
+     data-l-copy="@L["Copy"]"
+     data-l-generate="@L["Generate"]"
+     data-l-prefix="@L["Prefix"]"
+     data-l-suffix="@L["Suffix"]"
+     data-l-length="@L["Length"]"
+     data-l-unique-chars="@L["UniqueCharsOnly"]"
+     data-l-symbol-categories="@L["SymbolCategories"]"
+     data-l-lower="@L["LowercaseLetters"]"
+     data-l-upper="@L["UppercaseLetters"]"
+     data-l-numbers="@L["ArabicNumerals"]"
+     data-l-punctuation="@L["EnglishPunctuation"]"
+     data-l-chinese="@L["ChineseCapitalNumbers"]"
+     data-l-heavenly="@L["HeavenlyStems"]"
+     data-l-earthly="@L["EarthlyBranches"]"
+     data-l-bagua="@L["BaguaSymbols"]"
+     data-l-hexagrams="@L["SixtyFourHexagrams"]"
+     data-l-unicode-misc="@L["UnicodeMiscellaneousSymbols"]"
+     data-l-select-category="@L["SelectAtLeastOneCategory"]"
+     data-l-generated-success="@L["GeneratedSuccessfully"]"
+     data-l-copied="@L["CopiedToClipboard"]">
     <div class="card-header">
-        <h5 class="card-title">🎲 Random String Generator</h5>
+        <h5 class="card-title">🎲 @L["RandomStringGenerator"]</h5>
     </div>
     <div class="card-body">
         <div class="mb-3">
-            <label class="form-label">Generated String</label>
+            <label class="form-label">@L["GeneratedString"]</label>
             <div class="input-group">
                 <input type="text" class="form-control font-monospace" id="randomStringResult" value="@Model" readonly />
-                <button class="btn btn-outline-secondary" type="button" id="copyButton" title="Copy">
+                <button class="btn btn-outline-secondary" type="button" id="copyButton" title="@L["Copy"]">
                     <i class="fa fa-copy"></i>
                 </button>
-                <button class="btn btn-primary" type="button" id="refreshButton" title="Generate">
+                <button class="btn btn-primary" type="button" id="refreshButton" title="@L["Generate"]">
                     <i class="fa fa-refresh"></i>
                 </button>
             </div>
         </div>
         <div class="row g-3">
             <div class="col-md-4">
-                <label class="form-label">Prefix</label>
+                <label class="form-label">@L["Prefix"]</label>
                 <input type="text" class="form-control" id="prefixInput" value="" placeholder="Optional prefix" />
             </div>
             <div class="col-md-4">
-                <label class="form-label">Length</label>
+                <label class="form-label">@L["Length"]</label>
                 <input type="number" class="form-control" id="lengthInput" value="12" min="1" max="100" />
             </div>
             <div class="col-md-4">
-                <label class="form-label">Suffix</label>
+                <label class="form-label">@L["Suffix"]</label>
                 <input type="text" class="form-control" id="suffixInput" value="" placeholder="Optional suffix" />
             </div>
             <div class="col-12">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="isOnlyOnceInput" />
                     <label class="form-check-label" for="isOnlyOnceInput">
-                        Unique characters only
+                        @L["UniqueCharsOnly"]
                     </label>
                 </div>
             </div>
             <div class="col-12">
-                <label class="form-label">Symbol Categories</label>
+                <label class="form-label">@L["SymbolCategories"]</label>
                 <div class="row" id="categoryCheckboxes">
                     <div class="col-md-4 col-6">
                         <div class="form-check">
                             <input class="form-check-input category-checkbox" type="checkbox" value="1" id="catLowercase" checked />
-                            <label class="form-check-label" for="catLowercase"> Lowercase Letters</label>
+                            <label class="form-check-label" for="catLowercase"> @L["LowercaseLetters"]</label>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check">
                             <input class="form-check-input category-checkbox" type="checkbox" value="2" id="catUppercase" checked />
-                            <label class="form-check-label" for="catUppercase"> Uppercase Letters</label>
+                            <label class="form-check-label" for="catUppercase"> @L["UppercaseLetters"]</label>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check">
                             <input class="form-check-input category-checkbox" type="checkbox" value="4" id="catNumbers" checked />
-                            <label class="form-check-label" for="catNumbers"> Arabic Numerals</label>
+                            <label class="form-check-label" for="catNumbers"> @L["ArabicNumerals"]</label>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check">
                             <input class="form-check-input category-checkbox" type="checkbox" value="8" id="catPunctuation" checked />
-                            <label class="form-check-label" for="catPunctuation"> English Punctuation</label>
+                            <label class="form-check-label" for="catPunctuation"> @L["EnglishPunctuation"]</label>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check">
                             <input class="form-check-input category-checkbox" type="checkbox" value="16" id="catChinese" />
-                            <label class="form-check-label" for="catChinese"> Chinese Capital Numbers</label>
+                            <label class="form-check-label" for="catChinese"> @L["ChineseCapitalNumbers"]</label>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check">
                             <input class="form-check-input category-checkbox" type="checkbox" value="32" id="catHeavenly" />
-                            <label class="form-check-label" for="catHeavenly"> Heavenly Stems</label>
+                            <label class="form-check-label" for="catHeavenly"> @L["HeavenlyStems"]</label>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check">
                             <input class="form-check-input category-checkbox" type="checkbox" value="64" id="catEarthly" />
-                            <label class="form-check-label" for="catEarthly"> Earthly Branches</label>
+                            <label class="form-check-label" for="catEarthly"> @L["EarthlyBranches"]</label>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check">
                             <input class="form-check-input category-checkbox" type="checkbox" value="128" id="catBagua" />
-                            <label class="form-check-label" for="catBagua"> Bagua Symbols</label>
+                            <label class="form-check-label" for="catBagua"> @L["BaguaSymbols"]</label>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check">
                             <input class="form-check-input category-checkbox" type="checkbox" value="256" id="catHexagrams" />
-                            <label class="form-check-label" for="catHexagrams"> 64 Hexagrams</label>
+                            <label class="form-check-label" for="catHexagrams"> @L["SixtyFourHexagrams"]</label>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check">
                             <input class="form-check-input category-checkbox" type="checkbox" value="512" id="catUnicodeMisc" />
-                            <label class="form-check-label" for="catUnicodeMisc"> Unicode Miscellaneous</label>
+                            <label class="form-check-label" for="catUnicodeMisc"> @L["UnicodeMiscellaneousSymbols"]</label>
                         </div>
                     </div>
                 </div>
@@ -111,6 +161,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         var widget = document.getElementById('randomStringWidget');
         if (!widget) return;
+        
+        // Get localized strings from data attributes
+        var l = {
+            selectCategory: widget.dataset.lSelectCategory || 'Please select at least one category',
+            generatedSuccess: widget.dataset.lGeneratedSuccess || 'Generated successfully!',
+            copied: widget.dataset.lCopied || 'Copied to clipboard!'
+        };
         
         // Generate new random string
         function generate() {
@@ -132,9 +189,9 @@
             
             if (categories === 0) {
                 if (typeof abp !== 'undefined') {
-                    abp.notify.warn('Please select at least one category');
+                    abp.notify.warn(l.selectCategory);
                 } else {
-                    alert('Please select at least one category');
+                    alert(l.selectCategory);
                 }
                 return;
             }
@@ -156,7 +213,7 @@
                     dataType: 'text'
                 }).then(function(result) {
                     document.getElementById('randomStringResult').value = result;
-                    abp.notify.success('Generated successfully!');
+                    abp.notify.success(l.generatedSuccess);
                 });
             } else {
                 fetch('/api/app/random-string/make', {
@@ -178,7 +235,7 @@
             var text = document.getElementById('randomStringResult').value;
             navigator.clipboard.writeText(text).then(function() {
                 if (typeof abp !== 'undefined') {
-                    abp.notify.success('Copied to clipboard!');
+                    abp.notify.success(l.copied);
                 }
             });
         });

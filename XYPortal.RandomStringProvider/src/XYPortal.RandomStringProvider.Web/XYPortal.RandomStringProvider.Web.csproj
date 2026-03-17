@@ -16,10 +16,12 @@
     <PackageReference Include="jQuery" Version="3.7.1" />
     <PackageReference Include="Volo.Abp.Mapperly" Version="10.1.0" />
     <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared" Version="10.1.0"/>
+    <PackageReference Include="Volo.Abp.Localization" Version="10.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\XYPortal.RandomStringProvider.Application.Contracts\XYPortal.RandomStringProvider.Application.Contracts.csproj" />
+    <ProjectReference Include="..\XYPortal.RandomStringProvider.Domain.Shared\XYPortal.RandomStringProvider.Domain.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
