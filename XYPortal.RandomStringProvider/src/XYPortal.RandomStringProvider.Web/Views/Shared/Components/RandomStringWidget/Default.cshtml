@@ -18,12 +18,20 @@
             </div>
         </div>
         <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-md-4">
+                <label class="form-label">Prefix</label>
+                <input type="text" class="form-control" id="prefixInput" value="" placeholder="Optional prefix" />
+            </div>
+            <div class="col-md-4">
                 <label class="form-label">Length</label>
                 <input type="number" class="form-control" id="lengthInput" value="12" min="1" max="100" />
             </div>
-            <div class="col-md-6">
-                <div class="form-check mt-4">
+            <div class="col-md-4">
+                <label class="form-label">Suffix</label>
+                <input type="text" class="form-control" id="suffixInput" value="" placeholder="Optional suffix" />
+            </div>
+            <div class="col-12">
+                <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="isOnlyOnceInput" />
                     <label class="form-check-label" for="isOnlyOnceInput">
                         Unique characters only
@@ -87,6 +95,12 @@
                             <label class="form-check-label" for="catHexagrams"> 64 Hexagrams</label>
                         </div>
                     </div>
+                    <div class="col-md-4 col-6">
+                        <div class="form-check">
+                            <input class="form-check-input category-checkbox" type="checkbox" value="512" id="catUnicodeMisc" />
+                            <label class="form-check-label" for="catUnicodeMisc"> Unicode Miscellaneous</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -94,52 +108,83 @@
 </div>
 
 <script>
-    $(function() {
-        var widget = $('#randomStringWidget');
+    document.addEventListener('DOMContentLoaded', function() {
+        var widget = document.getElementById('randomStringWidget');
+        if (!widget) return;
         
         // Generate new random string
         function generate() {
-            var length = parseInt($('#lengthInput').val()) || 12;
-            var isOnlyOnce = $('#isOnlyOnceInput').prop('checked');
+            var prefixInput = document.getElementById('prefixInput');
+            var suffixInput = document.getElementById('suffixInput');
+            var lengthInput = document.getElementById('lengthInput');
+            var isOnlyOnceInput = document.getElementById('isOnlyOnceInput');
+            
+            var prefix = prefixInput.value || null;
+            var suffix = suffixInput.value || null;
+            var length = parseInt(lengthInput.value) || 12;
+            var isOnlyOnce = isOnlyOnceInput.checked;
             
             var categories = 0;
-            widget.find('.category-checkbox:checked').each(function() {
-                categories |= parseInt($(this).val());
+            var checkboxes = widget.querySelectorAll('.category-checkbox:checked');
+            checkboxes.forEach(function(checkbox) {
+                categories |= parseInt(checkbox.value);
             });
             
             if (categories === 0) {
-                abp.notify.warn('Please select at least one category');
+                if (typeof abp !== 'undefined') {
+                    abp.notify.warn('Please select at least one category');
+                } else {
+                    alert('Please select at least one category');
+                }
                 return;
             }
             
             var input = {
+                prefix: prefix,
+                suffix: suffix,
                 length: length,
                 isOnlyOnce: isOnlyOnce,
                 symbolCategories: categories
             };
             
-            abp.ajax({
-                url: '/api/app/random-string/make',
-                type: 'POST',
-                data: JSON.stringify(input),
-                contentType: 'application/json',
-                dataType: 'text'
-            }).then(function(result) {
-                $('#randomStringResult').val(result);
-                abp.notify.success('Generated successfully!');
-            });
+            if (typeof abp !== 'undefined') {
+                abp.ajax({
+                    url: '/api/app/random-string/make',
+                    type: 'POST',
+                    data: JSON.stringify(input),
+                    contentType: 'application/json',
+                    dataType: 'text'
+                }).then(function(result) {
+                    document.getElementById('randomStringResult').value = result;
+                    abp.notify.success('Generated successfully!');
+                });
+            } else {
+                fetch('/api/app/random-string/make', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(input)
+                })
+                .then(function(res) { return res.text(); })
+                .then(function(result) {
+                    document.getElementById('randomStringResult').value = result;
+                });
+            }
         }
         
         // Copy to clipboard
-        $('#copyButton').click(function() {
-            var text = $('#randomStringResult').val();
+        document.getElementById('copyButton').addEventListener('click', function() {
+            var text = document.getElementById('randomStringResult').value;
             navigator.clipboard.writeText(text).then(function() {
-                abp.notify.success('Copied to clipboard!');
+                if (typeof abp !== 'undefined') {
+                    abp.notify.success('Copied to clipboard!');
+                }
             });
         });
         
         // Refresh button
-        $('#refreshButton').click(function() {
+        document.getElementById('refreshButton').addEventListener('click', function() {
             generate();
         });
     });
