@@ -52,6 +52,8 @@ public class RandomStringWidgetViewComponent : AbpViewComponent
             ["Length"] = _localizer["Length"].Value,
             ["Prefix"] = _localizer["Prefix"].Value,
             ["Suffix"] = _localizer["Suffix"].Value,
+            ["IgnoreChars"] = _localizer["IgnoreChars"].Value,
+            ["IgnoreCharsHint"] = _localizer["IgnoreCharsHint"].Value,
             ["UniqueCharsOnly"] = _localizer["UniqueCharsOnly"].Value,
             ["SymbolCategories"] = _localizer["SymbolCategories"].Value,
             ["LowercaseLetters"] = _localizer["LowercaseLetters"].Value,

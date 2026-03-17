@@ -66,6 +66,8 @@ public class Localization_Tests : RandomStringProviderApplicationTestBase<Random
             "Length",
             "Prefix",
             "Suffix",
+            "IgnoreChars",
+            "IgnoreCharsHint",
             "UniqueCharsOnly",
             "SymbolCategories",
             "LowercaseLetters",

@@ -10,6 +10,8 @@
     "Length": "Length",
     "Prefix": "Prefix",
     "Suffix": "Suffix",
+    "IgnoreChars": "Ignore Characters",
+    "IgnoreCharsHint": "Separate multiple characters with commas",
     "UniqueCharsOnly": "Unique characters only",
     "SymbolCategories": "Symbol Categories",
     "LowercaseLetters": "Lowercase Letters",

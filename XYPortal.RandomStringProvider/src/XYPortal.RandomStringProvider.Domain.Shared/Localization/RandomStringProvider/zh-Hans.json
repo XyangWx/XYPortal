@@ -10,6 +10,8 @@
     "Length": "长度",
     "Prefix": "前缀",
     "Suffix": "后缀",
+    "IgnoreChars": "忽略字符",
+    "IgnoreCharsHint": "使用英文逗号分隔多个字符",
     "UniqueCharsOnly": "字符不重复",
     "SymbolCategories": "字符类型",
     "LowercaseLetters": "小写字母",

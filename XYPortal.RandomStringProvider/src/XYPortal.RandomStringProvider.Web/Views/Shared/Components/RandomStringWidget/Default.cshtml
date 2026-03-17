@@ -9,6 +9,8 @@
         ["Length"] = "Length",
         ["Prefix"] = "Prefix",
         ["Suffix"] = "Suffix",
+        ["IgnoreChars"] = "Ignore Characters",
+        ["IgnoreCharsHint"] = "Separate multiple characters with commas",
         ["UniqueCharsOnly"] = "Unique characters only",
         ["SymbolCategories"] = "Symbol Categories",
         ["LowercaseLetters"] = "Lowercase Letters",
@@ -35,6 +37,7 @@
      data-l-generate="@L["Generate"]"
      data-l-prefix="@L["Prefix"]"
      data-l-suffix="@L["Suffix"]"
+     data-l-ignore-chars="@L["IgnoreChars"]"
      data-l-length="@L["Length"]"
      data-l-unique-chars="@L["UniqueCharsOnly"]"
      data-l-symbol-categories="@L["SymbolCategories"]"
@@ -68,25 +71,31 @@
             </div>
         </div>
         <div class="row g-3">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="form-label">@L["Prefix"]</label>
                 <input type="text" class="form-control" id="prefixInput" value="" placeholder="Optional prefix" />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">@L["Length"]</label>
-                <input type="number" class="form-control" id="lengthInput" value="12" min="1" max="100" />
-            </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="form-label">@L["Suffix"]</label>
                 <input type="text" class="form-control" id="suffixInput" value="" placeholder="Optional suffix" />
             </div>
-            <div class="col-12">
-                <div class="form-check">
+            <div class="col-md-3">
+                <label class="form-label">@L["Length"]</label>
+                <input type="number" class="form-control" id="lengthInput" value="12" min="1" max="100" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">@L["UniqueCharsOnly"]</label>
+                <div class="form-check mt-2">
                     <input class="form-check-input" type="checkbox" id="isOnlyOnceInput" />
                     <label class="form-check-label" for="isOnlyOnceInput">
                         @L["UniqueCharsOnly"]
                     </label>
                 </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">@L["IgnoreChars"]</label>
+                <input type="text" class="form-control" id="ignoreCharsInput" value="" placeholder="a,b,c" />
+                <small class="text-muted">@L["IgnoreCharsHint"]</small>
             </div>
             <div class="col-12">
                 <label class="form-label">@L["SymbolCategories"]</label>
@@ -174,12 +183,24 @@
             var prefixInput = document.getElementById('prefixInput');
             var suffixInput = document.getElementById('suffixInput');
             var lengthInput = document.getElementById('lengthInput');
+            var ignoreCharsInput = document.getElementById('ignoreCharsInput');
             var isOnlyOnceInput = document.getElementById('isOnlyOnceInput');
             
             var prefix = prefixInput.value || null;
             var suffix = suffixInput.value || null;
             var length = parseInt(lengthInput.value) || 12;
             var isOnlyOnce = isOnlyOnceInput.checked;
+            
+            // Parse ignore chars - split by comma and trim each character
+            var ignoreCharsValue = ignoreCharsInput.value.trim();
+            var ignoreChars = null;
+            if (ignoreCharsValue) {
+                ignoreChars = ignoreCharsValue.split(',').map(function(c) {
+                    return c.trim();
+                }).filter(function(c) {
+                    return c.length > 0;
+                });
+            }
             
             var categories = 0;
             var checkboxes = widget.querySelectorAll('.category-checkbox:checked');
@@ -200,6 +221,7 @@
                 prefix: prefix,
                 suffix: suffix,
                 length: length,
+                ignoreChars: ignoreChars,
                 isOnlyOnce: isOnlyOnce,
                 symbolCategories: categories
             };
