@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using OpenIddict.Server.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
 using System.IO;
+using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.Mvc;
@@ -36,7 +38,10 @@ using Volo.Abp.VirtualFileSystem;
 using XYPortal.EntityFrameworkCore;
 using XYPortal.Localization;
 using XYPortal.MultiTenancy;
+using XYPortal.Web.Filters;
 using XYPortal.Web.Menus;
+using XYPortal.RandomStringProvider.Web;
+using XYPortal.RandomStringProvider;
 
 namespace XYPortal.Web;
 
@@ -53,7 +58,9 @@ namespace XYPortal.Web;
     typeof(AbpFeatureManagementWebModule),
     typeof(AbpTenantManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(RandomStringProviderApplicationModule),
+    typeof(RandomStringProviderWebModule)
     )]
 public class XYPortalWebModule : AbpModule
 {
@@ -123,6 +130,12 @@ public class XYPortalWebModule : AbpModule
         ConfigureSwaggerServices(context.Services);
 
         context.Services.AddMapperlyObjectMapper<XYPortalWebModule>();
+
+        // Add logging filter for RandomStringWidget debugging
+        context.Services.AddMvc(options =>
+        {
+            options.Filters.Add<RandomStringWidgetLoggingFilter>();
+        });
     }
 
     private void CheckSameSite(HttpContext httpContext, CookieOptions options)
@@ -170,11 +183,6 @@ public class XYPortalWebModule : AbpModule
 
     private void ConfigureUrls(IConfiguration configuration)
     {
-        Configure<AppUrlOptions>(options =>
-        {
-            options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"];
-        });
-
         if (!configuration.GetValue<bool>("App:RequireHttps"))
         {
             Configure<OpenIddictServerAspNetCoreOptions>(
@@ -258,7 +266,14 @@ public class XYPortalWebModule : AbpModule
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
         var configuration = context.GetConfiguration();
-
+        
+        ILogger<XYPortalWebModule> logger = app.ApplicationServices.GetRequiredService<ILogger<XYPortalWebModule>>();
+        var vfs = app.ApplicationServices.GetRequiredService<IVirtualFileProvider>();
+        var file = vfs.GetFileInfo("/Views/Shared/Components/RandomStringWidget/Default.cshtml");
+        
+        logger.LogInformation($"/Views/Shared/Components/RandomStringWidget/Default.cshtml => {file}");
+        ListFiles(vfs, "/", logger);
+        
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -304,5 +319,25 @@ public class XYPortalWebModule : AbpModule
     private static bool IsMultiTenancyEnabled()
     {
         return MultiTenancyConsts.IsEnabled;
+    }
+    
+    private void ListFiles(IVirtualFileProvider fileProvider, string path, ILogger<XYPortalWebModule> logger)
+    {
+        var directory = fileProvider.GetDirectoryContents(path);
+
+        foreach (var item in directory)
+        {
+            if (item.IsDirectory)
+            {
+                // 递归子目录
+                ListFiles(fileProvider, item.Name.StartsWith("/") ? item.Name : $"{path.EnsureEndsWith('/')}{item.Name}", logger);
+            }
+            else if (item.Name.EndsWith(".cshtml"))
+            {
+                // 打印找到的 .cshtml 资源路径
+                var fullPath = path.EnsureEndsWith('/') + item.Name;
+                logger.LogDebug($"[VFS Resource]: {fullPath}");
+            }
+        }
     }
 }

@@ -41,6 +41,8 @@ using Volo.Abp.VirtualFileSystem;
 using XYPortal.LinkBoard;
 using XYPortal.Localization;
 using XYPortal.MultiTenancy;
+using XYPortal.RandomStringProvider;
+using XYPortal.RandomStringProvider.Web;
 using XYPortal.Web.Menus;
 
 namespace XYPortal.Web;
@@ -61,7 +63,9 @@ namespace XYPortal.Web;
     typeof(AbpIdentityWebModule),
     typeof(AbpTenantManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(RandomStringProviderWebModule),
+    typeof(RandomStringProviderApplicationModule)
     )]
 public class XYPortalWebModule : AbpModule
 {

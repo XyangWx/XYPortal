@@ -4,6 +4,9 @@
   "modules": {
     "XYPortal.LinkBoard": {
       "path": "Modules/XYPortal.LinkBoard.abpmdl"
+    },
+    "XYPortal.RandomStringProvider": {
+      "path": "temp/XYPortal.RandomStringProvider.abpmdl"
     }
   }
 }

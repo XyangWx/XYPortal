@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>XYPortal.RandomStringProvider</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\XYPortal.RandomStringProvider.Application\XYPortal.RandomStringProvider.Application.csproj" />
+    <ProjectReference Include="..\..\src\XYPortal.RandomStringProvider.Domain.Shared\XYPortal.RandomStringProvider.Domain.Shared.csproj" />
+    <ProjectReference Include="..\XYPortal.RandomStringProvider.Domain.Tests\XYPortal.RandomStringProvider.Domain.Tests.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+  </ItemGroup>
+
+</Project>
