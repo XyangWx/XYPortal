@@ -1,7 +1,25 @@
 {
   "culture": "en",
   "texts": {
-    "MyAccount":  "My account",
-    "SamplePageMessage": "A sample page for the PasswordBook module"
+    "MyAccount": "My account",
+    "SamplePageMessage": "A sample page for the PasswordBook module",
+    "PasswordBook": "Password Book",
+    "Create": "Create",
+    "CreatePasswordBook": "Create Password Book",
+    "Name": "Name",
+    "Description": "Description",
+    "AllowedType": "Password Type",
+    "NumericOnly": "Numeric Only",
+    "General": "General",
+    "MinLength": "Min Length",
+    "MaxLength": "Max Length",
+    "Cancel": "Cancel",
+    "Save": "Save",
+    "View": "View",
+    "Delete": "Delete",
+    "Actions": "Actions",
+    "CreationTime": "Creation Time",
+    "Edit": "Edit",
+    "Restore": "Restore"
   }
 }

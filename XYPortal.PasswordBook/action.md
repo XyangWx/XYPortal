@@ -217,3 +217,6 @@ public static class PasswordBookPermissions
   - 恢复 GenerateEmbeddedFilesManifest 属性到 Web.csproj
   - 创建 Index.cshtml、Index.cshtml.cs、index.js、index.css
   - 更新 PasswordBookDto 添加 AllowedType, MinLength, MaxLength 属性
+- 添加菜单和本地化
+  - 更新 PasswordBookMenuContributor 添加权限检查
+  - 添加英文和中文本地化资源（en.json, zh-Hans.json）

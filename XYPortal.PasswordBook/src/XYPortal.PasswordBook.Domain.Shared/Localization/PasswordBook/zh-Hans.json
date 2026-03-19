@@ -2,6 +2,24 @@
   "culture": "zh-Hans",
   "texts": {
     "MyAccount": "我的账户",
-    "SamplePageMessage": "PasswordBook 模块的示例页面"
+    "SamplePageMessage": "密码本模块示例页面",
+    "PasswordBook": "密码本",
+    "Create": "创建",
+    "CreatePasswordBook": "创建密码本",
+    "Name": "名称",
+    "Description": "描述",
+    "AllowedType": "密码类型",
+    "NumericOnly": "纯数字",
+    "General": "一般密码",
+    "MinLength": "最小长度",
+    "MaxLength": "最大长度",
+    "Cancel": "取消",
+    "Save": "保存",
+    "View": "查看",
+    "Delete": "删除",
+    "Actions": "操作",
+    "CreationTime": "创建时间",
+    "Edit": "编辑",
+    "Restore": "恢复"
   }
 }
