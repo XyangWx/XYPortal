@@ -1,15 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
+using XYPortal.PasswordBook.AggregateRoots;
+using XYPortal.PasswordBook.Entities;
+using PasswordBookEntity = XYPortal.PasswordBook.AggregateRoots.PasswordBook;
 
 namespace XYPortal.PasswordBook.EntityFrameworkCore;
 
 [ConnectionStringName(PasswordBookDbProperties.ConnectionStringName)]
 public class PasswordBookDbContext : AbpDbContext<PasswordBookDbContext>, IPasswordBookDbContext
 {
-    /* Add DbSet for each Aggregate Root here. Example:
-     * public DbSet<Question> Questions { get; set; }
-     */
+    public DbSet<PasswordBookEntity> PasswordBooks { get; set; }
+    public DbSet<PasswordEntry> PasswordEntries { get; set; }
+    public DbSet<PasswordHistory> PasswordHistories { get; set; }
 
     public PasswordBookDbContext(DbContextOptions<PasswordBookDbContext> options)
         : base(options)

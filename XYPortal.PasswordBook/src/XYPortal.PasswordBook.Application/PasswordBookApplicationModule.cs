@@ -2,6 +2,7 @@
 using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Application;
+using XYPortal.RandomStringProvider;
 
 namespace XYPortal.PasswordBook;
 
@@ -9,7 +10,8 @@ namespace XYPortal.PasswordBook;
     typeof(PasswordBookDomainModule),
     typeof(PasswordBookApplicationContractsModule),
     typeof(AbpDddApplicationModule),
-    typeof(AbpMapperlyModule)
+    typeof(AbpMapperlyModule),
+    typeof(RandomStringProviderApplicationModule)
     )]
 public class PasswordBookApplicationModule : AbpModule
 {

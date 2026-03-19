@@ -6,12 +6,14 @@ using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
+using XYPortal.RandomStringProvider;
 
 namespace XYPortal.PasswordBook;
 
 [DependsOn(
     typeof(AbpValidationModule),
-    typeof(AbpDddDomainSharedModule)
+    typeof(AbpDddDomainSharedModule),
+    typeof(RandomStringProviderDomainSharedModule)
 )]
 public class PasswordBookDomainSharedModule : AbpModule
 {

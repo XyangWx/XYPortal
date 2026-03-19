@@ -2,12 +2,15 @@
 using Volo.Abp.Http.Client;
 using Volo.Abp.Modularity;
 using Volo.Abp.VirtualFileSystem;
+using XYPortal.RandomStringProvider;
 
 namespace XYPortal.PasswordBook;
 
 [DependsOn(
     typeof(PasswordBookApplicationContractsModule),
-    typeof(AbpHttpClientModule))]
+    typeof(AbpHttpClientModule),
+    typeof(RandomStringProviderHttpApiClientModule)
+)]
 public class PasswordBookHttpApiClientModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)

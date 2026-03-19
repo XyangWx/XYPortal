@@ -4,12 +4,15 @@ using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Microsoft.Extensions.DependencyInjection;
+using XYPortal.RandomStringProvider;
 
 namespace XYPortal.PasswordBook;
 
 [DependsOn(
     typeof(PasswordBookApplicationContractsModule),
-    typeof(AbpAspNetCoreMvcModule))]
+    typeof(AbpAspNetCoreMvcModule),
+    typeof(RandomStringProviderHttpApiModule)
+)]
 public class PasswordBookHttpApiModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
