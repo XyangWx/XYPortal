@@ -12,6 +12,9 @@ public class PasswordBookDto
     public required Guid OwnerId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
+    public PasswordType AllowedType { get; set; } = PasswordType.General;
+    public int MinLength { get; set; } = 8;
+    public int MaxLength { get; set; } = 20;
     public required DateTime CreationTime { get; set; }
     public DateTime? LastModificationTime { get; set; }
     public bool IsDeleted { get; set; }

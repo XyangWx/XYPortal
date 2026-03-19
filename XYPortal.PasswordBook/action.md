@@ -213,3 +213,7 @@ public static class PasswordBookPermissions
   - 在 IPasswordBookAppService 添加 GenerateRandomPasswordAsync 接口
   - 在 PasswordBookAppService 实现 GenerateRandomPasswordAsync 方法
   - 在 HttpApi 添加 PasswordBookController
+- 添加 Web 页面
+  - 恢复 GenerateEmbeddedFilesManifest 属性到 Web.csproj
+  - 创建 Index.cshtml、Index.cshtml.cs、index.js、index.css
+  - 更新 PasswordBookDto 添加 AllowedType, MinLength, MaxLength 属性

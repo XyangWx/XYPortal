@@ -1,11 +1,74 @@
-﻿@page
+@page
 @using Microsoft.Extensions.Localization
 @using XYPortal.PasswordBook.Localization
 @using XYPortal.PasswordBook.Web.Pages.PasswordBook
+@using XYPortal.PasswordBook.Enums
 @model XYPortal.PasswordBook.Web.Pages.PasswordBook.IndexModel
 @inject IStringLocalizer<PasswordBookResource> L
 
-@{
+@section scripts {
+    <abp-script src="/pages/password-book/index.js" />
 }
-<h1>PasswordBook</h1>
-<p>@L["SamplePageMessage"]</p>
+
+<abp-card>
+    <abp-card-header>
+        <abp-row>
+            <abp-column size-md="_6">
+                <h2>@L["PasswordBook"]</h2>
+            </abp-column>
+            <abp-column size-md="_6" class="text-end">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateModal">
+                    <i class="fa fa-plus"></i> @L["Create"]
+                </button>
+            </abp-column>
+        </abp-row>
+    </abp-card-header>
+    <abp-card-body>
+        <abp-table striped-rows="true" id="PasswordBookTable">
+            <thead>
+                <tr>
+                    <th>@L["Name"]</th>
+                    <th>@L["Description"]</th>
+                    <th>@L["AllowedType"]</th>
+                    <th>@L["CreationTime"]</th>
+                    <th>@L["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model.PasswordBooks)
+                {
+                    <tr data-id="@book.Id">
+                        <td>@book.Name</td>
+                        <td>@book.Description</td>
+                        <td>@book.AllowedType</td>
+                        <td>@book.CreationTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>
+                            <abp-button button-type="Primary" size="Small" text="@L["View"]" />
+                            <abp-button button-type="Danger" size="Small" text="@L["Delete"]" onclick="deletePasswordBook('@book.Id')" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </abp-table>
+    </abp-card-body>
+</abp-card>
+
+@* Create Modal *@
+<abp-modal id="CreateModal" title="@L["CreatePasswordBook"]">
+    <abp-modal-body>
+        <form id="CreateForm" method="post" asp-page-handler="Create">
+            <abp-input asp-for="CreateInput.Name" label="@L["Name"]" required />
+            <abp-input asp-for="CreateInput.Description" label="@L["Description"]" />
+            <abp-select asp-for="CreateInput.AllowedType" label="@L["AllowedType"]">
+                <option value="@PasswordType.NumericOnly">@L["NumericOnly"]</option>
+                <option value="@PasswordType.General">@L["General"]</option>
+            </abp-select>
+            <abp-input asp-for="CreateInput.MinLength" label="@L["MinLength"]" value="8" />
+            <abp-input asp-for="CreateInput.MaxLength" label="@L["MaxLength"]" value="20" />
+        </form>
+    </abp-modal-body>
+    <abp-modal-footer>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@L["Cancel"]</button>
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('CreateForm').submit()">@L["Save"]</button>
+    </abp-modal-footer>
+</abp-modal>
