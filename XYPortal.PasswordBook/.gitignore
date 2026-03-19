@@ -400,3 +400,6 @@ FodyWeavers.xsd
 
 # ABP Studio
 **/.abpstudio/
+
+# Action plan
+action.md
