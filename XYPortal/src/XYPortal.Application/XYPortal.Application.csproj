@@ -13,6 +13,7 @@
     <ProjectReference Include="..\XYPortal.Application.Contracts\XYPortal.Application.Contracts.csproj" />
     <ProjectReference Include="..\..\..\XYPortal.LinkBoard\src\XYPortal.LinkBoard.Application\XYPortal.LinkBoard.Application.csproj" />
     <ProjectReference Include="..\..\..\XYPortal.RandomStringProvider\src\XYPortal.RandomStringProvider.Application\XYPortal.RandomStringProvider.Application.csproj" />
+    <ProjectReference Include="..\..\..\XYPortal.PasswordBook\src\XYPortal.PasswordBook.Application\XYPortal.PasswordBook.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

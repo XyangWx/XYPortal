@@ -45,6 +45,7 @@
     <ProjectReference Include="..\XYPortal.HttpApi.Client\XYPortal.HttpApi.Client.csproj" />
     <ProjectReference Include="..\XYPortal.HttpApi\XYPortal.HttpApi.csproj" />
     <ProjectReference Include="..\..\..\XYPortal.LinkBoard\src\XYPortal.LinkBoard.HttpApi.Client\XYPortal.LinkBoard.HttpApi.Client.csproj" />
+    <ProjectReference Include="..\..\..\XYPortal.PasswordBook\src\XYPortal.PasswordBook.Web\XYPortal.PasswordBook.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
