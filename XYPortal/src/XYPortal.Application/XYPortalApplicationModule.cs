@@ -7,6 +7,7 @@ using Volo.Abp.SettingManagement;
 using Volo.Abp.TenantManagement;
 using Microsoft.Extensions.DependencyInjection;
 using XYPortal.LinkBoard;
+using XYPortal.PasswordBook;
 using XYPortal.RandomStringProvider;
 
 namespace XYPortal;
@@ -14,6 +15,7 @@ namespace XYPortal;
 [DependsOn(
     typeof(XYPortalDomainModule),
     typeof(LinkBoardApplicationModule),
+    typeof(PasswordBookApplicationModule),
     typeof(RandomStringProviderApplicationModule),
     typeof(AbpAccountApplicationModule),
     typeof(XYPortalApplicationContractsModule),

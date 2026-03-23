@@ -8,12 +8,14 @@ using Volo.Abp.TenantManagement;
 using Volo.Abp.SettingManagement;
 using Volo.Abp.VirtualFileSystem;
 using XYPortal.LinkBoard;
+using XYPortal.PasswordBook;
 
 namespace XYPortal;
 
 [DependsOn(
     typeof(XYPortalApplicationContractsModule),
     typeof(LinkBoardHttpApiClientModule),
+    typeof(PasswordBookHttpApiClientModule),
     typeof(AbpAccountHttpApiClientModule),
     typeof(AbpIdentityHttpApiClientModule),
     typeof(AbpPermissionManagementHttpApiClientModule),

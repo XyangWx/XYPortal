@@ -43,6 +43,7 @@ using XYPortal.Localization;
 using XYPortal.MultiTenancy;
 using XYPortal.RandomStringProvider;
 using XYPortal.RandomStringProvider.Web;
+using XYPortal.PasswordBook.Web;
 using XYPortal.Web.Menus;
 
 namespace XYPortal.Web;
@@ -51,6 +52,7 @@ namespace XYPortal.Web;
     typeof(XYPortalHttpApiClientModule),
     typeof(XYPortalHttpApiModule),
     typeof(LinkBoardHttpApiClientModule),
+    typeof(PasswordBookWebModule),
     typeof(AbpAspNetCoreAuthenticationOpenIdConnectModule),
     typeof(AbpAspNetCoreMvcClientModule),
     typeof(AbpHttpClientWebModule),

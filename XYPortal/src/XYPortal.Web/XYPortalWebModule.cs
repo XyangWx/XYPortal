@@ -41,6 +41,7 @@ using XYPortal.MultiTenancy;
 using XYPortal.Web.Filters;
 using XYPortal.Web.Menus;
 using XYPortal.RandomStringProvider.Web;
+using XYPortal.PasswordBook.Web;
 using XYPortal.RandomStringProvider;
 
 namespace XYPortal.Web;
@@ -49,6 +50,7 @@ namespace XYPortal.Web;
     typeof(XYPortalHttpApiModule),
     typeof(XYPortalApplicationModule),
     typeof(XYPortalEntityFrameworkCoreModule),
+    typeof(PasswordBookWebModule),
     typeof(AbpAutofacModule),
     typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpIdentityWebModule),
