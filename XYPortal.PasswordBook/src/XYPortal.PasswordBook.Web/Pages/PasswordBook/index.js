@@ -14,7 +14,8 @@ $(function () {
         fetch('/api/password-book', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
             },
             body: JSON.stringify(input)
         })
@@ -25,7 +26,7 @@ $(function () {
                 location.reload();
             } else {
                 return response.json().then(err => {
-                    throw new Error(err.message || 'Failed to create PasswordBook');
+                    throw new Error(err.error || err.message || 'Failed to create PasswordBook');
                 });
             }
         })
@@ -41,7 +42,10 @@ $(function () {
             function (confirmed) {
                 if (confirmed) {
                     fetch('/api/password-book/' + id, {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: {
+                            'RequestVerificationToken': abp.security.antiForgery.getToken()
+                        }
                     })
                     .then(response => {
                         if (response.ok) {

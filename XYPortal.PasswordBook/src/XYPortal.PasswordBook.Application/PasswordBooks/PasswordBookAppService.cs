@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -30,15 +31,18 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
 {
     private readonly PasswordBookManager _passwordBookManager;
     private readonly PermissionChecker _permissionChecker;
+    private readonly ILogger<PasswordBookAppService> _logger;
 
     public PasswordBookAppService(
         IRepository<PasswordBookEntity, Guid> repository,
         PasswordBookManager passwordBookManager,
-        PermissionChecker permissionChecker)
+        PermissionChecker permissionChecker,
+        ILogger<PasswordBookAppService> logger)
         : base(repository)
     {
         _passwordBookManager = passwordBookManager;
         _permissionChecker = permissionChecker;
+        _logger = logger;
     }
 
     /// <summary>
@@ -47,6 +51,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     private async Task CheckPasswordBookPermissionAsync()
     {
         var hasPermission = await _permissionChecker.IsGrantedAsync(PasswordBookPermissions.PassWordBookUser);
+        _logger.LogInformation("[CheckPermission] PassWordBookUser={HasPermission}", hasPermission);
         if (!hasPermission)
         {
             throw new AbpAuthorizationException("You do not have permission to use PasswordBook feature (PASSWORDBOOKUSER permission required)");
@@ -63,9 +68,13 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         var userId = CurrentUser.GetId();
         var books = await _passwordBookManager.GetListByOwnerAsync(userId);
 
-        return new ListResultDto<PasswordBookDto>(
-            ObjectMapper.Map<List<PasswordBookEntity>, List<PasswordBookDto>>(books)
-        );
+        var dtos = ObjectMapper.Map<List<PasswordBookEntity>, List<PasswordBookDto>>(books);
+        foreach (var (dto, entity) in dtos.Zip(books))
+        {
+            dto.PopulateComplexFields(entity);
+        }
+
+        return new ListResultDto<PasswordBookDto>(dtos);
     }
 
     /// <summary>
@@ -82,7 +91,9 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         }
 
         var passwordBook = await _passwordBookManager.GetByIdAsync(id);
-        return ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
+        var dto = ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
+        dto.PopulateComplexFields(passwordBook);
+        return dto;
     }
 
     /// <summary>
@@ -182,15 +193,23 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     /// </summary>
     public override async Task DeleteAsync(Guid id)
     {
+        _logger.LogInformation("[DeleteAsync] Called with id={Id}", id);
+
         await CheckPasswordBookPermissionAsync();
+        _logger.LogInformation("[DeleteAsync] Permission check passed");
 
         var userId = CurrentUser.GetId();
+        _logger.LogInformation("[DeleteAsync] CurrentUserId={UserId}", userId);
+
         if (!await _passwordBookManager.HasAccessPermissionAsync(userId, id))
         {
+            _logger.LogWarning("[DeleteAsync] Access denied for user={UserId} on PasswordBook={Id}", userId, id);
             throw new UnauthorizedAccessException("You do not have permission to delete this PasswordBook");
         }
 
+        _logger.LogInformation("[DeleteAsync] Calling SoftDeleteAsync for id={Id}", id);
         await _passwordBookManager.SoftDeleteAsync(id);
+        _logger.LogInformation("[DeleteAsync] SoftDeleteAsync completed for id={Id}", id);
     }
 
     /// <summary>
@@ -251,7 +270,9 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
             passwordFormat
         );
 
-        return ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
+        var dto = ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
+        dto.PopulateComplexFields(passwordBook);
+        return dto;
     }
 
     /// <summary>
@@ -284,7 +305,9 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
 
         await Repository.UpdateAsync(passwordBook);
 
-        return ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
+        var dto = ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
+        dto.PopulateComplexFields(passwordBook);
+        return dto;
     }
 
     /// <summary>
