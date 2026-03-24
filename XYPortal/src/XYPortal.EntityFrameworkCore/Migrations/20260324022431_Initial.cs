@@ -431,6 +431,36 @@ namespace XYPortal.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LinkBoardCategories",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    DisplayName = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    Description = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
+                    Icon = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    SortOrder = table.Column<int>(type: "integer", nullable: false),
+                    IsPublic = table.Column<bool>(type: "boolean", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    ReviewComment = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
+                    DraftOfId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDefault = table.Column<bool>(type: "boolean", nullable: false),
+                    ExtraProperties = table.Column<string>(type: "text", nullable: false),
+                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LinkBoardCategories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OpenIddictApplications",
                 columns: table => new
                 {
@@ -492,6 +522,27 @@ namespace XYPortal.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OpenIddictScopes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PasswordBooks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    PasswordFormatJson = table.Column<string>(type: "text", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    ExtraProperties = table.Column<string>(type: "text", nullable: false),
+                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PasswordBooks", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -727,6 +778,42 @@ namespace XYPortal.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LinkBoardLinks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Url = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
+                    Description = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    Icon = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
+                    SortOrder = table.Column<int>(type: "integer", nullable: false),
+                    IsPublic = table.Column<bool>(type: "boolean", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    ReviewComment = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
+                    DraftOfId = table.Column<Guid>(type: "uuid", nullable: true),
+                    ExtraProperties = table.Column<string>(type: "text", nullable: false),
+                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LinkBoardLinks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LinkBoardLinks_LinkBoardCategories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "LinkBoardCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OpenIddictAuthorizations",
                 columns: table => new
                 {
@@ -749,6 +836,34 @@ namespace XYPortal.Migrations
                         column: x => x.ApplicationId,
                         principalTable: "OpenIddictApplications",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PasswordEntries",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PasswordBookId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    HasUsername = table.Column<bool>(type: "boolean", nullable: false),
+                    Username = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    PasswordType = table.Column<int>(type: "integer", nullable: false),
+                    WeakLevel = table.Column<int>(type: "integer", nullable: true),
+                    CurrentPassword = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    Remark = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PasswordEntries", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PasswordEntries_PasswordBooks_PasswordBookId",
+                        column: x => x.PasswordBookId,
+                        principalTable: "PasswordBooks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -806,6 +921,27 @@ namespace XYPortal.Migrations
                         column: x => x.AuthorizationId,
                         principalTable: "OpenIddictAuthorizations",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PasswordHistories",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PasswordEntryId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PasswordValue = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    IsCurrent = table.Column<bool>(type: "boolean", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PasswordHistories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PasswordHistories_PasswordEntries_PasswordEntryId",
+                        column: x => x.PasswordEntryId,
+                        principalTable: "PasswordEntries",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -1023,6 +1159,52 @@ namespace XYPortal.Migrations
                 column: "UserName");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LinkBoardCategories_DraftOfId",
+                table: "LinkBoardCategories",
+                column: "DraftOfId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LinkBoardCategories_IsPublic_Status",
+                table: "LinkBoardCategories",
+                columns: new[] { "IsPublic", "Status" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LinkBoardCategories_Name",
+                table: "LinkBoardCategories",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LinkBoardCategories_SortOrder",
+                table: "LinkBoardCategories",
+                column: "SortOrder");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LinkBoardLinks_CategoryId",
+                table: "LinkBoardLinks",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LinkBoardLinks_DraftOfId",
+                table: "LinkBoardLinks",
+                column: "DraftOfId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LinkBoardLinks_IsPublic_Status_CreatorId",
+                table: "LinkBoardLinks",
+                columns: new[] { "IsPublic", "Status", "CreatorId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LinkBoardLinks_SortOrder",
+                table: "LinkBoardLinks",
+                column: "SortOrder");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LinkBoardLinks_Url",
+                table: "LinkBoardLinks",
+                column: "Url");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OpenIddictApplications_ClientId",
                 table: "OpenIddictApplications",
                 column: "ClientId");
@@ -1051,6 +1233,36 @@ namespace XYPortal.Migrations
                 name: "IX_OpenIddictTokens_ReferenceId",
                 table: "OpenIddictTokens",
                 column: "ReferenceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PasswordBooks_IsDeleted",
+                table: "PasswordBooks",
+                column: "IsDeleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PasswordBooks_OwnerId",
+                table: "PasswordBooks",
+                column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PasswordEntries_IsDeleted",
+                table: "PasswordEntries",
+                column: "IsDeleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PasswordEntries_PasswordBookId",
+                table: "PasswordEntries",
+                column: "PasswordBookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PasswordHistories_IsCurrent",
+                table: "PasswordHistories",
+                column: "IsCurrent");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PasswordHistories_PasswordEntryId",
+                table: "PasswordHistories",
+                column: "PasswordEntryId");
         }
 
         /// <inheritdoc />
@@ -1132,10 +1344,16 @@ namespace XYPortal.Migrations
                 name: "AbpUserTokens");
 
             migrationBuilder.DropTable(
+                name: "LinkBoardLinks");
+
+            migrationBuilder.DropTable(
                 name: "OpenIddictScopes");
 
             migrationBuilder.DropTable(
                 name: "OpenIddictTokens");
+
+            migrationBuilder.DropTable(
+                name: "PasswordHistories");
 
             migrationBuilder.DropTable(
                 name: "AbpEntityChanges");
@@ -1153,13 +1371,22 @@ namespace XYPortal.Migrations
                 name: "AbpUsers");
 
             migrationBuilder.DropTable(
+                name: "LinkBoardCategories");
+
+            migrationBuilder.DropTable(
                 name: "OpenIddictAuthorizations");
+
+            migrationBuilder.DropTable(
+                name: "PasswordEntries");
 
             migrationBuilder.DropTable(
                 name: "AbpAuditLogs");
 
             migrationBuilder.DropTable(
                 name: "OpenIddictApplications");
+
+            migrationBuilder.DropTable(
+                name: "PasswordBooks");
         }
     }
 }

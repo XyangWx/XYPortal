@@ -26,7 +26,7 @@ public static class PasswordBookDbContextModelCreatingExtensions
             b.Property(x => x.OwnerId).IsRequired();
             b.Property(x => x.Name).IsRequired().HasMaxLength(200);
             b.Property(x => x.Description).HasMaxLength(1000);
-            b.Property(x => x.PasswordFormatJson).IsRequired().HasColumnType("nvarchar(max)");
+            b.Property(x => x.PasswordFormatJson).IsRequired().HasColumnType("text");
 
             b.HasIndex(x => x.OwnerId);
             b.HasIndex(x => x.IsDeleted);

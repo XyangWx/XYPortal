@@ -12,6 +12,7 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using XYPortal.LinkBoard.Entities;
 using XYPortal.LinkBoard.EntityFrameworkCore;
 using XYPortal.PasswordBook;
 using XYPortal.PasswordBook.EntityFrameworkCore;
@@ -24,11 +25,13 @@ namespace XYPortal.EntityFrameworkCore;
 [ReplaceDbContext(typeof(IIdentityDbContext))]
 [ReplaceDbContext(typeof(ITenantManagementDbContext))]
 [ReplaceDbContext(typeof(IPasswordBookDbContext))]
+[ReplaceDbContext(typeof(ILinkBoardDbContext))]
 [ConnectionStringName("Default")]
 public class XYPortalDbContext :
     AbpDbContext<XYPortalDbContext>,
     IIdentityDbContext,
     ITenantManagementDbContext,
+    ILinkBoardDbContext,
     IPasswordBookDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
@@ -58,6 +61,10 @@ public class XYPortalDbContext :
     // Tenant Management
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
+
+    // LinkBooks
+    public DbSet<LinkCategory> LinkCategories { get; }
+    public DbSet<Link> Links { get; }
 
     // PasswordBook
     public DbSet<PasswordBookEntity> PasswordBooks { get; set; }
