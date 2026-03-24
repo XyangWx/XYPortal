@@ -22,7 +22,7 @@ public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
     /// <summary>
     /// Name
     /// </summary>
-    public string Name { get; private set; }
+    public string? Name { get; private set; }
 
     /// <summary>
     /// Description
@@ -32,7 +32,7 @@ public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
     /// <summary>
     /// Password Format Requirements (stored as JSON)
     /// </summary>
-    public string PasswordFormatJson { get; private set; }
+    public string? PasswordFormatJson { get; private set; }
 
     /// <summary>
     /// Creation Time
@@ -79,7 +79,14 @@ public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
     /// </summary>
     public PasswordFormatRequirement GetPasswordFormat()
     {
-        return DeserializePasswordFormat(PasswordFormatJson);
+        if (!string.IsNullOrEmpty(PasswordFormatJson))
+        {
+            return DeserializePasswordFormat(PasswordFormatJson);
+        }
+        else
+        {
+            throw new InvalidOperationException("PasswordFormatJson is null");
+        }
     }
 
     /// <summary>

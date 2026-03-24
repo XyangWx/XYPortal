@@ -19,7 +19,7 @@ public class PasswordEntry : Entity<Guid>
     /// <summary>
     /// Title
     /// </summary>
-    public string Title { get; private set; }
+    public string? Title { get; private set; }
 
     /// <summary>
     /// Has Username
@@ -44,7 +44,7 @@ public class PasswordEntry : Entity<Guid>
     /// <summary>
     /// Current Valid Password Value
     /// </summary>
-    public string CurrentPassword { get; private set; }
+    public string? CurrentPassword { get; private set; }
 
     /// <summary>
     /// Remark

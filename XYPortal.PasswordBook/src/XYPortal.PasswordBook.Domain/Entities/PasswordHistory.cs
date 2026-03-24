@@ -16,7 +16,7 @@ public class PasswordHistory : Entity<Guid>
     /// <summary>
     /// Password Value
     /// </summary>
-    public string PasswordValue { get; private set; }
+    public string? PasswordValue { get; private set; }
 
     /// <summary>
     /// Is Current Valid Password
