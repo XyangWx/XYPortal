@@ -17,12 +17,13 @@
 
   <ItemGroup>
     <PackageReference Include="DistributedLock.Redis" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="8.0.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="10.0.0" />
-    <ProjectReference Include="..\..\..\XYPortal.RandomStringProvider\src\XYPortal.RandomStringProvider.Web\XYPortal.RandomStringProvider.Web.csproj"/>
-    <ProjectReference Include="..\..\..\XYPortal.RandomStringProvider\src\XYPortal.RandomStringProvider.Domain.Shared\XYPortal.RandomStringProvider.Domain.Shared.csproj"/>
-    <ProjectReference Include="..\..\..\XYPortal.RandomStringProvider\src\XYPortal.RandomStringProvider.Application\XYPortal.RandomStringProvider.Application.csproj"/>
+    <ProjectReference Include="..\..\..\XYPortal.RandomStringProvider\src\XYPortal.RandomStringProvider.Web\XYPortal.RandomStringProvider.Web.csproj" />
+    <ProjectReference Include="..\..\..\XYPortal.RandomStringProvider\src\XYPortal.RandomStringProvider.Domain.Shared\XYPortal.RandomStringProvider.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\..\XYPortal.RandomStringProvider\src\XYPortal.RandomStringProvider.Application\XYPortal.RandomStringProvider.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,6 +62,12 @@
     </None>
     <None Update="Pages\**\*.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="log4net.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
