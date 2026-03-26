@@ -4,12 +4,17 @@ $(function () {
         var formData = new FormData(form);
 
         var input = {
-            name: formData.get('Name') || form.querySelector('[name="Name"]').value,
-            description: formData.get('Description') || form.querySelector('[name="Description"]')?.value || null,
-            allowedType: parseInt(form.querySelector('[name="AllowedType"]')?.value || 1),
-            minLength: parseInt(form.querySelector('[name="MinLength"]')?.value || 8),
-            maxLength: parseInt(form.querySelector('[name="MaxLength"]')?.value || 20)
+            name: formData.get('CreateInput.Name') || form.querySelector('[name="CreateInput.Name"]')?.value,
+            description: formData.get('CreateInput.Description') || form.querySelector('[name="CreateInput.Description"]')?.value || null,
+            allowedType: parseInt(formData.get('CreateInput.AllowedType') || form.querySelector('[name="CreateInput.AllowedType"]')?.value || 1),
+            minLength: parseInt(formData.get('CreateInput.MinLength') || form.querySelector('[name="CreateInput.MinLength"]')?.value || 8),
+            maxLength: parseInt(formData.get('CreateInput.MaxLength') || form.querySelector('[name="CreateInput.MaxLength"]')?.value || 20)
         };
+
+        if (!input.name) {
+            abp.notify.error('Password book name is required');
+            return;
+        }
 
         fetch('/api/password-book', {
             method: 'POST',
