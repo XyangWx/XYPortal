@@ -37,6 +37,16 @@ public class PasswordBookManager : DomainService
         string? description,
         PasswordFormatRequirement? passwordFormat = null)
     {
+        // Check for duplicate name for the same owner
+        var existingBook = await _passwordBookRepository
+            .FirstOrDefaultAsync(x => x.OwnerId == ownerId && x.Name == name && !x.IsDeleted);
+        
+        if (existingBook != null)
+        {
+            throw new BusinessException("PasswordBook:DuplicateName")
+                .WithData("Name", name);
+        }
+
         var passwordBook = new PasswordBookEntity(
             Guid.NewGuid(),
             ownerId,
@@ -47,6 +57,16 @@ public class PasswordBookManager : DomainService
 
         await _passwordBookRepository.InsertAsync(passwordBook);
         return passwordBook;
+    }
+
+    /// <summary>
+    /// Check if name already exists for the owner
+    /// </summary>
+    public async Task<bool> NameExistsAsync(Guid ownerId, string name, Guid? excludeId = null)
+    {
+        var query = await _passwordBookRepository.GetQueryableAsync();
+        return query.Any(x => x.OwnerId == ownerId && x.Name == name && !x.IsDeleted &&
+            (excludeId == null || x.Id != excludeId));
     }
 
     /// <summary>

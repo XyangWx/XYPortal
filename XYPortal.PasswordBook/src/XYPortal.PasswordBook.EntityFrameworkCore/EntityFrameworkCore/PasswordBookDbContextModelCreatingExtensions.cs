@@ -30,6 +30,7 @@ public static class PasswordBookDbContextModelCreatingExtensions
 
             b.HasIndex(x => x.OwnerId);
             b.HasIndex(x => x.IsDeleted);
+            b.HasIndex(x => new { x.OwnerId, x.Name }).IsUnique().HasFilter("[IsDeleted] = 0");
         });
 
         builder.Entity<PasswordEntry>(b =>
