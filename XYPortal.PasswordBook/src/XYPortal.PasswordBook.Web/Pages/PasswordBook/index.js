@@ -50,6 +50,52 @@ $(function () {
         });
     };
 
+    window.viewPasswordBook = function (id) {
+        fetch('/api/password-book/' + id + '/with-entries', {
+            method: 'GET',
+            headers: {
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load PasswordBook');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('view-book-name').textContent = data.name || '';
+            document.getElementById('view-book-description').textContent = data.description || '-';
+            document.getElementById('view-book-allowedtype').textContent = data.allowedType === 1 ? 'General' : 'NumericOnly';
+            document.getElementById('view-book-creationtime').textContent = new Date(data.creationTime).toLocaleString();
+
+            var tbody = document.getElementById('PasswordEntriesTableBody');
+            tbody.innerHTML = '';
+
+            if (data.passwordEntries && data.passwordEntries.length > 0) {
+                data.passwordEntries.forEach(function (entry) {
+                    if (!entry.isDeleted) {
+                        var row = '<tr>' +
+                            '<td>' + (entry.title || '') + '</td>' +
+                            '<td>' + (entry.username || '-') + '</td>' +
+                            '<td>' + (entry.passwordType === 1 ? 'General' : 'NumericOnly') + '</td>' +
+                            '<td>' + (entry.weakLevel || '-') + '</td>' +
+                            '</tr>';
+                        tbody.innerHTML += row;
+                    }
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No password entries</td></tr>';
+            }
+
+            var modal = new bootstrap.Modal(document.getElementById('ViewModal'));
+            modal.show();
+        })
+        .catch(error => {
+            abp.notify.error(error.message);
+        });
+    };
+
     window.deletePasswordBook = function (id) {
         abp.message.confirm(
             'Are you sure you want to delete this PasswordBook?',
