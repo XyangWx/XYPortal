@@ -31,7 +31,17 @@ $(function () {
                 location.reload();
             } else {
                 return response.json().then(err => {
-                    throw new Error(err.error || err.message || 'Failed to create PasswordBook');
+                    var errorMessage = 'Failed to create PasswordBook';
+                    if (err && err.error) {
+                        if (typeof err.error === 'object') {
+                            errorMessage = err.error.message || err.error.code || JSON.stringify(err.error);
+                        } else {
+                            errorMessage = err.error;
+                        }
+                    } else if (err && err.message) {
+                        errorMessage = err.message;
+                    }
+                    throw new Error(errorMessage);
                 });
             }
         })
