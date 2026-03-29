@@ -103,6 +103,12 @@ public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
     {
         CheckPasswordFormat(password, passwordType);
 
+        // 使所有其他未删除的条目失效（新密码启用后其他密码作废）
+        foreach (var existingEntry in _passwordEntries.Where(e => !e.IsDeleted))
+        {
+            existingEntry.SoftDelete();
+        }
+
         var entry = new PasswordEntry(
             Guid.NewGuid(),
             Id,
@@ -174,6 +180,12 @@ public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
         var entry = _passwordEntries.FirstOrDefault(e => e.Id == entryId && e.IsDeleted);
         if (entry == null)
             throw new EntityNotFoundException("Password entry not found or not deleted");
+
+        // 使所有其他未删除的条目失效（恢复的密码启用后其他密码作废）
+        foreach (var existingEntry in _passwordEntries.Where(e => !e.IsDeleted && e.Id != entryId))
+        {
+            existingEntry.SoftDelete();
+        }
 
         entry.Restore();
         LastModificationTime = DateTime.UtcNow;

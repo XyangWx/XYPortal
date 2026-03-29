@@ -54,7 +54,7 @@
 </abp-card>
 
 @* View Modal *@
-<abp-modal id="ViewModal" title="@L["PasswordBookDetails"]">
+<abp-modal id="ViewModal" title="@L["PasswordBookDetails"]" size="ExtraLarge">
     <abp-modal-body>
         <div id="ViewModalContent">
             <dl class="row">
@@ -66,8 +66,14 @@
                 <dd class="col-sm-9" id="view-book-allowedtype"></dd>
                 <dt class="col-sm-3">@L["CreationTime"]:</dt>
                 <dd class="col-sm-9" id="view-book-creationtime"></dd>
+                <dt class="col-sm-3">@L["PasswordBookId"]:</dt>
+                <dd class="col-sm-9" id="view-book-id"></dd>
             </dl>
-            <h5>@L["PasswordEntries"]</h5>
+            <h5>@L["PasswordEntries"] 
+                <button type="button" class="btn btn-primary btn-sm" onclick="showCreateEntryModal()">
+                    <i class="fa fa-plus"></i> @L["AddEntry"]
+                </button>
+            </h5>
             <abp-table striped-rows="true" id="PasswordEntriesTable">
                 <thead>
                     <tr>
@@ -75,6 +81,8 @@
                         <th>@L["Username"]</th>
                         <th>@L["PasswordType"]</th>
                         <th>@L["WeakLevel"]</th>
+                        <th>@L["IsDeleted"]</th>
+                        <th>@L["Actions"]</th>
                     </tr>
                 </thead>
                 <tbody id="PasswordEntriesTableBody">
@@ -84,6 +92,58 @@
     </abp-modal-body>
     <abp-modal-footer>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@L["Close"]</button>
+    </abp-modal-footer>
+</abp-modal>
+
+@* Create Entry Modal *@
+<abp-modal id="CreateEntryModal" title="@L["CreatePasswordEntry"]">
+    <abp-modal-body>
+        <form id="CreateEntryForm">
+            <input type="hidden" id="entry-passwordbook-id" />
+            <div class="mb-3">
+                <label class="form-label">@L["Title"] *</label>
+                <input type="text" class="form-control" id="entry-title" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["Password"] *</label>
+                <input type="password" class="form-control" id="entry-password" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["HasUsername"]</label>
+                <select class="form-select" id="entry-hasusername">
+                    <option value="false">@L["No"]</option>
+                    <option value="true">@L["Yes"]</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["Username"]</label>
+                <input type="text" class="form-control" id="entry-username" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["PasswordType"]</label>
+                <select class="form-select" id="entry-passwordtype">
+                    <option value="@PasswordType.General">@L["General"]</option>
+                    <option value="@PasswordType.NumericOnly">@L["NumericOnly"]</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["WeakLevel"]</label>
+                <select class="form-select" id="entry-weaklevel">
+                    <option value="">@L["SelectWeakLevel"]</option>
+                    <option value="@PasswordWeakLevel.Strong">@L["Strong"]</option>
+                    <option value="@PasswordWeakLevel.Medium">@L["Medium"]</option>
+                    <option value="@PasswordWeakLevel.Weak">@L["Weak"]</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["Remark"]</label>
+                <textarea class="form-control" id="entry-remark" rows="2"></textarea>
+            </div>
+        </form>
+    </abp-modal-body>
+    <abp-modal-footer>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@L["Cancel"]</button>
+        <button type="button" class="btn btn-primary" onclick="createPasswordEntry()">@L["Save"]</button>
     </abp-modal-footer>
 </abp-modal>
 

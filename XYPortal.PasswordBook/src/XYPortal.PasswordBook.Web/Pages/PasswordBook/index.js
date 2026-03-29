@@ -68,24 +68,37 @@ $(function () {
             document.getElementById('view-book-description').textContent = data.description || '-';
             document.getElementById('view-book-allowedtype').textContent = data.allowedType === 1 ? 'General' : 'NumericOnly';
             document.getElementById('view-book-creationtime').textContent = new Date(data.creationTime).toLocaleString();
+            document.getElementById('view-book-id').textContent = data.id;
+
+            // Set the password book ID for create entry form
+            document.getElementById('entry-passwordbook-id').value = data.id;
 
             var tbody = document.getElementById('PasswordEntriesTableBody');
             tbody.innerHTML = '';
 
             if (data.passwordEntries && data.passwordEntries.length > 0) {
                 data.passwordEntries.forEach(function (entry) {
-                    if (!entry.isDeleted) {
-                        var row = '<tr>' +
-                            '<td>' + (entry.title || '') + '</td>' +
-                            '<td>' + (entry.username || '-') + '</td>' +
-                            '<td>' + (entry.passwordType === 1 ? 'General' : 'NumericOnly') + '</td>' +
-                            '<td>' + (entry.weakLevel || '-') + '</td>' +
-                            '</tr>';
-                        tbody.innerHTML += row;
+                    var actionButtons = '';
+                    if (entry.isDeleted) {
+                        // Show restore button for deleted entries
+                        actionButtons = '<button type="button" class="btn btn-success btn-sm" onclick="restorePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-undo"></i> @L["Restore"]</button>';
+                    } else {
+                        // Show delete button for active entries
+                        actionButtons = '<button type="button" class="btn btn-danger btn-sm" onclick="deletePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-trash"></i> @L["Delete"]</button>';
                     }
+                    
+                    var row = '<tr>' +
+                        '<td>' + (entry.title || '') + '</td>' +
+                        '<td>' + (entry.username || '-') + '</td>' +
+                        '<td>' + (entry.passwordType === 1 ? 'General' : 'NumericOnly') + '</td>' +
+                        '<td>' + (entry.weakLevel || '-') + '</td>' +
+                        '<td>' + (entry.isDeleted ? '<span class="badge bg-secondary">@L["Voided"]</span>' : '<span class="badge bg-success">@L["Active"]</span>') + '</td>' +
+                        '<td>' + actionButtons + '</td>' +
+                        '</tr>';
+                    tbody.innerHTML += row;
                 });
             } else {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No password entries</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No password entries</td></tr>';
             }
 
             var modal = new bootstrap.Modal(document.getElementById('ViewModal'));
@@ -114,6 +127,123 @@ $(function () {
                             location.reload();
                         } else {
                             throw new Error('Failed to delete PasswordBook');
+                        }
+                    })
+                    .catch(error => {
+                        abp.notify.error(error.message);
+                    });
+                }
+            }
+        );
+    };
+
+    // 显示创建密码条目模态框
+    window.showCreateEntryModal = function() {
+        var modal = new bootstrap.Modal(document.getElementById('CreateEntryModal'));
+        modal.show();
+    };
+
+    // 创建密码条目
+    window.createPasswordEntry = function() {
+        var passwordBookId = document.getElementById('entry-passwordbook-id').value;
+        
+        var input = {
+            title: document.getElementById('entry-title')?.value || '',
+            password: document.getElementById('entry-password')?.value || '',
+            hasUsername: document.getElementById('entry-hasusername')?.value === 'true',
+            username: document.getElementById('entry-username')?.value || null,
+            passwordType: parseInt(document.getElementById('entry-passwordtype')?.value || '1'),
+            weakLevel: document.getElementById('entry-weaklevel')?.value ? parseInt(document.getElementById('entry-weaklevel').value) : null,
+            remark: document.getElementById('entry-remark')?.value || null
+        };
+        
+        if (!input.title || !input.password) {
+            abp.notify.error('Title and Password are required');
+            return;
+        }
+        
+        fetch('/api/password-book/' + passwordBookId + '/entries', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            },
+            body: JSON.stringify(input)
+        })
+        .then(response => {
+            if (response.ok) {
+                abp.notify.success('Password entry created successfully');
+                $('#CreateEntryModal').modal('hide');
+                location.reload();
+            } else {
+                return response.json().then(err => {
+                    var errorMessage = 'Failed to create password entry';
+                    if (err && err.error) {
+                        if (typeof err.error === 'object') {
+                            errorMessage = err.error.message || err.error.code || JSON.stringify(err.error);
+                        } else {
+                            errorMessage = err.error;
+                        }
+                    } else if (err && err.message) {
+                        errorMessage = err.message;
+                    }
+                    throw new Error(errorMessage);
+                });
+            }
+        })
+        .catch(error => {
+            abp.notify.error(error.message);
+        });
+    };
+
+    // 删除密码条目
+    window.deletePasswordEntry = function(passwordBookId, entryId) {
+        abp.message.confirm(
+            'Are you sure you want to delete this password entry?',
+            'Delete Confirmation',
+            function(confirmed) {
+                if (confirmed) {
+                    fetch('/api/password-book/' + passwordBookId + '/entries/' + entryId, {
+                        method: 'DELETE',
+                        headers: {
+                            'RequestVerificationToken': abp.security.antiForgery.getToken()
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            abp.notify.success('Password entry deleted successfully');
+                            location.reload();
+                        } else {
+                            throw new Error('Failed to delete password entry');
+                        }
+                    })
+                    .catch(error => {
+                        abp.notify.error(error.message);
+                    });
+                }
+            }
+        );
+    };
+
+    // 恢复密码条目
+    window.restorePasswordEntry = function(passwordBookId, entryId) {
+        abp.message.confirm(
+            'Are you sure you want to restore this password entry?',
+            'Restore Confirmation',
+            function(confirmed) {
+                if (confirmed) {
+                    fetch('/api/password-book/' + passwordBookId + '/entries/' + entryId + '/restore', {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': abp.security.antiForgery.getToken()
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            abp.notify.success('Password entry restored successfully');
+                            location.reload();
+                        } else {
+                            throw new Error('Failed to restore password entry');
                         }
                     })
                     .catch(error => {
