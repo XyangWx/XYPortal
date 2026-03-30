@@ -150,7 +150,7 @@ $(function () {
         var input = {
             title: document.getElementById('entry-title')?.value || '',
             password: document.getElementById('entry-password')?.value || '',
-            hasUsername: document.getElementById('entry-hasusername')?.value === 'true',
+            hasUsername: (document.getElementById('entry-hasusername')?.value ?? '') === 'true',
             username: document.getElementById('entry-username')?.value || null,
             passwordType: parseInt(document.getElementById('entry-passwordtype')?.value || '1'),
             weakLevel: document.getElementById('entry-weaklevel')?.value ? parseInt(document.getElementById('entry-weaklevel').value) : null,

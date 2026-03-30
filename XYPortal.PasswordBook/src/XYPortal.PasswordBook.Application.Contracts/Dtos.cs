@@ -62,7 +62,7 @@ public class PasswordEntryDto
 public class CreatePasswordEntryDto
 {
     public string Title { get; set; } = string.Empty;
-    public bool HasUsername { get; set; }
+    public bool? HasUsername { get; set; }
     public string? Username { get; set; }
     public PasswordType PasswordType { get; set; }
     public PasswordWeakLevel? WeakLevel { get; set; }

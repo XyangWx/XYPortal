@@ -113,7 +113,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         
         var entry = passwordBook.AddPasswordEntry(
             input.Title,
-            input.HasUsername,
+            input.HasUsername ?? false,
             input.Username,
             input.PasswordType,
             input.WeakLevel,
