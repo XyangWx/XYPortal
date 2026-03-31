@@ -147,13 +147,26 @@ $(function () {
     window.createPasswordEntry = function() {
         var passwordBookId = document.getElementById('entry-passwordbook-id').value;
         
+        var passwordTypeValue = document.getElementById('entry-passwordtype')?.value;
+        var passwordTypeInt = parseInt(passwordTypeValue);
+        if (isNaN(passwordTypeInt) || (passwordTypeInt !== 0 && passwordTypeInt !== 1)) {
+            passwordTypeInt = 1; // default to General
+        }
+        
+        var weakLevelValue = document.getElementById('entry-weaklevel')?.value;
+        var weakLevel = null;
+        if (weakLevelValue) {
+            var weakLevelInt = parseInt(weakLevelValue);
+            weakLevel = isNaN(weakLevelInt) ? null : weakLevelInt;
+        }
+        
         var input = {
             title: document.getElementById('entry-title')?.value || '',
             password: document.getElementById('entry-password')?.value || '',
-            hasUsername: (document.getElementById('entry-hasusername')?.value ?? '') === 'true',
+            hasUsername: document.getElementById('entry-hasusername')?.value === 'true',
             username: document.getElementById('entry-username')?.value || null,
-            passwordType: parseInt(document.getElementById('entry-passwordtype')?.value || '1'),
-            weakLevel: document.getElementById('entry-weaklevel')?.value ? parseInt(document.getElementById('entry-weaklevel').value) : null,
+            passwordType: passwordTypeInt,
+            weakLevel: weakLevel,
             remark: document.getElementById('entry-remark')?.value || null
         };
         
