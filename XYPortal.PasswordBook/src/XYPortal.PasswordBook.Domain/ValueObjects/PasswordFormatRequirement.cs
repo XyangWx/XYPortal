@@ -1,5 +1,7 @@
 using System;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using XYPortal.PasswordBook.Enums;
 
 namespace XYPortal.PasswordBook.ValueObjects;
@@ -9,6 +11,7 @@ namespace XYPortal.PasswordBook.ValueObjects;
 /// </summary>
 public class PasswordFormatRequirement
 {
+    private readonly ILogger<PasswordFormatRequirement>? _logger = LoggerHelper.CreateLogger<PasswordFormatRequirement>();
     public int MinLength { get; private set; }
     public int MaxLength { get; private set; }
     public bool RequireUppercase { get; private set; }
@@ -20,7 +23,7 @@ public class PasswordFormatRequirement
 
     private PasswordFormatRequirement() 
     {
-        SpecialChars = "!@#$%^&*()-_=+[]{}|;:,.<>?";
+        SpecialChars = @"`~!@#$%^&*()_\-+=|\\{}[\]:;<>,.?/""'";
     }
 
     public PasswordFormatRequirement(
@@ -44,7 +47,7 @@ public class PasswordFormatRequirement
         RequireLowercase = requireLowercase;
         RequireDigit = requireDigit;
         RequireSpecialChar = requireSpecialChar;
-        SpecialChars = specialChars ?? "!@#$%^&*()-_=+[]{}|;:,.<>?";
+        SpecialChars = specialChars ?? @"`~!@#$%^&*()_\-+=|\\{}[\]:;<>,.?/""'";
         AllowedType = allowedType ?? PasswordType.General;
     }
 
@@ -53,6 +56,9 @@ public class PasswordFormatRequirement
     /// </summary>
     public (bool IsValid, string? ErrorMessage) Validate(string password)
     {
+        _logger?.LogDebug($"Password: {password}");
+        _logger.LogDebug($"[{SpecialChars}] => {Regex.IsMatch(password, $"[{SpecialChars}]")}");
+        
         if (string.IsNullOrWhiteSpace(password))
             return (false, "Password cannot be empty");
 
@@ -70,9 +76,15 @@ public class PasswordFormatRequirement
 
         if (RequireDigit && !Regex.IsMatch(password, "[0-9]"))
             return (false, "Password must contain digits");
-
-        if (RequireSpecialChar && !Regex.IsMatch(password, $"[{Regex.Escape(SpecialChars)}]"))
-            return (false, $"Password must contain special characters: {SpecialChars}");
+        
+        var label = SpecialChars
+            .Trim('[', ']')
+            .Replace("\\-", "-")
+            .Replace("\\\\", "\\")
+            .Replace("\\]", "]");
+        
+        if (RequireSpecialChar && !Regex.IsMatch(password, $"[{SpecialChars}]"))
+            return (false, $"Password must contain special characters: {label}");
 
         return (true, null);
     }

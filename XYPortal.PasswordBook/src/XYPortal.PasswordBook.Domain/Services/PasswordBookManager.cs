@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Domain;
 using Volo.Abp.Domain.Repositories;
@@ -22,10 +23,12 @@ namespace XYPortal.PasswordBook.Domain.Services;
 public class PasswordBookManager : DomainService
 {
     private readonly IRepository<PasswordBookEntity, Guid> _passwordBookRepository;
+    private readonly ILogger<PasswordBookManager> _logger;
 
-    public PasswordBookManager(IRepository<PasswordBookEntity, Guid> passwordBookRepository)
+    public PasswordBookManager(IRepository<PasswordBookEntity, Guid> passwordBookRepository, ILogger<PasswordBookManager> logger)
     {
         _passwordBookRepository = passwordBookRepository;
+        _logger = logger;
     }
 
     /// <summary>
@@ -37,6 +40,7 @@ public class PasswordBookManager : DomainService
         string? description,
         PasswordFormatRequirement? passwordFormat = null)
     {
+        _logger.LogDebug($"Password Book Name: {name}");
         // Check for duplicate name for the same owner
         var existingBook = await _passwordBookRepository
             .FirstOrDefaultAsync(x => x.OwnerId == ownerId && x.Name == name && !x.IsDeleted);
@@ -46,7 +50,7 @@ public class PasswordBookManager : DomainService
             throw new BusinessException("PasswordBook:DuplicateName")
                 .WithData("Name", name);
         }
-
+        _logger.LogDebug("Create Password Book");
         var passwordBook = new PasswordBookEntity(
             Guid.NewGuid(),
             ownerId,
@@ -56,6 +60,7 @@ public class PasswordBookManager : DomainService
         );
 
         await _passwordBookRepository.InsertAsync(passwordBook);
+        _logger.LogDebug("PasswordBook Saved");
         return passwordBook;
     }
 
@@ -151,7 +156,7 @@ public class PasswordBookManager : DomainService
         if (Regex.IsMatch(password, "[a-z]")) score++;
         if (Regex.IsMatch(password, "[A-Z]")) score++;
         if (Regex.IsMatch(password, "[0-9]")) score++;
-        if (Regex.IsMatch(password, "[!@#$%^&*()_+\\-=\\[\\]{}|;:,.<>?]")) score++;
+        if (Regex.IsMatch(password, @"[`~!@#$%^&*()_\-+=|\\{}[\]:;<>,.?/""']")) score++;
 
         if (Regex.IsMatch(password, @"(.)\1{2,}")) score--;
         if (Regex.IsMatch(password, @"(012|123|234|345|456|567|678|789|890)")) score--;
