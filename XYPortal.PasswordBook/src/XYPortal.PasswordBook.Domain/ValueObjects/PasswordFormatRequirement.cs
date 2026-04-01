@@ -20,7 +20,7 @@ public class PasswordFormatRequirement
 
     private PasswordFormatRequirement() 
     {
-        SpecialChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+        SpecialChars = "!@#$%^&*()-_=+[]{}|;:,.<>?";
     }
 
     public PasswordFormatRequirement(
@@ -44,7 +44,7 @@ public class PasswordFormatRequirement
         RequireLowercase = requireLowercase;
         RequireDigit = requireDigit;
         RequireSpecialChar = requireSpecialChar;
-        SpecialChars = specialChars ?? "!@#$%^&*()_+-=[]{}|;:,.<>?";
+        SpecialChars = specialChars ?? "!@#$%^&*()-_=+[]{}|;:,.<>?";
         AllowedType = allowedType ?? PasswordType.General;
     }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Volo.Abp;
@@ -101,6 +102,16 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     /// </summary>
     public async Task<PasswordEntryDto> AddPasswordEntryAsync(Guid passwordBookId, CreatePasswordEntryDto input)
     {
+        var create_payload = JsonSerializer.Serialize(
+            input,
+            new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            }) ?? "{}";
+        
+        _logger.LogDebug(create_payload);
+        
         await CheckPasswordBookPermissionAsync();
 
         var userId = CurrentUser.GetId();

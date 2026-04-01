@@ -175,6 +175,8 @@ $(function () {
             return;
         }
         
+        console.log(input);
+        
         fetch('/api/password-book/' + passwordBookId + '/entries', {
             method: 'POST',
             headers: {
