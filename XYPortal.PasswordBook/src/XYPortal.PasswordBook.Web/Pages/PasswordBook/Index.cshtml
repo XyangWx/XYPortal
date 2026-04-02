@@ -7,6 +7,15 @@
 @inject IStringLocalizer<PasswordBookResource> L
 
 @section scripts {
+    <script>
+        // Localized strings for JavaScript
+        window.passwordBookLocales = {
+            Delete: '@L["Delete"]',
+            Restore: '@L["Restore"]',
+            Active: '@L["Active"]',
+            Voided: '@L["Voided"]'
+        };
+    </script>
     <script src="/Pages/PasswordBook/index.js"></script>
 }
 

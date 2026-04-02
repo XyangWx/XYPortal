@@ -81,10 +81,10 @@ $(function () {
                     var actionButtons = '';
                     if (entry.isDeleted) {
                         // Show restore button for deleted entries
-                        actionButtons = '<button type="button" class="btn btn-success btn-sm" onclick="restorePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-undo"></i> @L["Restore"]</button>';
+                        actionButtons = '<button type="button" class="btn btn-success btn-sm" onclick="restorePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-undo"></i> ' + window.passwordBookLocales.Restore + '</button>';
                     } else {
                         // Show delete button for active entries
-                        actionButtons = '<button type="button" class="btn btn-danger btn-sm" onclick="deletePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-trash"></i> @L["Delete"]</button>';
+                        actionButtons = '<button type="button" class="btn btn-danger btn-sm" onclick="deletePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-trash"></i> ' + window.passwordBookLocales.Delete + '</button>';
                     }
                     
                     var row = '<tr>' +
@@ -92,7 +92,7 @@ $(function () {
                         '<td>' + (entry.username || '-') + '</td>' +
                         '<td>' + (entry.passwordType === 1 ? 'General' : 'NumericOnly') + '</td>' +
                         '<td>' + (entry.weakLevel || '-') + '</td>' +
-                        '<td>' + (entry.isDeleted ? '<span class="badge bg-secondary">@L["Voided"]</span>' : '<span class="badge bg-success">@L["Active"]</span>') + '</td>' +
+                        '<td>' + (entry.isDeleted ? '<span class="badge bg-secondary">' + window.passwordBookLocales.Voided + '</span>' : '<span class="badge bg-success">' + window.passwordBookLocales.Active + '</span>') + '</td>' +
                         '<td>' + actionButtons + '</td>' +
                         '</tr>';
                     tbody.innerHTML += row;
