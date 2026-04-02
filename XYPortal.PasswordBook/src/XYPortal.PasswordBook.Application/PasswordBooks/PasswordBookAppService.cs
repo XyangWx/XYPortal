@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -22,6 +23,7 @@ using PasswordBookEntity = XYPortal.PasswordBook.AggregateRoots.PasswordBook;
 using PermissionChecker = Volo.Abp.Authorization.Permissions.IPermissionChecker;
 using RandomCategory = XYPortal.RandomStringProvider.RandomCategory;
 using XYPortal.RandomStringProvider.RandomStringProvider;
+using EntityNotFoundException = Volo.Abp.Domain.Entities.EntityNotFoundException;
 
 namespace XYPortal.PasswordBook.Application.PasswordBooks;
 
@@ -67,7 +69,15 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         await CheckPasswordBookPermissionAsync();
 
         var userId = CurrentUser.GetId();
-        var books = await _passwordBookManager.GetListByOwnerAsync(userId);
+        
+        // Use repository with Include to load navigation properties
+        var query = await Repository.GetQueryableAsync();
+        var queryWithIncludes = query
+            .Include(x => x.PasswordEntries)
+                .ThenInclude(e => e.PasswordHistories)
+            .Where(x => x.OwnerId == userId && !x.IsDeleted);
+        
+        var books = await EntityFrameworkQueryableExtensions.ToListAsync(queryWithIncludes);
 
         var dtos = ObjectMapper.Map<List<PasswordBookEntity>, List<PasswordBookDto>>(books);
         foreach (var (dto, entity) in dtos.Zip(books))
@@ -91,7 +101,20 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
             throw new UnauthorizedAccessException("You do not have permission to access this PasswordBook");
         }
 
-        var passwordBook = await _passwordBookManager.GetByIdAsync(id);
+        // Use repository with Include to load navigation properties
+        var query = await Repository.GetQueryableAsync();
+        var queryWithIncludes = query
+            .Include(x => x.PasswordEntries)
+                .ThenInclude(e => e.PasswordHistories)
+            .Where(x => x.Id == id);
+            
+        var passwordBook = await EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(queryWithIncludes);
+        
+        if (passwordBook == null)
+        {
+            throw new EntityNotFoundException(typeof(PasswordBookEntity), id);
+        }
+        
         var dto = ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
         dto.PopulateComplexFields(passwordBook);
         return dto;

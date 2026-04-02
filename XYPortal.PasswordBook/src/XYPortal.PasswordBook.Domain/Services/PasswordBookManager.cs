@@ -25,7 +25,9 @@ public class PasswordBookManager : DomainService
     private readonly IRepository<PasswordBookEntity, Guid> _passwordBookRepository;
     private readonly ILogger<PasswordBookManager> _logger;
 
-    public PasswordBookManager(IRepository<PasswordBookEntity, Guid> passwordBookRepository, ILogger<PasswordBookManager> logger)
+    public PasswordBookManager(
+        IRepository<PasswordBookEntity, Guid> passwordBookRepository,
+        ILogger<PasswordBookManager> logger)
     {
         _passwordBookRepository = passwordBookRepository;
         _logger = logger;
@@ -79,14 +81,19 @@ public class PasswordBookManager : DomainService
     /// </summary>
     public async Task<List<PasswordBookEntity>> GetListByOwnerAsync(Guid ownerId, bool includeDeleted = false)
     {
-        var books = await _passwordBookRepository.GetListAsync(x => x.OwnerId == ownerId);
+        var query = await _passwordBookRepository.GetQueryableAsync();
+        
+        // Filter by owner and load navigation properties via ToList() then filter
+        // Note: This approach loads all books for the owner; for better performance,
+        // consider implementing a custom repository with optimized queries
+        var allBooks = await _passwordBookRepository.GetListAsync(x => x.OwnerId == ownerId);
         
         if (!includeDeleted)
         {
-            books = books.Where(x => !x.IsDeleted).ToList();
+            allBooks = allBooks.Where(x => !x.IsDeleted).ToList();
         }
 
-        return books;
+        return allBooks;
     }
 
     /// <summary>

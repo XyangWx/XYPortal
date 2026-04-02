@@ -31,6 +31,16 @@ public static class PasswordBookDbContextModelCreatingExtensions
             b.HasIndex(x => x.OwnerId);
             b.HasIndex(x => x.IsDeleted);
             b.HasIndex(x => new { x.OwnerId, x.Name }).IsUnique().HasFilter("[IsDeleted] = 0");
+
+            // Configure relationship with PasswordEntries
+            b.HasMany(x => x.PasswordEntries)
+                .WithOne()
+                .HasForeignKey(x => x.PasswordBookId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Allow property access mode for private navigation property
+            b.Navigation(x => x.PasswordEntries)
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
         });
 
         builder.Entity<PasswordEntry>(b =>

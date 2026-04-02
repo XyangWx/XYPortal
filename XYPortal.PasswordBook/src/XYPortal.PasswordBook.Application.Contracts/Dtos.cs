@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using XYPortal.PasswordBook.Enums;
 
 namespace XYPortal.PasswordBook.Application.Contracts.Dtos;
@@ -19,6 +20,7 @@ public class PasswordBookDto
     public DateTime? LastModificationTime { get; set; }
     public bool IsDeleted { get; set; }
     public int EntryCount { get; set; }
+    public List<PasswordEntryDto> PasswordEntries { get; set; } = new();
 }
 
 /// <summary>
@@ -54,6 +56,19 @@ public class PasswordEntryDto
     public DateTime CreationTime { get; set; }
     public DateTime? LastModificationTime { get; set; }
     public bool IsDeleted { get; set; }
+    public List<PasswordHistoryDto> PasswordHistories { get; set; } = new();
+}
+
+/// <summary>
+/// PasswordHistory DTO
+/// </summary>
+public class PasswordHistoryDto
+{
+    public Guid Id { get; set; }
+    public Guid PasswordEntryId { get; set; }
+    public string? PasswordValue { get; set; }
+    public bool IsCurrent { get; set; }
+    public DateTime CreationTime { get; set; }
 }
 
 /// <summary>

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Riok.Mapperly.Abstractions;
 using Volo.Abp.Mapperly;
@@ -15,6 +17,7 @@ public partial class PasswordBookApplicationMappers : MapperBase<PasswordBookEnt
     [MapperIgnoreTarget(nameof(PasswordBookDto.MinLength))]
     [MapperIgnoreTarget(nameof(PasswordBookDto.MaxLength))]
     [MapperIgnoreTarget(nameof(PasswordBookDto.EntryCount))]
+    [MapperIgnoreTarget(nameof(PasswordBookDto.PasswordEntries))]
     private partial void MapToDtoIgnoreComplexFields(PasswordBookEntity source, PasswordBookDto destination);
 
     public override partial void Map(PasswordBookEntity source, PasswordBookDto destination);
@@ -25,6 +28,10 @@ public partial class PasswordBookApplicationMappers : MapperBase<PasswordBookEnt
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public partial class PasswordEntryMapper : MapperBase<PasswordEntry, PasswordEntryDto>
 {
+    [MapperIgnoreTarget(nameof(PasswordEntryDto.PasswordBookId))]
+    [MapperIgnoreTarget(nameof(PasswordEntryDto.PasswordHistories))]
+    private partial void MapToDtoIgnoreComplexFields(PasswordEntry source, PasswordEntryDto destination);
+
     public override partial PasswordEntryDto Map(PasswordEntry source);
     public override partial void Map(PasswordEntry source, PasswordEntryDto destination);
 }
@@ -41,5 +48,37 @@ public static class PasswordBookDtoExtensions
         dto.MinLength = format.MinLength;
         dto.MaxLength = format.MaxLength;
         dto.EntryCount = entity.PasswordEntries.Count(e => !e.IsDeleted);
+        dto.PasswordEntries = entity.PasswordEntries
+            .Select(e => MapEntryToDto(e, dto.Id))
+            .ToList();
+    }
+
+    private static PasswordEntryDto MapEntryToDto(PasswordEntry entry, Guid passwordBookId)
+    {
+        var dto = new PasswordEntryDto
+        {
+            Id = entry.Id,
+            PasswordBookId = passwordBookId,
+            Title = entry.Title,
+            HasUsername = entry.HasUsername,
+            Username = entry.Username,
+            PasswordType = entry.PasswordType,
+            WeakLevel = entry.WeakLevel,
+            Remark = entry.Remark,
+            CreationTime = entry.CreationTime,
+            LastModificationTime = entry.LastModificationTime,
+            IsDeleted = entry.IsDeleted,
+            PasswordHistories = entry.PasswordHistories
+                .Select(h => new PasswordHistoryDto
+                {
+                    Id = h.Id,
+                    PasswordEntryId = h.PasswordEntryId,
+                    PasswordValue = h.PasswordValue,
+                    IsCurrent = h.IsCurrent,
+                    CreationTime = h.CreationTime
+                })
+                .ToList()
+        };
+        return dto;
     }
 }
