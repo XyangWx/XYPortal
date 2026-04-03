@@ -20,9 +20,9 @@ $ErrorActionPreference = "Stop"
 
 $ScriptRoot = $PSScriptRoot
 
-# Detect platform
+# Detect platform (improved: handle 'Unix' value on Linux)
 $RunningOnWindows = $PSVersionTable.Platform -eq 'Win32NT' -or $null -eq $PSVersionTable.Platform
-$RunningOnLinux = $PSVersionTable.Platform -eq 'Linux'
+$RunningOnLinux = $PSVersionTable.Platform -eq 'Linux' -or $PSVersionTable.Platform -eq 'Unix'
 $RunningOnMacOS = $PSVersionTable.Platform -eq 'Darwin'
 
 Write-Host "========================================" -ForegroundColor Cyan
@@ -103,6 +103,147 @@ function Build-Project {
     }
 }
 
+# Function to check if a port is available
+function Test-PortAvailable {
+    param([int]$Port)
+    
+    $endpoint = "127.0.0.1:$Port"
+    
+    if ($RunningOnWindows) {
+        $connections = Get-NetTCPConnection -LocalAddress $endpoint -ErrorAction SilentlyContinue
+    }
+    else {
+        # Linux/macOS: use ss or netstat
+        $ssCmd = "ss -tlnp 2>/dev/null | grep ':$Port'"
+        $output = Invoke-Expression $ssCmd
+        $connections = $output
+    }
+    
+    if ($connections -and $connections.Count -gt 0) {
+        return $false
+    }
+    return $true
+}
+
+# Function to kill process on a specific port
+function Stop-ProcessOnPort {
+    param([int]$Port)
+    
+    Write-Host "  Checking port $Port..." -ForegroundColor Gray
+    
+    if ($RunningOnWindows) {
+        $pids = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
+        foreach ($pid in $pids) {
+            try {
+                Stop-Process -Id $pid -Force -ErrorAction Stop
+                Write-Host "  [Killed] PID $pid on port $Port" -ForegroundColor Yellow
+            }
+            catch {
+                Write-Host "  [Warn] Could not kill PID $pid on port $Port (may need elevated privileges)" -ForegroundColor Yellow
+            }
+        }
+    }
+    else {
+        # Linux/macOS: parse ss output to get PIDs
+        $ssCmd = "ss -tlnp 2>/dev/null | grep ':$Port'"
+        $output = Invoke-Expression $ssCmd
+        
+        if ($output -match 'pid=(\d+)') {
+            $pids = [regex]::Matches($output, 'pid=(\d+)') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique
+            foreach ($pid in $pids) {
+                try {
+                    # Try graceful kill first
+                    Kill -Signal SIGTERM $pid 2>$null
+                    Start-Sleep -Milliseconds 500
+                    # Force kill if still running
+                    Kill -Signal SIGKILL $pid 2>$null
+                    Write-Host "  [Killed] PID $pid on port $Port" -ForegroundColor Yellow
+                }
+                catch {
+                    Write-Host "  [Warn] Could not kill PID $pid on port $Port (may need sudo)" -ForegroundColor Yellow
+                }
+            }
+        }
+    }
+}
+
+# Function to cleanup all service processes
+function Stop-AllServices {
+    param([hashtable]$Processes)
+    
+    Write-Host ""
+    Write-Host "Stopping all services..." -ForegroundColor Yellow
+    
+    foreach ($entry in $Processes.GetEnumerator()) {
+        $name = $entry.Key
+        $proc = $entry.Value
+        
+        if ($proc -and -not $proc.HasExited) {
+            try {
+                # Kill the process tree
+                if (-not $RunningOnWindows) {
+                    # On Linux/macOS, try to kill process group
+                    Kill -Signal SIGTERM -Id $proc.Id 2>$null
+                    Start-Sleep -Milliseconds 500
+                    if (-not $proc.HasExited) {
+                        Kill -Signal SIGKILL -Id $proc.Id 2>$null
+                    }
+                }
+                else {
+                    $proc.Kill()
+                }
+                Write-Host "  [$name] stopped (PID: $($proc.Id))" -ForegroundColor Gray
+            }
+            catch {
+                Write-Host "  [$name] could not be stopped cleanly" -ForegroundColor Gray
+            }
+        }
+    }
+    
+    # Also try to kill any stray dotnet processes for these projects
+    $projectNames = @("XYPortal.AuthServer", "XYPortal.HttpApi.Host", "XYPortal.Web.Host")
+    foreach ($projName in $projectNames) {
+        if ($RunningOnWindows) {
+            $strayProcs = Get-Process -Name "dotnet" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*$projName*" }
+        }
+        else {
+            $strayProcs = Invoke-Expression "pgrep -f 'dotnet.*$projName' 2>/dev/null" | ForEach-Object { Get-Process -Id $_ -ErrorAction SilentlyContinue }
+        }
+        
+        foreach ($sp in $strayProcs) {
+            try {
+                if ($sp -and -not $sp.HasExited) {
+                    Kill -Signal SIGKILL $sp.Id 2>$null
+                    Write-Host "  [Cleanup] Killed stray $projName (PID: $($sp.Id))" -ForegroundColor Gray
+                }
+            }
+            catch {
+                # Ignore
+            }
+        }
+    }
+}
+
+# =============================================
+# Phase 0: Pre-flight check - cleanup stale processes
+# =============================================
+Write-Host "Phase 0: Pre-flight check..." -ForegroundColor Cyan
+
+$ports = @{ 44367 = "AuthServer"; 44373 = "HttpApi.Host"; 44331 = "Web.Host" }
+
+foreach ($port in $ports.Keys) {
+    if (-not (Test-PortAvailable -Port $port)) {
+        Write-Host "  Port $port ($($ports[$port])) is in use, attempting to free it..." -ForegroundColor Yellow
+        Stop-ProcessOnPort -Port $port
+        Start-Sleep -Milliseconds 500
+    }
+    else {
+        Write-Host "  Port $port ($($ports[$port])) is available" -ForegroundColor Gray
+    }
+}
+
+Write-Host ""
+
 # =============================================
 # Phase 1: Build dependency projects
 # =============================================
@@ -145,162 +286,115 @@ Write-Host "Starting AuthServer, HttpApi.Host, and Web.Host..." -ForegroundColor
 Write-Host "Type /q and press Enter to stop all services and exit." -ForegroundColor Yellow
 Write-Host ""
 
-# Start all three services as background jobs
-$jobs = @()
+# Track running processes (PID-based, not Job-based)
+$runningProcesses = @{}
 
-$authJob = Start-Job -ScriptBlock {
-    param($Path, $Name)
-    try {
-        Push-Location $Path
-        $process = Start-Process -FilePath "dotnet" -ArgumentList "run" -NoNewWindow -PassThru -Wait
-        return @{ Name = $Name; ExitCode = $process.ExitCode; State = "Completed" }
-    }
-    catch {
-        return @{ Name = $Name; Error = $_.Exception.Message; State = "Failed" }
-    }
-    finally {
-        Pop-Location
-    }
-} -ArgumentList $AuthServerPath, "AuthServer"
-$jobs += @{ Name = "AuthServer"; Job = $authJob }
-Write-Host "[AuthServer] Started (Job ID: $($authJob.Id))" -ForegroundColor Yellow
-
-$httpApiJob = Start-Job -ScriptBlock {
-    param($Path, $Name)
-    try {
-        Push-Location $Path
-        $process = Start-Process -FilePath "dotnet" -ArgumentList "run" -NoNewWindow -PassThru -Wait
-        return @{ Name = $Name; ExitCode = $process.ExitCode; State = "Completed" }
-    }
-    catch {
-        return @{ Name = $Name; Error = $_.Exception.Message; State = "Failed" }
-    }
-    finally {
-        Pop-Location
-    }
-} -ArgumentList $HttpApiHostPath, "HttpApi.Host"
-$jobs += @{ Name = "HttpApi.Host"; Job = $httpApiJob }
-Write-Host "[HttpApi.Host] Started (Job ID: $($httpApiJob.Id))" -ForegroundColor Yellow
-
-$webHostJob = Start-Job -ScriptBlock {
-    param($Path, $Name)
-    try {
-        Push-Location $Path
-        $process = Start-Process -FilePath "dotnet" -ArgumentList "run" -NoNewWindow -PassThru -Wait
-        return @{ Name = $Name; ExitCode = $process.ExitCode; State = "Completed" }
-    }
-    catch {
-        return @{ Name = $Name; Error = $_.Exception.Message; State = "Failed" }
-    }
-    finally {
-        Pop-Location
-    }
-} -ArgumentList $WebHostPath, "Web.Host"
-$jobs += @{ Name = "Web.Host"; Job = $webHostJob }
-Write-Host "[Web.Host] Started (Job ID: $($webHostJob.Id))" -ForegroundColor Yellow
-
-Write-Host ""
-Write-Host "All three services are running." -ForegroundColor Green
+try {
+    # Start AuthServer
+    Write-Host "[AuthServer] Starting dotnet run..." -ForegroundColor Yellow
+    $authProc = Start-Process -FilePath "dotnet" -ArgumentList "run" -NoNewWindow -PassThru -WorkingDirectory $AuthServerPath
+    $runningProcesses["AuthServer"] = $authProc
+    Write-Host "[AuthServer] Started (PID: $($authProc.Id))" -ForegroundColor Green
+    
+    # Start HttpApi.Host
+    Write-Host "[HttpApi.Host] Starting dotnet run..." -ForegroundColor Yellow
+    $httpApiProc = Start-Process -FilePath "dotnet" -ArgumentList "run" -NoNewWindow -PassThru -WorkingDirectory $HttpApiHostPath
+    $runningProcesses["HttpApi.Host"] = $httpApiProc
+    Write-Host "[HttpApi.Host] Started (PID: $($httpApiProc.Id))" -ForegroundColor Green
+    
+    # Start Web.Host
+    Write-Host "[Web.Host] Starting dotnet run..." -ForegroundColor Yellow
+    $webHostProc = Start-Process -FilePath "dotnet" -ArgumentList "run" -NoNewWindow -PassThru -WorkingDirectory $WebHostPath
+    $runningProcesses["Web.Host"] = $webHostProc
+    Write-Host "[Web.Host] Started (PID: $($webHostProc.Id))" -ForegroundColor Green
+    
+    Write-Host ""
+    Write-Host "All three services are running." -ForegroundColor Green
+    Write-Host ""
+}
+catch {
+    Write-Host ""
+    Write-Host "ERROR: Failed to start services: $_" -ForegroundColor Red
+    Stop-AllServices -Processes $runningProcesses
+    exit 1
+}
 
 # =============================================
 # Phase 3: Monitor services and wait for /q
 # =============================================
 $quit = $false
 $checkInterval = 2  # seconds
+$anyFailure = $false
+$failureMessage = ""
 
-while (-not $quit) {
+while (-not $quit -and -not $anyFailure) {
     Start-Sleep -Seconds $checkInterval
     
-    # Check if any job has ended unexpectedly
-    foreach ($jobInfo in $jobs) {
-        $job = $jobInfo.Job
-        $name = $jobInfo.Name
+    # Check if any process has exited unexpectedly
+    foreach ($entry in $runningProcesses.GetEnumerator()) {
+        $name = $entry.Key
+        $proc = $entry.Value
         
-        # Get any output/error
-        if ($job.HasMoreData) {
-            $output = Receive-Job -Job $job
-            if ($output) {
-                foreach ($item in $output) {
-                    if ($item.State -eq "Failed") {
-                        Write-Host ""
-                        Write-Host "========================================" -ForegroundColor Red
-                        Write-Host "SERVICE FAILED: $($item.Name)" -ForegroundColor Red
-                        Write-Host "========================================" -ForegroundColor Red
-                        if ($item.Error) {
-                            Write-Host "Error: $($item.Error)" -ForegroundColor Red
-                        }
-                        
-                        # Stop all other jobs
-                        Write-Host ""
-                        Write-Host "Stopping all remaining services..." -ForegroundColor Yellow
-                        foreach ($ji in $jobs) {
-                            Stop-Job -Job $ji.Job -ErrorAction SilentlyContinue
-                            Remove-Job -Job $ji.Job -ErrorAction SilentlyContinue
-                        }
-                        
-                        Write-Host "Exiting due to service failure." -ForegroundColor Red
-                        exit 1
-                    }
-                }
-            }
-        }
-        
-        # Check job state
-        if ($job.State -eq 'Failed') {
+        if ($proc -and $proc.HasExited) {
+            $exitCode = $proc.ExitCode
             Write-Host ""
             Write-Host "========================================" -ForegroundColor Red
             Write-Host "SERVICE STOPPED: $name" -ForegroundColor Red
             Write-Host "========================================" -ForegroundColor Red
+            Write-Host "PID: $($proc.Id)" -ForegroundColor Red
+            Write-Host "Exit Code: $exitCode" -ForegroundColor Red
             
-            $output = Receive-Job -Job $job
-            if ($output) {
-                Write-Host ($output | Out-String) -ForegroundColor Red
+            if ($exitCode -ne 0) {
+                $anyFailure = $true
+                $failureMessage = "$name exited with code $exitCode"
             }
             
-            # Stop all other jobs
-            Write-Host ""
-            Write-Host "Stopping all remaining services..." -ForegroundColor Yellow
-            foreach ($ji in $jobs) {
-                Stop-Job -Job $ji.Job -ErrorAction SilentlyContinue
-                Remove-Job -Job $ji.Job -ErrorAction SilentlyContinue
-            }
-            
-            Write-Host "Exiting due to service failure." -ForegroundColor Red
-            exit 1
+            # Remove from tracking
+            $runningProcesses.Remove($name)
         }
     }
     
+    # If all processes have exited
+    if ($runningProcesses.Count -eq 0 -and -not $quit) {
+        Write-Host ""
+        Write-Host "All services have stopped." -ForegroundColor Yellow
+        $anyFailure = $true
+        $failureMessage = "All services exited unexpectedly"
+    }
+    
     # Check for /q input (non-blocking)
-    try {
-        if ($Host.UI.RawUI.KeyAvailable) {
-            $key = $Host.UI.RawUI.ReadKey('NoEcho, IncludeKeyDown')
-            if ($key.Character -eq 'q' -or $key.Character -eq 'Q') {
-                $quit = $true
+    if (-not $anyFailure) {
+        try {
+            if ($Host.UI.RawUI.KeyAvailable) {
+                $key = $Host.UI.RawUI.ReadKey('NoEcho, IncludeKeyDown')
+                if ($key.Character -eq 'q' -or $key.Character -eq 'Q') {
+                    $quit = $true
+                }
             }
         }
-    }
-    catch {
-        # Key reading not available, continue polling
+        catch {
+            # Key reading not available, continue polling
+        }
     }
 }
 
 # =============================================
 # Exit: User pressed /q or all services stopped
 # =============================================
-Write-Host ""
-Write-Host "/q received. Stopping all services..." -ForegroundColor Yellow
-
-foreach ($jobInfo in $jobs) {
-    try {
-        Stop-Job -Job $jobInfo.Job -ErrorAction SilentlyContinue
-        Remove-Job -Job $jobInfo.Job -ErrorAction SilentlyContinue
-        Write-Host "  [$($jobInfo.Name)] stopped" -ForegroundColor Gray
-    }
-    catch {
-        Write-Host "  [$($jobInfo.Name)] could not be stopped cleanly" -ForegroundColor Gray
-    }
+if ($quit) {
+    Write-Host ""
+    Write-Host "/q received. Stopping all services..." -ForegroundColor Yellow
 }
 
-Write-Host ""
-Write-Host "All services stopped. Exiting." -ForegroundColor Green
-exit 0
+Stop-AllServices -Processes $runningProcesses
+
+if ($anyFailure) {
+    Write-Host ""
+    Write-Host "Exiting due to: $failureMessage" -ForegroundColor Red
+    exit 1
+}
+else {
+    Write-Host ""
+    Write-Host "All services stopped. Exiting." -ForegroundColor Green
+    exit 0
+}
