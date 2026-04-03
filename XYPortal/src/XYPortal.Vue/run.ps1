@@ -3,11 +3,11 @@
 
 <#
 .SYNOPSIS
-    Build and run script for XYPortal AuthServer, HttpApi.Host and Web.Host
+    Build and run script for XYPortal Vue frontend with AuthServer and HttpApi.Host
 
 .DESCRIPTION
     Builds XYPortal.LinkBoard, XYPortal.RandomStringProvider, XYPortal.PasswordBook,
-    then runs AuthServer, HttpApi.Host and Web.Host simultaneously.
+    then runs AuthServer, HttpApi.Host, and Vue dev server simultaneously.
     Supports Windows and Linux/macOS.
     
     Type /q and press Enter to stop all services and exit.
@@ -32,7 +32,7 @@ Write-Host "Platform: $(if ($RunningOnWindows) { 'Windows' } elseif ($RunningOnL
 Write-Host ""
 
 # XYPortal root is 3 levels up from script root
-# Script: src/XYPortal.Web.Host/run.ps1
+# Script: src/XYPortal.Vue/run.ps1
 # Root:   /data/Repositories/XYPortal/
 $XYPortalRoot = Split-Path (Split-Path (Split-Path $ScriptRoot -Parent) -Parent) -Parent
 
@@ -247,8 +247,8 @@ function Stop-AllServices {
         }
     }
     
-    # Cleanup stray dotnet processes for AuthServer, HttpApi.Host, and Web.Host
-    $dotnetProjects = @("XYPortal.AuthServer", "XYPortal.HttpApi.Host", "XYPortal.Web.Host")
+    # Cleanup stray dotnet processes for AuthServer and HttpApi.Host
+    $dotnetProjects = @("XYPortal.AuthServer", "XYPortal.HttpApi.Host")
     foreach ($projName in $dotnetProjects) {
         if ($RunningOnWindows) {
             $strayPids = @()
@@ -269,6 +269,22 @@ function Stop-AllServices {
             }
         }
     }
+    
+    # Cleanup any vite/node processes running in the Vue directory
+    if ($RunningOnWindows) {
+        $strayNodeProcs = Get-Process -Name "node" -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "*XYPortal.Vue*" }
+        $strayNodePids = $strayNodeProcs | Select-Object -ExpandProperty Id
+    }
+    else {
+        $strayNodePids = Invoke-Expression "pgrep -f 'vite.*XYPortal.Vue' 2>/dev/null"
+        if ($strayNodePids -is [string]) { $strayNodePids = @($strayNodePids) }
+    }
+    
+    foreach ($pid in $strayNodePids) {
+        if ($pid) {
+            Stop-ProcessGracefully -Pid $pid -Name "stray vite"
+        }
+    }
 }
 
 # =============================================
@@ -276,10 +292,11 @@ function Stop-AllServices {
 # =============================================
 Write-Host "Phase 0: Pre-flight check..." -ForegroundColor Cyan
 
+# AuthServer: 44367, HttpApi.Host: 44373, Vue: 3000
 $ports = @{
     44367 = "AuthServer"
     44373 = "HttpApi.Host"
-    44331 = "Web.Host"
+    3000  = "Vue"
 }
 
 foreach ($port in $ports.Keys) {
@@ -318,21 +335,21 @@ Write-Host ""
 Write-Host "All dependency projects built successfully." -ForegroundColor Green
 
 # =============================================
-# Phase 2: Run AuthServer, HttpApi.Host, Web.Host
+# Phase 2: Run AuthServer, HttpApi.Host, and Vue dev server
 # =============================================
 Write-Host ""
 Write-Host "Phase 2: Starting services..." -ForegroundColor Cyan
 
 $AuthServerPath = Join-Path $ScriptRoot "../XYPortal.AuthServer"
 $HttpApiHostPath = Join-Path $ScriptRoot "../XYPortal.HttpApi.Host"
-$WebHostPath = $ScriptRoot
+$VuePath = $ScriptRoot
 
 Test-ProjectExists -Path $AuthServerPath -ProjectName "XYPortal.AuthServer"
 Test-ProjectExists -Path $HttpApiHostPath -ProjectName "XYPortal.HttpApi.Host"
-Test-ProjectExists -Path $WebHostPath -ProjectName "XYPortal.Web.Host"
+Test-ProjectExists -Path $VuePath -ProjectName "XYPortal.Vue"
 
 Write-Host ""
-Write-Host "Starting AuthServer, HttpApi.Host, and Web.Host..." -ForegroundColor Green
+Write-Host "Starting AuthServer, HttpApi.Host, and Vue dev server..." -ForegroundColor Green
 Write-Host "Type /q and press Enter to stop all services and exit." -ForegroundColor Yellow
 Write-Host ""
 
@@ -351,11 +368,11 @@ try {
     $runningProcesses["HttpApi.Host"] = $httpApiProc
     Write-Host "[HttpApi.Host] Started (PID: $($httpApiProc.Id))" -ForegroundColor Green
     
-    # Start Web.Host
-    Write-Host "[Web.Host] Starting dotnet run..." -ForegroundColor Yellow
-    $webHostProc = Start-Process -FilePath "dotnet" -ArgumentList "run" -NoNewWindow -PassThru -WorkingDirectory $WebHostPath
-    $runningProcesses["Web.Host"] = $webHostProc
-    Write-Host "[Web.Host] Started (PID: $($webHostProc.Id))" -ForegroundColor Green
+    # Start Vue dev server (npm run dev)
+    Write-Host "[Vue] Starting npm run dev..." -ForegroundColor Yellow
+    $vueProc = Start-Process -FilePath "npm" -ArgumentList "run", "dev" -NoNewWindow -PassThru -WorkingDirectory $VuePath
+    $runningProcesses["Vue"] = $vueProc
+    Write-Host "[Vue] Started (PID: $($vueProc.Id))" -ForegroundColor Green
     
     Write-Host ""
     Write-Host "All three services are running." -ForegroundColor Green
