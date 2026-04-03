@@ -66,15 +66,15 @@ function Build-Project {
 # Build sequence
 try {
     # 1. Build XYPortal.PasswordBook
-    $PasswordBookPath = Join-Path $ScriptRoot "../../XYPortal.PasswordBook"
+    $PasswordBookPath = Join-Path $ScriptRoot "../../../XYPortal.PasswordBook"
     Build-Project -Path $PasswordBookPath -ExitCode 1 -ProjectName "XYPortal.PasswordBook"
     
     # 2. Build XYPortal.LinkBoard
-    $LinkBoardPath = Join-Path $ScriptRoot "../XYPortal.LinkBoard"
+    $LinkBoardPath = Join-Path $ScriptRoot "../../../XYPortal.LinkBoard"
     Build-Project -Path $LinkBoardPath -ExitCode 2 -ProjectName "XYPortal.LinkBoard"
     
     # 3. Build XYPortal.RandomStringProvider
-    $RandomStringProviderPath = Join-Path $ScriptRoot "../../XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider"
+    $RandomStringProviderPath = Join-Path $ScriptRoot "../../../XYPortal.RandomStringProvider"
     Build-Project -Path $RandomStringProviderPath -ExitCode 3 -ProjectName "XYPortal.RandomStringProvider"
     
     # 4. Build and Run XYPortal.Web
