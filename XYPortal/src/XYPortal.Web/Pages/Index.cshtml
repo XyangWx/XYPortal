@@ -20,16 +20,16 @@
     <abp-script src="/Pages/Index.js" />
 }
 
-<div class="row mb-3">
+<div class="row mb-3 align-items-start">
     @* 第一列：欢迎语 *@
-    <div class="col-xl-4 col-12 d-flex align-items-center">
+    <div class="col-xl-4 col-12">
         <div class="card w-100">
             <div class="card-body">
                 <h5 class="mb-0">
                     @if (CurrentUser.IsAuthenticated)
                     {
-                        var surname = HttpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Surname)?.Value ?? "";
-                        var name = HttpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+                        var surname = HttpContextAccessor.HttpContext?.User.FindFirst("surname")?.Value ?? "";
+                        var name = HttpContextAccessor.HttpContext?.User.FindFirst("name")?.Value ?? "";
                         <span>欢迎！@surname@name</span>
                     }
                     else
@@ -47,10 +47,8 @@
     </div>
 
     @* 第三列：RandomString Widget *@
-    <div class="col-xl-4 col-12 d-flex align-items-center">
-        <div class="w-100">
-            @await Component.InvokeAsync(typeof(RandomStringWidgetViewComponent), new { length = 16 })
-        </div>
+    <div class="col-xl-4 col-12">
+        @await Component.InvokeAsync(typeof(RandomStringWidgetViewComponent), new { length = 16 })
     </div>
 </div>
 
