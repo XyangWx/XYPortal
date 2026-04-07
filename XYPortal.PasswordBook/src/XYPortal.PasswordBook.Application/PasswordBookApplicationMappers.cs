@@ -68,6 +68,7 @@ public static class PasswordBookDtoExtensions
             CreationTime = entry.CreationTime,
             LastModificationTime = entry.LastModificationTime,
             IsDeleted = entry.IsDeleted,
+            CurrentPassword = entry.CurrentPassword,
             PasswordHistories = entry.PasswordHistories
                 .Select(h => new PasswordHistoryDto
                 {

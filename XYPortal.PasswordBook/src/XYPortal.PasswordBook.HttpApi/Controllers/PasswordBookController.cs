@@ -104,6 +104,13 @@ public class PasswordBookController : AbpControllerBase, IPasswordBookAppService
         return _passwordBookAppService.DeletePasswordEntryAsync(passwordBookId, entryId);
     }
 
+    [HttpGet]
+    [Route("{passwordBookId}/entries/{entryId}")]
+    public Task<PasswordEntryDto> GetPasswordEntryAsync(Guid passwordBookId, Guid entryId)
+    {
+        return _passwordBookAppService.GetPasswordEntryAsync(passwordBookId, entryId);
+    }
+
     [HttpPost]
     [Route("{passwordBookId}/entries/{entryId}/restore")]
     public Task RestorePasswordEntryAsync(Guid passwordBookId, Guid entryId)

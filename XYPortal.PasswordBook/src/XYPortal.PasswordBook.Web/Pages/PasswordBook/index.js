@@ -83,8 +83,9 @@ $(function () {
                         // Show restore button for deleted entries
                         actionButtons = '<button type="button" class="btn btn-success btn-sm" onclick="restorePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-undo"></i> ' + window.passwordBookLocales.Restore + '</button>';
                     } else {
-                        // Show delete button for active entries
-                        actionButtons = '<button type="button" class="btn btn-danger btn-sm" onclick="deletePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-trash"></i> ' + window.passwordBookLocales.Delete + '</button>';
+                        // Show delete and copy buttons for active entries
+                        actionButtons = '<button type="button" class="btn btn-secondary btn-sm" onclick="copyPasswordToClipboard(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-copy"></i> ' + window.passwordBookLocales.Copy + '</button>'
+                            + ' <button type="button" class="btn btn-danger btn-sm" onclick="deletePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-trash"></i> ' + window.passwordBookLocales.Delete + '</button>';
                     }
                     
                     var row = '<tr>' +
@@ -267,5 +268,34 @@ $(function () {
                 }
             }
         );
+    };
+
+    // 复制密码到剪贴板
+    window.copyPasswordToClipboard = function(passwordBookId, entryId) {
+        fetch('/api/password-book/' + passwordBookId + '/entries/' + entryId, {
+            method: 'GET',
+            headers: {
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to get password entry');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.currentPassword) {
+                throw new Error('Password not found');
+            }
+            navigator.clipboard.writeText(data.currentPassword).then(function() {
+                abp.notify.success('Password copied to clipboard');
+            }).catch(function(err) {
+                abp.notify.error('Failed to copy password: ' + err);
+            });
+        })
+        .catch(error => {
+            abp.notify.error(error.message);
+        });
     };
 });

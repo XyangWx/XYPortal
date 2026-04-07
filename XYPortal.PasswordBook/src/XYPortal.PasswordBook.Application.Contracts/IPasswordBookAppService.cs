@@ -44,6 +44,11 @@ public interface IPasswordBookAppService : ICrudAppService<PasswordBookDto, Guid
     Task RestorePasswordEntryAsync(Guid passwordBookId, Guid entryId);
 
     /// <summary>
+    /// Get a single PasswordEntry by ID (includes CurrentPassword)
+    /// </summary>
+    Task<PasswordEntryDto> GetPasswordEntryAsync(Guid passwordBookId, Guid entryId);
+
+    /// <summary>
     /// Evaluate Password Strength
     /// </summary>
     Task<PasswordWeakLevel> EvaluatePasswordStrengthAsync(string password);

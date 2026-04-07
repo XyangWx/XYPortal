@@ -215,6 +215,43 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     }
 
     /// <summary>
+    /// Get a single PasswordEntry by ID (includes CurrentPassword)
+    /// </summary>
+    public async Task<PasswordEntryDto> GetPasswordEntryAsync(Guid passwordBookId, Guid entryId)
+    {
+        await CheckPasswordBookPermissionAsync();
+
+        var userId = CurrentUser.GetId();
+        if (!await _passwordBookManager.HasAccessPermissionAsync(userId, passwordBookId))
+        {
+            throw new UnauthorizedAccessException("You do not have permission to access this password entry");
+        }
+
+        var passwordBook = await _passwordBookManager.GetByIdAsync(passwordBookId);
+        var entry = passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId && !e.IsDeleted);
+        if (entry == null)
+        {
+            throw new EntityNotFoundException("Password entry not found");
+        }
+
+        return new PasswordEntryDto
+        {
+            Id = entry.Id,
+            PasswordBookId = passwordBookId,
+            Title = entry.Title,
+            HasUsername = entry.HasUsername,
+            Username = entry.Username,
+            PasswordType = entry.PasswordType,
+            WeakLevel = entry.WeakLevel,
+            CurrentPassword = entry.CurrentPassword,
+            Remark = entry.Remark,
+            CreationTime = entry.CreationTime,
+            LastModificationTime = entry.LastModificationTime,
+            IsDeleted = entry.IsDeleted
+        };
+    }
+
+    /// <summary>
     /// Evaluate Password Strength
     /// </summary>
     public Task<PasswordWeakLevel> EvaluatePasswordStrengthAsync(string password)

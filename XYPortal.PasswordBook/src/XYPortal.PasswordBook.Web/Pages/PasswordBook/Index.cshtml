@@ -13,6 +13,7 @@
             Delete: '@L["Delete"]',
             Restore: '@L["Restore"]',
             Active: '@L["Active"]',
+            Copy: '@L["CopyPassword"]',
             Voided: '@L["Voided"]'
         };
     </script>
@@ -63,7 +64,8 @@
 </abp-card>
 
 @* View Modal *@
-<abp-modal id="ViewModal" title="@L["PasswordBookDetails"]" size="ExtraLarge">
+<abp-modal id="ViewModal" size="ExtraLarge">
+    <abp-modal-header title="@L["PasswordBookDetails"].Value"></abp-modal-header>
     <abp-modal-body>
         <div id="ViewModalContent">
             <dl class="row">
@@ -105,7 +107,8 @@
 </abp-modal>
 
 @* Create Entry Modal *@
-<abp-modal id="CreateEntryModal" title="@L["CreatePasswordEntry"]">
+<abp-modal id="CreateEntryModal">
+    <abp-modal-header title="@L["CreatePasswordEntry"].Value"></abp-modal-header>
     <abp-modal-body>
         <form id="CreateEntryForm">
             <input type="hidden" id="entry-passwordbook-id" />
@@ -157,7 +160,8 @@
 </abp-modal>
 
 @* Create Modal *@
-<abp-modal id="CreateModal" title="@L["CreatePasswordBook"]">
+<abp-modal id="CreateModal">
+    <abp-modal-header title="@L["CreatePasswordBook"].Value"></abp-modal-header>
     <abp-modal-body>
         <form id="CreateForm" method="post" asp-page-handler="Create">
             <abp-input asp-for="CreateInput.Name" label="@L["Name"]" required />

@@ -56,6 +56,7 @@ public class PasswordEntryDto
     public DateTime CreationTime { get; set; }
     public DateTime? LastModificationTime { get; set; }
     public bool IsDeleted { get; set; }
+    public string? CurrentPassword { get; set; }
     public List<PasswordHistoryDto> PasswordHistories { get; set; } = new();
 }
 
