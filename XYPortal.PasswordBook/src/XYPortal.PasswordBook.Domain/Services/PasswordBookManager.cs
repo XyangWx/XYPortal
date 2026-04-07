@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Volo.Abp;
@@ -97,11 +98,14 @@ public class PasswordBookManager : DomainService
     }
 
     /// <summary>
-    /// Get PasswordBook details
+    /// Get PasswordBook details (with PasswordEntries loaded)
     /// </summary>
     public async Task<PasswordBookEntity> GetByIdAsync(Guid id)
     {
-        return await _passwordBookRepository.GetAsync(id);
+        var query = await _passwordBookRepository.GetQueryableAsync();
+        return await query
+            .Include(x => x.PasswordEntries)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     /// <summary>
