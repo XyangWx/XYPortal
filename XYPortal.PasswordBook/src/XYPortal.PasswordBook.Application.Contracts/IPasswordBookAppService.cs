@@ -36,7 +36,7 @@ public interface IPasswordBookAppService : ICrudAppService<PasswordBookDto, Guid
     /// <summary>
     /// Delete PasswordEntry (Soft Delete)
     /// </summary>
-    Task DeletePasswordEntryAsync(Guid passwordBookId, Guid entryId);
+    Task DeletePasswordEntryAsync(Guid passwordBookId, Guid entryId, int queryKind = 0);
 
     /// <summary>
     /// Restore PasswordEntry
@@ -46,7 +46,7 @@ public interface IPasswordBookAppService : ICrudAppService<PasswordBookDto, Guid
     /// <summary>
     /// Get a single PasswordEntry by ID (includes CurrentPassword)
     /// </summary>
-    Task<PasswordEntryDto> GetPasswordEntryAsync(Guid passwordBookId, Guid entryId);
+    Task<PasswordEntryDto> GetPasswordEntryAsync(Guid passwordBookId, Guid entryId, int queryKind = 0);
 
     /// <summary>
     /// Evaluate Password Strength

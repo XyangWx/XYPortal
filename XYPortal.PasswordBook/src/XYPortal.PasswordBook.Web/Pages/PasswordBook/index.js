@@ -79,13 +79,15 @@ $(function () {
             if (data.passwordEntries && data.passwordEntries.length > 0) {
                 data.passwordEntries.forEach(function (entry) {
                     var actionButtons = '';
+                    // Show Password 按钮始终显示（不论是否已删除）
+                    actionButtons = '<button type="button" class="btn btn-info btn-sm" onclick="showPasswordEntry(\'' + data.id + '\', \'' + entry.id + '\', ' + (entry.isDeleted ? 1 : 0) + ')"><i class="fa fa-eye"></i> ' + window.passwordBookLocales.ShowPassword + '</button>';
+
                     if (entry.isDeleted) {
-                        // Show restore button for deleted entries
-                        actionButtons = '<button type="button" class="btn btn-success btn-sm" onclick="restorePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-undo"></i> ' + window.passwordBookLocales.Restore + '</button>';
+                        // 已删除条目：显示恢复按钮
+                        actionButtons += ' <button type="button" class="btn btn-success btn-sm" onclick="restorePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-undo"></i> ' + window.passwordBookLocales.Restore + '</button>';
                     } else {
-                        // Show all action buttons for active entries
-                        actionButtons = '<button type="button" class="btn btn-info btn-sm" onclick="showPasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-eye"></i> ' + window.passwordBookLocales.ShowPassword + '</button>'
-                            + ' <button type="button" class="btn btn-secondary btn-sm" onclick="copyPasswordToClipboard(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-copy"></i> ' + window.passwordBookLocales.Copy + '</button>'
+                        // 有效条目：显示复制和删除按钮
+                        actionButtons += ' <button type="button" class="btn btn-secondary btn-sm" onclick="copyPasswordToClipboard(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-copy"></i> ' + window.passwordBookLocales.Copy + '</button>'
                             + ' <button type="button" class="btn btn-danger btn-sm" onclick="deletePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-trash"></i> ' + window.passwordBookLocales.Delete + '</button>';
                     }
                     
@@ -301,8 +303,9 @@ $(function () {
     };
 
     // 显示密码明文（不消失模态框）
-    window.showPasswordEntry = function(passwordBookId, entryId) {
-        fetch('/api/password-book/' + passwordBookId + '/entries/' + entryId, {
+    window.showPasswordEntry = function(passwordBookId, entryId, queryKind) {
+        queryKind = (typeof queryKind === 'number') ? queryKind : 0;
+        fetch('/api/password-book/' + passwordBookId + '/entries/' + entryId + '?queryKind=' + queryKind, {
             method: 'GET',
             headers: {
                 'RequestVerificationToken': abp.security.antiForgery.getToken()

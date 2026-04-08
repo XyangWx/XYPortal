@@ -164,7 +164,30 @@ public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
     /// </summary>
     public void RemovePasswordEntry(Guid entryId)
     {
-        var entry = _passwordEntries.FirstOrDefault(e => e.Id == entryId && !e.IsDeleted);
+        RemovePasswordEntry(entryId, queryKind: 0);
+    }
+
+    /// <summary>
+    /// Remove PasswordEntry (Soft Delete) with queryKind control
+    /// </summary>
+    /// <param name="entryId">Entry ID</param>
+    /// <param name="queryKind">0 = active only, 1 = deleted only, -1 = any</param>
+    public void RemovePasswordEntry(Guid entryId, int queryKind)
+    {
+        PasswordEntry entry;
+        if (queryKind == 0)
+        {
+            entry = _passwordEntries.FirstOrDefault(e => e.Id == entryId && !e.IsDeleted);
+        }
+        else if (queryKind == 1)
+        {
+            entry = _passwordEntries.FirstOrDefault(e => e.Id == entryId && e.IsDeleted);
+        }
+        else
+        {
+            entry = _passwordEntries.FirstOrDefault(e => e.Id == entryId);
+        }
+
         if (entry == null)
             throw new EntityNotFoundException("Password entry not found");
 

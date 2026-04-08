@@ -181,7 +181,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     /// <summary>
     /// Delete PasswordEntry (Soft Delete)
     /// </summary>
-    public async Task DeletePasswordEntryAsync(Guid passwordBookId, Guid entryId)
+    public async Task DeletePasswordEntryAsync(Guid passwordBookId, Guid entryId, int queryKind = 0)
     {
         await CheckPasswordBookPermissionAsync();
 
@@ -192,7 +192,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         }
 
         var passwordBook = await _passwordBookManager.GetByIdAsync(passwordBookId);
-        passwordBook.RemovePasswordEntry(entryId);
+        passwordBook.RemovePasswordEntry(entryId, queryKind);
         await Repository.UpdateAsync(passwordBook);
     }
 
@@ -217,7 +217,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     /// <summary>
     /// Get a single PasswordEntry by ID (includes CurrentPassword)
     /// </summary>
-    public async Task<PasswordEntryDto> GetPasswordEntryAsync(Guid passwordBookId, Guid entryId)
+    public async Task<PasswordEntryDto> GetPasswordEntryAsync(Guid passwordBookId, Guid entryId, int queryKind = 0)
     {
         await CheckPasswordBookPermissionAsync();
 
@@ -228,7 +228,19 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         }
 
         var passwordBook = await _passwordBookManager.GetByIdAsync(passwordBookId);
-        var entry = passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId && !e.IsDeleted);
+        PasswordEntry entry;
+        if (queryKind == 0)
+        {
+            entry = passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId && !e.IsDeleted);
+        }
+        else if (queryKind == 1)
+        {
+            entry = passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId && e.IsDeleted);
+        }
+        else
+        {
+            entry = passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId);
+        }
         if (entry == null)
         {
             throw new EntityNotFoundException("Password entry not found");

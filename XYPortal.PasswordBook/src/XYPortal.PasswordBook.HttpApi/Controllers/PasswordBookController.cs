@@ -99,16 +99,16 @@ public class PasswordBookController : AbpControllerBase, IPasswordBookAppService
 
     [HttpDelete]
     [Route("{passwordBookId}/entries/{entryId}")]
-    public Task DeletePasswordEntryAsync(Guid passwordBookId, Guid entryId)
+    public Task DeletePasswordEntryAsync(Guid passwordBookId, Guid entryId, [FromQuery] int queryKind = 0)
     {
-        return _passwordBookAppService.DeletePasswordEntryAsync(passwordBookId, entryId);
+        return _passwordBookAppService.DeletePasswordEntryAsync(passwordBookId, entryId, queryKind);
     }
 
     [HttpGet]
     [Route("{passwordBookId}/entries/{entryId}")]
-    public Task<PasswordEntryDto> GetPasswordEntryAsync(Guid passwordBookId, Guid entryId)
+    public Task<PasswordEntryDto> GetPasswordEntryAsync(Guid passwordBookId, Guid entryId, [FromQuery] int queryKind = 0)
     {
-        return _passwordBookAppService.GetPasswordEntryAsync(passwordBookId, entryId);
+        return _passwordBookAppService.GetPasswordEntryAsync(passwordBookId, entryId, queryKind);
     }
 
     [HttpPost]
