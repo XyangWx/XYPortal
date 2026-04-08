@@ -95,7 +95,7 @@ $(function () {
                         '<td>' + (entry.title || '') + '</td>' +
                         '<td>' + (entry.username || '-') + '</td>' +
                         '<td>' + (entry.passwordType === 1 ? 'General' : 'NumericOnly') + '</td>' +
-                        '<td>' + (entry.weakLevel || '-') + '</td>' +
+                        '<td>' + (entry.weakLevel ?? '-') + '</td>' +
                         '<td>' + (entry.isDeleted ? '<span class="badge bg-secondary">' + window.passwordBookLocales.Voided + '</span>' : '<span class="badge bg-success">' + window.passwordBookLocales.Active + '</span>') + '</td>' +
                         '<td>' + actionButtons + '</td>' +
                         '</tr>';
