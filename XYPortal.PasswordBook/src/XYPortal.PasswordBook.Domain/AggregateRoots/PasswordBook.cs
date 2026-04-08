@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 using XYPortal.PasswordBook.Entities;
@@ -14,6 +15,8 @@ namespace XYPortal.PasswordBook.AggregateRoots;
 /// </summary>
 public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
 {
+    private readonly ILogger<PasswordBook> _logger = LoggerHelper.CreateLogger<PasswordBook>();
+    
     /// <summary>
     /// Owner User ID
     /// </summary>
@@ -101,6 +104,7 @@ public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
         string password,
         string? remark = null)
     {
+        _logger.LogDebug("[AddPasswordEntry] Received params: passwordType={PasswordType}, weakLevel={WeakLevel}", passwordType, weakLevel);
         CheckPasswordFormat(password, passwordType);
 
         // 使所有其他未删除的条目失效（新密码启用后其他密码作废）
@@ -109,6 +113,7 @@ public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
             existingEntry.SoftDelete();
         }
 
+        _logger.LogDebug("[AddPasswordEntry] Before new PasswordEntry: passwordType={PasswordType}, weakLevel={WeakLevel}", passwordType, weakLevel);
         var entry = new PasswordEntry(
             Guid.NewGuid(),
             Id,
@@ -120,6 +125,7 @@ public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
             password,
             remark
         );
+        _logger.LogDebug("[AddPasswordEntry] After new PasswordEntry: entry created successfully");
 
         _passwordEntries.Add(entry);
         LastModificationTime = DateTime.UtcNow;

@@ -145,6 +145,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
 
         var passwordBook = await _passwordBookManager.GetByIdAsync(passwordBookId);
         
+        _logger.LogDebug("[AddPasswordEntryAsync] DTO WeakLevel={WeakLevel}, PasswordType={PasswordType}", input.WeakLevel, input.PasswordType);
         var entry = passwordBook.AddPasswordEntry(
             input.Title,
             input.HasUsername ?? false,
