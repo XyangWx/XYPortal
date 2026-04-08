@@ -170,7 +170,7 @@ $(function () {
             hasUsername: document.getElementById('entry-hasusername')?.value === 'true',
             username: document.getElementById('entry-username')?.value || null,
             passwordType: passwordTypeInt,
-            weakLevel: weakLevel,
+            WeakLevel: weakLevel,
             remark: document.getElementById('entry-remark')?.value || null
         };
         
