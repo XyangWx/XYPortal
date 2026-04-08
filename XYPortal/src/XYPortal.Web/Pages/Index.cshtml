@@ -1,8 +1,6 @@
 @page
 @model XYPortal.Web.Pages.IndexModel
 @using Microsoft.AspNetCore.Mvc.Localization
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Http
 @using XYPortal.Localization
 @using XYPortal.Web.Components.LinkBoardWidget
 @using Volo.Abp.Users
@@ -10,7 +8,6 @@
 @using XYPortal.RandomStringProvider.Web.Components.RandomStringProvider
 @inject IHtmlLocalizer<XYPortalResource> L
 @inject ICurrentUser CurrentUser
-@inject IHttpContextAccessor HttpContextAccessor
 
 @section styles {
     <abp-style src="/Pages/Index.css" />
@@ -28,9 +25,7 @@
                 <h5 class="mb-0">
                     @if (CurrentUser.IsAuthenticated)
                     {
-                        var surname = HttpContextAccessor.HttpContext?.User.FindFirst("surname")?.Value ?? "";
-                        var name = HttpContextAccessor.HttpContext?.User.FindFirst("name")?.Value ?? "";
-                        <span>欢迎！@surname@name</span>
+                        <span>欢迎！@CurrentUser.SurName@CurrentUser.Name</span>
                     }
                     else
                     {
