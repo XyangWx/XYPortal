@@ -369,8 +369,11 @@ try {
     Write-Host "[HttpApi.Host] Started (PID: $($httpApiProc.Id))" -ForegroundColor Green
     
     # Start Vue dev server (npm run dev)
+    # On Windows, "npm" is a text script; use "npm.cmd" instead
+    # On Linux/macOS, "npm" is the native binary
+    $npmExe = if ($RunningOnWindows) { "npm.cmd" } else { "npm" }
     Write-Host "[Vue] Starting npm run dev..." -ForegroundColor Yellow
-    $vueProc = Start-Process -FilePath "npm" -ArgumentList "run", "dev" -NoNewWindow -PassThru -WorkingDirectory $VuePath
+    $vueProc = Start-Process -FilePath $npmExe -ArgumentList "run", "dev" -NoNewWindow -PassThru -WorkingDirectory $VuePath
     $runningProcesses["Vue"] = $vueProc
     Write-Host "[Vue] Started (PID: $($vueProc.Id))" -ForegroundColor Green
     
