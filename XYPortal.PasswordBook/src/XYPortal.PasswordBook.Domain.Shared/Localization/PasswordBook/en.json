@@ -43,6 +43,7 @@
     "No": "No",
     "Yes": "Yes",
     "Close": "Close",
-    "PasswordBookId": "Password Book ID"
+    "PasswordBookId": "Password Book ID",
+    "ShowPassword": "Show Password"
   }
 }

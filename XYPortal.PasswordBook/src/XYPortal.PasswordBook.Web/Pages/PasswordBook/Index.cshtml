@@ -14,7 +14,8 @@
             Restore: '@L["Restore"]',
             Active: '@L["Active"]',
             Copy: '@L["CopyPassword"]',
-            Voided: '@L["Voided"]'
+            Voided: '@L["Voided"]',
+            ShowPassword: '@L["ShowPassword"]'
         };
     </script>
     <script src="/Pages/PasswordBook/index.js"></script>
@@ -156,6 +157,35 @@
     <abp-modal-footer>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@L["Cancel"]</button>
         <button type="button" class="btn btn-primary" onclick="createPasswordEntry()">@L["Save"]</button>
+    </abp-modal-footer>
+</abp-modal>
+
+@* Show Password Modal (Non-dismissible) *@
+<abp-modal id="ShowPasswordModal" data-bs-backdrop="static" data-bs-keyboard="false">
+    <abp-modal-header title="@L["ShowPassword"].Value"></abp-modal-header>
+    <abp-modal-body>
+        <dl class="row">
+            <dt class="col-sm-3">@L["Title"]:</dt>
+            <dd class="col-sm-9" id="sp-title"></dd>
+            <dt class="col-sm-3">@L["Username"]:</dt>
+            <dd class="col-sm-9" id="sp-username"></dd>
+            <dt class="col-sm-3">@L["Password"]:</dt>
+            <dd class="col-sm-9">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="sp-password" readonly style="user-select: all;" />
+                    <button class="btn btn-outline-secondary" type="button" onclick="copySpPassword()">
+                        <i class="fa fa-copy"></i>
+                    </button>
+                </div>
+            </dd>
+            <dt class="col-sm-3">@L["Remark"]:</dt>
+            <dd class="col-sm-9" id="sp-remark"></dd>
+            <dt class="col-sm-3">@L["WeakLevel"]:</dt>
+            <dd class="col-sm-9" id="sp-weaklevel"></dd>
+        </dl>
+    </abp-modal-body>
+    <abp-modal-footer>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@L["Close"]</button>
     </abp-modal-footer>
 </abp-modal>
 

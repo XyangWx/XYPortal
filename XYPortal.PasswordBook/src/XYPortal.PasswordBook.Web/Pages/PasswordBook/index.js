@@ -83,8 +83,9 @@ $(function () {
                         // Show restore button for deleted entries
                         actionButtons = '<button type="button" class="btn btn-success btn-sm" onclick="restorePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-undo"></i> ' + window.passwordBookLocales.Restore + '</button>';
                     } else {
-                        // Show delete and copy buttons for active entries
-                        actionButtons = '<button type="button" class="btn btn-secondary btn-sm" onclick="copyPasswordToClipboard(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-copy"></i> ' + window.passwordBookLocales.Copy + '</button>'
+                        // Show all action buttons for active entries
+                        actionButtons = '<button type="button" class="btn btn-info btn-sm" onclick="showPasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-eye"></i> ' + window.passwordBookLocales.ShowPassword + '</button>'
+                            + ' <button type="button" class="btn btn-secondary btn-sm" onclick="copyPasswordToClipboard(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-copy"></i> ' + window.passwordBookLocales.Copy + '</button>'
                             + ' <button type="button" class="btn btn-danger btn-sm" onclick="deletePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-trash"></i> ' + window.passwordBookLocales.Delete + '</button>';
                     }
                     
@@ -296,6 +297,40 @@ $(function () {
         })
         .catch(error => {
             abp.notify.error(error.message);
+        });
+    };
+
+    // 显示密码明文（不消失模态框）
+    window.showPasswordEntry = function(passwordBookId, entryId) {
+        fetch('/api/password-book/' + passwordBookId + '/entries/' + entryId, {
+            method: 'GET',
+            headers: {
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load password entry');
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('sp-title').textContent = data.title || '';
+            document.getElementById('sp-username').textContent = data.username || '-';
+            document.getElementById('sp-password').value = data.currentPassword || '';
+            document.getElementById('sp-remark').textContent = data.remark || '-';
+            document.getElementById('sp-weaklevel').textContent = data.weakLevel || '-';
+            var modal = new bootstrap.Modal(document.getElementById('ShowPasswordModal'));
+            modal.show();
+        })
+        .catch(error => abp.notify.error(error.message));
+    };
+
+    // 复制 ShowPasswordModal 中的密码
+    window.copySpPassword = function() {
+        var pwd = document.getElementById('sp-password').value;
+        navigator.clipboard.writeText(pwd).then(function() {
+            abp.notify.success('Password copied');
+        }).catch(function(err) {
+            abp.notify.error('Failed to copy password: ' + err);
         });
     };
 });

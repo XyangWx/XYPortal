@@ -43,6 +43,7 @@
     "No": "否",
     "Yes": "是",
     "Close": "关闭",
-    "PasswordBookId": "密码本ID"
+    "PasswordBookId": "密码本ID",
+    "ShowPassword": "显示密码"
   }
 }
