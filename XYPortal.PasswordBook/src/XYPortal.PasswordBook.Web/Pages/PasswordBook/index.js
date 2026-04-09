@@ -158,10 +158,12 @@ $(function () {
         }
         
         var weakLevelValue = document.getElementById('entry-weaklevel')?.value;
+        console.log({ weakLevelValue: weakLevelValue});
         var weakLevel = null;
-        if (weakLevelValue) {
+        if (weakLevelValue !== '') {
             var weakLevelInt = parseInt(weakLevelValue);
             weakLevel = isNaN(weakLevelInt) ? null : weakLevelInt;
+            console.log({ weakLeval: weakLevel });
         }
         
         var input = {
@@ -173,7 +175,7 @@ $(function () {
             WeakLevel: weakLevel,
             remark: document.getElementById('entry-remark')?.value || null
         };
-        
+        debugger;
         if (!input.title || !input.password) {
             abp.notify.error('Title and Password are required');
             return;
