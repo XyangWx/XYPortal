@@ -116,3 +116,22 @@ public class GenerateRandomPasswordResultDto
     public string Password { get; set; } = string.Empty;
     public PasswordWeakLevel WeakLevel { get; set; }
 }
+
+/// <summary>
+/// Generate Random Password from Password Weak Level
+/// </summary>
+public class GenerateRandomPasswordFromWeakLevelDto
+{
+    public int MinLength { get; set; } = 8;
+    public int MaxLength { get; set; } = 20;
+    public PasswordWeakLevel WeakLevel { get; set; } = PasswordWeakLevel.Strong;
+}
+
+/// <summary>
+/// Generate Random Password from Password Weak Level Result
+/// </summary>
+public class GenerateRandomPasswordFromWeakLevelResult
+{
+    public string Password { get; set; } = string.Empty;
+}
+

@@ -35,6 +35,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     private readonly PasswordBookManager _passwordBookManager;
     private readonly PermissionChecker _permissionChecker;
     private readonly ILogger<PasswordBookAppService> _logger;
+    private static readonly Random _random = new Random(DateTime.Now.Millisecond);
 
     public PasswordBookAppService(
         IRepository<PasswordBookEntity, Guid> repository,
@@ -451,5 +452,82 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
             category |= RandomCategory.EnglishPunctuation;
 
         return category;
+    }
+
+    /// <summary>
+    /// Generate Random Password from Password Weak Level
+    /// </summary>
+    public async Task<GenerateRandomPasswordFromWeakLevelResult> GenerateRandomPasswordAsync(GenerateRandomPasswordFromWeakLevelDto input)
+    {
+        // Determine length and character types based on target weak level
+        var (length, characterTypes) = GetPasswordParamsForWeakLevel(input.WeakLevel, input.MinLength, input.MaxLength);
+
+        var input_1 = new GenerateRandomPasswordDto
+        {
+            CharacterTypes = characterTypes,
+            Length = length,
+            IsOnlyOnce = false,
+        };
+
+        var output = await GenerateRandomPasswordAsync(input_1);
+
+        return new GenerateRandomPasswordFromWeakLevelResult
+        {
+            Password = output.Password,
+        };
+    }
+
+    /// <summary>
+    /// Get password parameters (length and character types) for a target weak level
+    /// </summary>
+    private static (int Length, PasswordCharacterType CharacterTypes) GetPasswordParamsForWeakLevel(
+        PasswordWeakLevel targetLevel, int minLength, int maxLength)
+    {
+        int length = _random.Next(minLength, maxLength + 1);
+        
+        return targetLevel switch
+        {
+            PasswordWeakLevel.VeryWeak => (
+                Math.Max(4, minLength),
+                PasswordCharacterType.LowercaseLetters | PasswordCharacterType.ArabicNumerals
+            ),
+            PasswordWeakLevel.Weak => (
+                Math.Max(6, minLength),
+                PasswordCharacterType.LowercaseLetters | PasswordCharacterType.ArabicNumerals
+            ),
+            PasswordWeakLevel.Medium => (
+                Math.Max(8, minLength),
+                PasswordCharacterType.LowercaseLetters | PasswordCharacterType.UppercaseLetters | PasswordCharacterType.ArabicNumerals
+            ),
+            PasswordWeakLevel.Strong => (
+                Math.Min(Math.Max(10, minLength), maxLength),
+                PasswordCharacterType.All
+            ),
+            PasswordWeakLevel.VeryStrong => (
+                Math.Min(20, maxLength),
+                PasswordCharacterType.All
+            ),
+            _ => (length, PasswordCharacterType.All)
+        };
+    }
+
+    /// <summary>
+    /// Check if actual level matches target or is acceptably close
+    /// </summary>
+    private static bool IsLevelMatchOrClose(PasswordWeakLevel actual, PasswordWeakLevel target)
+    {
+        // Exact match
+        if (actual == target) return true;
+
+        // For VeryStrong, accept Strong as close enough
+        if (target == PasswordWeakLevel.VeryStrong && actual == PasswordWeakLevel.Strong) return true;
+
+        // For Strong, accept Medium as close enough (within 1 level)
+        if (target == PasswordWeakLevel.Strong && (int)actual >= (int)PasswordWeakLevel.Medium) return true;
+
+        // For Medium, accept Weak as close enough
+        if (target == PasswordWeakLevel.Medium && actual >= PasswordWeakLevel.Weak) return true;
+
+        return false;
     }
 }
