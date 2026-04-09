@@ -45,6 +45,8 @@
     "Yes": "Yes",
     "Close": "Close",
     "PasswordBookId": "Password Book ID",
-    "ShowPassword": "Show Password"
+    "ShowPassword": "Show Password",
+    "GeneratePassword": "Generate Password",
+    "AutoFill": "Auto Fill"
   }
 }

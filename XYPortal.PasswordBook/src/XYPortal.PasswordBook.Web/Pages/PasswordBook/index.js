@@ -169,6 +169,53 @@ $(function () {
         modal.show();
     };
 
+    // Generate Random Password from WeakLevel
+    window.generateRandomPasswordFromWeakLevel = function() {
+        var weakLevelValue = document.getElementById('entry-weaklevel')?.value;
+        var weakLevel = parseInt(weakLevelValue);
+        if (isNaN(weakLevel)) {
+            // Default to Strong (3) if not selected
+            weakLevel = 3;
+        }
+
+        var minLength = parseInt(document.getElementById('entry-minlength')?.value) || 8;
+        var maxLength = parseInt(document.getElementById('entry-maxlength')?.value) || 20;
+
+        var input = {
+            minLength: minLength,
+            maxLength: maxLength,
+            weakLevel: weakLevel
+        };
+
+        fetch('/api/password-book/generate-random-password-from-weak-level', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            },
+            body: JSON.stringify(input)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to generate password');
+            }
+            return response.json();
+        })
+        .then(data => {
+            var passwordField = document.getElementById('entry-password');
+            var autoFill = document.getElementById('entry-auto-fill')?.checked;
+            if (autoFill) {
+                passwordField.value = data.password;
+            } else {
+                // Show in a notification for manual copy
+                abp.notify.success('Generated password: ' + data.password);
+            }
+        })
+        .catch(error => {
+            abp.notify.error(error.message || 'Failed to generate password');
+        });
+    };
+
     // 创建密码条目
     window.createPasswordEntry = function() {
         var passwordBookId = document.getElementById('entry-passwordbook-id').value;

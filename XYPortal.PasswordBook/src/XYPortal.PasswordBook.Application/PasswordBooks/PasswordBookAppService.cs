@@ -464,6 +464,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
 
         var input_1 = new GenerateRandomPasswordDto
         {
+            PasswordBookId = input.PasswordBookId,
             CharacterTypes = characterTypes,
             Length = length,
             IsOnlyOnce = false,

@@ -124,7 +124,26 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">@L["Password"] *</label>
-                <input type="password" class="form-control" id="entry-password" required />
+                <div class="input-group">
+                    <input type="password" class="form-control" id="entry-password" required />
+                    <button type="button" class="btn btn-outline-secondary" id="btn-generate-password" onclick="generateRandomPasswordFromWeakLevel()">@L["GeneratePassword"]</button>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4">
+                    <label class="form-label">@L["MinLength"]</label>
+                    <input type="number" class="form-control" id="entry-minlength" value="8" min="4" max="50" />
+                </div>
+                <div class="col-4">
+                    <label class="form-label">@L["MaxLength"]</label>
+                    <input type="number" class="form-control" id="entry-maxlength" value="20" min="8" max="100" />
+                </div>
+                <div class="col-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="entry-auto-fill" checked />
+                        <label class="form-check-label" for="entry-auto-fill">@L["AutoFill"]</label>
+                    </div>
+                </div>
             </div>
             <div class="mb-3">
                 <label class="form-label">@L["HasUsername"]</label>
