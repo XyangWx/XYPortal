@@ -124,9 +124,11 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">@L["Password"] *</label>
-                <div class="input-group">
-                    <input type="password" class="form-control" id="entry-password" required />
+                <div class="input-group password-input-group">
+                    <input type="password" class="form-control" id="entry-password" required
+                           onmouseenter="showPasswordTooltip()" onmouseleave="hidePasswordTooltip()" />
                     <button type="button" class="btn btn-outline-secondary" id="btn-generate-password" onclick="generateRandomPasswordFromWeakLevel()">@L["GeneratePassword"]</button>
+                    <div class="password-tooltip" id="password-tooltip"></div>
                 </div>
             </div>
             <div class="row mb-3">
@@ -234,3 +236,36 @@
         <button type="button" class="btn btn-primary" onclick="createPasswordBook()">@L["Save"]</button>
     </abp-modal-footer>
 </abp-modal>
+
+<style>
+    .password-input-group {
+        position: relative;
+    }
+
+    .password-tooltip {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        background-color: #333;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        max-width: 300px;
+        word-wrap: break-word;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        margin-top: 4px;
+    }
+
+    .password-tooltip::before {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 10px;
+        border-width: 0 6px 6px 6px;
+        border-style: solid;
+        border-color: transparent transparent #333 transparent;
+    }
+</style>

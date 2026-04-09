@@ -169,6 +169,24 @@ $(function () {
         modal.show();
     };
 
+    // Show password tooltip on hover
+    window.showPasswordTooltip = function() {
+        var passwordField = document.getElementById('entry-password');
+        var tooltip = document.getElementById('password-tooltip');
+        if (passwordField && tooltip && passwordField.value) {
+            tooltip.textContent = passwordField.value;
+            tooltip.style.display = 'block';
+        }
+    };
+
+    // Hide password tooltip
+    window.hidePasswordTooltip = function() {
+        var tooltip = document.getElementById('password-tooltip');
+        if (tooltip) {
+            tooltip.style.display = 'none';
+        }
+    };
+
     // Generate Random Password from WeakLevel
     window.generateRandomPasswordFromWeakLevel = function() {
         var passwordBookId = document.getElementById('entry-passwordbook-id')?.value;
