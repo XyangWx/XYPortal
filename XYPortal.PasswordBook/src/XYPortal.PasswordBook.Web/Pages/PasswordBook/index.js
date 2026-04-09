@@ -171,6 +171,12 @@ $(function () {
 
     // Generate Random Password from WeakLevel
     window.generateRandomPasswordFromWeakLevel = function() {
+        var passwordBookId = document.getElementById('entry-passwordbook-id')?.value;
+        if (!passwordBookId) {
+            abp.notify.error('PasswordBook ID is missing');
+            return;
+        }
+
         var weakLevelValue = document.getElementById('entry-weaklevel')?.value;
         var weakLevel = parseInt(weakLevelValue);
         if (isNaN(weakLevel)) {
@@ -182,6 +188,7 @@ $(function () {
         var maxLength = parseInt(document.getElementById('entry-maxlength')?.value) || 20;
 
         var input = {
+            passwordBookId: passwordBookId,
             minLength: minLength,
             maxLength: maxLength,
             weakLevel: weakLevel
