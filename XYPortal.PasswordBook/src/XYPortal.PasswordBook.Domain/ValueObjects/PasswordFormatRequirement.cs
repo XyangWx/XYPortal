@@ -58,35 +58,49 @@ public class PasswordFormatRequirement
     {
         _logger?.LogDebug($"Password: {password}");
         _logger.LogDebug($"[{SpecialChars}] => {Regex.IsMatch(password, $"[{SpecialChars}]")}");
+
+        if (AllowedType == PasswordType.NumericOnly)
+        {
+            if (!Regex.IsMatch(password, "^[0-9]*$"))
+            {
+                return (false, "Password only contain numeric characters");
+            }
+            else
+            {
+                return (true, null);
+            }
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                return (false, "Password cannot be empty");
+
+            if (password.Length < MinLength)
+                return (false, $"Password length cannot be less than {MinLength} characters");
+
+            if (password.Length > MaxLength)
+                return (false, $"Password length cannot exceed {MaxLength} characters");
+
+            if (RequireUppercase && !Regex.IsMatch(password, "[A-Z]"))
+                return (false, "Password must contain uppercase letters");
+
+            if (RequireLowercase && !Regex.IsMatch(password, "[a-z]"))
+                return (false, "Password must contain lowercase letters");
+
+            if (RequireDigit && !Regex.IsMatch(password, "[0-9]"))
+                return (false, "Password must contain digits");
         
-        if (string.IsNullOrWhiteSpace(password))
-            return (false, "Password cannot be empty");
-
-        if (password.Length < MinLength)
-            return (false, $"Password length cannot be less than {MinLength} characters");
-
-        if (password.Length > MaxLength)
-            return (false, $"Password length cannot exceed {MaxLength} characters");
-
-        if (RequireUppercase && !Regex.IsMatch(password, "[A-Z]"))
-            return (false, "Password must contain uppercase letters");
-
-        if (RequireLowercase && !Regex.IsMatch(password, "[a-z]"))
-            return (false, "Password must contain lowercase letters");
-
-        if (RequireDigit && !Regex.IsMatch(password, "[0-9]"))
-            return (false, "Password must contain digits");
+            var label = SpecialChars
+                .Trim('[', ']')
+                .Replace("\\-", "-")
+                .Replace("\\\\", "\\")
+                .Replace("\\]", "]");
         
-        var label = SpecialChars
-            .Trim('[', ']')
-            .Replace("\\-", "-")
-            .Replace("\\\\", "\\")
-            .Replace("\\]", "]");
-        
-        if (RequireSpecialChar && !Regex.IsMatch(password, $"[{SpecialChars}]"))
-            return (false, $"Password must contain special characters: {label}");
+            if (RequireSpecialChar && !Regex.IsMatch(password, $"[{SpecialChars}]"))
+                return (false, $"Password must contain special characters: {label}");
 
-        return (true, null);
+            return (true, null);
+        }
     }
 
     /// <summary>

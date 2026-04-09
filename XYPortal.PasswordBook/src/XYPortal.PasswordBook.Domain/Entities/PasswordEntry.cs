@@ -90,7 +90,7 @@ public class PasswordEntry : Entity<Guid>
         WeakLevel = passwordType == PasswordType.General ? weakLevel : null;
         CurrentPassword = Check.NotNullOrWhiteSpace(currentPassword, nameof(currentPassword));
         Remark = remark;
-        CreationTime = DateTime.UtcNow;
+        CreationTime = DateTime.Now;
         IsDeleted = false;
 
         _passwordHistories.Add(new PasswordHistory(
@@ -98,7 +98,7 @@ public class PasswordEntry : Entity<Guid>
             id,
             currentPassword,
             true,
-            DateTime.UtcNow
+            DateTime.Now
         ));
     }
 
