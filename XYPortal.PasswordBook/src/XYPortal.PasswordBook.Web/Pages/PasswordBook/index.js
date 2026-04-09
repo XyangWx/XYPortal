@@ -1,13 +1,22 @@
 $(function () {
+    // Helper function to decode HTML entities in localization strings
+    // ABP's @L[] may return HTML-encoded strings (e.g., &#x5F3A; for Chinese characters)
+    window.decodeHtmlEntities = function(str) {
+        if (!str) return str;
+        var textarea = document.createElement('textarea');
+        textarea.innerHTML = str;
+        return textarea.value;
+    };
+
     // Helper function to get localized WeakLevel string from number
     window.getWeakLevelText = function(weakLevel) {
         if (weakLevel == null) return '-';
         switch (weakLevel) {
-            case 0: return window.passwordBookLocales.VeryWeak;
-            case 1: return window.passwordBookLocales.Weak;
-            case 2: return window.passwordBookLocales.Medium;
-            case 3: return window.passwordBookLocales.Strong;
-            case 4: return window.passwordBookLocales.VeryStrong;
+            case 0: return window.decodeHtmlEntities(window.passwordBookLocales.VeryWeak);
+            case 1: return window.decodeHtmlEntities(window.passwordBookLocales.Weak);
+            case 2: return window.decodeHtmlEntities(window.passwordBookLocales.Medium);
+            case 3: return window.decodeHtmlEntities(window.passwordBookLocales.Strong);
+            case 4: return window.decodeHtmlEntities(window.passwordBookLocales.VeryStrong);
             default: return '-';
         }
     };
