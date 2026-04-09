@@ -1,4 +1,17 @@
 $(function () {
+    // Helper function to get localized WeakLevel string from number
+    window.getWeakLevelText = function(weakLevel) {
+        if (weakLevel == null) return '-';
+        switch (weakLevel) {
+            case 0: return window.passwordBookLocales.VeryWeak;
+            case 1: return window.passwordBookLocales.Weak;
+            case 2: return window.passwordBookLocales.Medium;
+            case 3: return window.passwordBookLocales.Strong;
+            case 4: return window.passwordBookLocales.VeryStrong;
+            default: return '-';
+        }
+    };
+
     window.createPasswordBook = function () {
         var form = document.getElementById('CreateForm');
         var formData = new FormData(form);
@@ -95,7 +108,7 @@ $(function () {
                         '<td>' + (entry.title || '') + '</td>' +
                         '<td>' + (entry.username || '-') + '</td>' +
                         '<td>' + (entry.passwordType === 1 ? 'General' : 'NumericOnly') + '</td>' +
-                        '<td>' + (entry.weakLevel ?? '-') + '</td>' +
+                        '<td>' + window.getWeakLevelText(entry.weakLevel) + '</td>' +
                         '<td>' + (entry.isDeleted ? '<span class="badge bg-secondary">' + window.passwordBookLocales.Voided + '</span>' : '<span class="badge bg-success">' + window.passwordBookLocales.Active + '</span>') + '</td>' +
                         '<td>' + actionButtons + '</td>' +
                         '</tr>';
@@ -322,7 +335,7 @@ $(function () {
             document.getElementById('sp-username').textContent = data.username || '-';
             document.getElementById('sp-password').value = data.currentPassword || '';
             document.getElementById('sp-remark').textContent = data.remark || '-';
-            document.getElementById('sp-weaklevel').textContent = data.weakLevel || '-';
+            document.getElementById('sp-weaklevel').textContent = window.getWeakLevelText(data.weakLevel);
             var modal = new bootstrap.Modal(document.getElementById('ShowPasswordModal'));
             modal.show();
         })
