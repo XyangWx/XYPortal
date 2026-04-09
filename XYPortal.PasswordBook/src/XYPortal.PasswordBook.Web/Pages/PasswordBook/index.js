@@ -195,6 +195,12 @@ $(function () {
             return;
         }
 
+        var passwordTypeValue = document.getElementById('entry-passwordtype')?.value;
+        var passwordTypeInt = parseInt(passwordTypeValue);
+        if (isNaN(passwordTypeInt) || (passwordTypeInt !== 0 && passwordTypeInt !== 1)) {
+            passwordTypeInt = 1; // default to General
+        }
+
         var weakLevelValue = document.getElementById('entry-weaklevel')?.value;
         var weakLevel = parseInt(weakLevelValue);
         if (isNaN(weakLevel)) {
@@ -209,6 +215,7 @@ $(function () {
             passwordBookId: passwordBookId,
             minLength: minLength,
             maxLength: maxLength,
+            passwordType: passwordTypeInt,
             weakLevel: weakLevel
         };
 

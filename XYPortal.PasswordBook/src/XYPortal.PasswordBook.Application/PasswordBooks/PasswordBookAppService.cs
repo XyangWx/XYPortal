@@ -482,34 +482,43 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     /// Get password parameters (length and character types) for a target weak level
     /// </summary>
     private static (int Length, PasswordCharacterType CharacterTypes) GetPasswordParamsForWeakLevel(
-        PasswordWeakLevel targetLevel, int minLength, int maxLength)
+        PasswordWeakLevel targetLevel, int minLength, int maxLength, PasswordType passwordType = PasswordType.General)
     {
         int length = _random.Next(minLength, maxLength + 1);
-        
-        return targetLevel switch
+
+        switch (passwordType)
         {
-            PasswordWeakLevel.VeryWeak => (
-                Math.Max(4, minLength),
-                PasswordCharacterType.LowercaseLetters | PasswordCharacterType.ArabicNumerals
-            ),
-            PasswordWeakLevel.Weak => (
-                Math.Max(6, minLength),
-                PasswordCharacterType.LowercaseLetters | PasswordCharacterType.ArabicNumerals
-            ),
-            PasswordWeakLevel.Medium => (
-                Math.Max(8, minLength),
-                PasswordCharacterType.LowercaseLetters | PasswordCharacterType.UppercaseLetters | PasswordCharacterType.ArabicNumerals
-            ),
-            PasswordWeakLevel.Strong => (
-                Math.Min(Math.Max(10, minLength), maxLength),
-                PasswordCharacterType.All
-            ),
-            PasswordWeakLevel.VeryStrong => (
-                Math.Min(20, maxLength),
-                PasswordCharacterType.All
-            ),
-            _ => (length, PasswordCharacterType.All)
-        };
+            case PasswordType.General:
+                return targetLevel switch
+                {
+                    PasswordWeakLevel.VeryWeak => (
+                        Math.Max(4, minLength),
+                        PasswordCharacterType.LowercaseLetters | PasswordCharacterType.ArabicNumerals
+                    ),
+                    PasswordWeakLevel.Weak => (
+                        Math.Max(6, minLength),
+                        PasswordCharacterType.LowercaseLetters | PasswordCharacterType.ArabicNumerals
+                    ),
+                    PasswordWeakLevel.Medium => (
+                        Math.Max(8, minLength),
+                        PasswordCharacterType.LowercaseLetters | PasswordCharacterType.UppercaseLetters | PasswordCharacterType.ArabicNumerals
+                    ),
+                    PasswordWeakLevel.Strong => (
+                        Math.Min(Math.Max(10, minLength), maxLength),
+                        PasswordCharacterType.All
+                    ),
+                    PasswordWeakLevel.VeryStrong => (
+                        Math.Min(20, maxLength),
+                        PasswordCharacterType.All
+                    ),
+                    _ => (length, PasswordCharacterType.All)
+                };
+            case PasswordType.NumericOnly:
+                return (length, PasswordCharacterType.ArabicNumerals);
+            default:
+                throw new ArgumentOutOfRangeException(nameof(passwordType), passwordType, null);
+        }
+        
     }
 
     /// <summary>

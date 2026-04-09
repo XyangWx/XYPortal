@@ -125,6 +125,7 @@ public class GenerateRandomPasswordFromWeakLevelDto
     public required Guid PasswordBookId { get; set; }
     public int MinLength { get; set; } = 8;
     public int MaxLength { get; set; } = 20;
+    public PasswordType PasswordType { get; set; } = PasswordType.General;
     public PasswordWeakLevel WeakLevel { get; set; } = PasswordWeakLevel.Strong;
 }
 
