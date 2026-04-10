@@ -572,6 +572,8 @@ const showPasswordEntry = async (entry: PasswordEntryDto) => {
       { headers: { Authorization: `Bearer ${user?.access_token}` } }
     );
     Object.assign(showPasswordData, response.data);
+    // 修复：将 currentPassword 映射到 password（方案一）
+    showPasswordData.password = response.data.currentPassword;
     showPasswordModalVisible.value = true;
   } catch {
     message.error('获取密码失败');
