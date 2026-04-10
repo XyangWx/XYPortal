@@ -18,10 +18,13 @@ public partial class PasswordBookApplicationMappers : MapperBase<PasswordBookEnt
     [MapperIgnoreTarget(nameof(PasswordBookDto.MaxLength))]
     [MapperIgnoreTarget(nameof(PasswordBookDto.EntryCount))]
     [MapperIgnoreTarget(nameof(PasswordBookDto.PasswordEntries))]
-    private partial void MapToDtoIgnoreComplexFields(PasswordBookEntity source, PasswordBookDto destination);
-
     public override partial void Map(PasswordBookEntity source, PasswordBookDto destination);
 
+    [MapperIgnoreTarget(nameof(PasswordBookDto.AllowedType))]
+    [MapperIgnoreTarget(nameof(PasswordBookDto.MinLength))]
+    [MapperIgnoreTarget(nameof(PasswordBookDto.MaxLength))]
+    [MapperIgnoreTarget(nameof(PasswordBookDto.EntryCount))]
+    [MapperIgnoreTarget(nameof(PasswordBookDto.PasswordEntries))]
     public override partial PasswordBookDto Map(PasswordBookEntity source);
 }
 
