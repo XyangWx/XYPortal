@@ -63,8 +63,8 @@ public class XYPortalDbContext :
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
 
     // LinkBooks
-    public DbSet<LinkCategory> LinkCategories { get; }
-    public DbSet<Link> Links { get; }
+    public DbSet<LinkCategory> LinkCategories { get; set; }
+    public DbSet<Link> Links { get; set; }
 
     // PasswordBook
     public DbSet<PasswordBookEntity> PasswordBooks { get; set; }
