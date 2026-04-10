@@ -250,7 +250,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         }
 
         var passwordBook = await _passwordBookManager.GetByIdAsync(passwordBookId);
-        PasswordEntry entry;
+        PasswordEntry? entry;
         if (queryKind == 0)
         {
             entry = passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId && !e.IsDeleted);
