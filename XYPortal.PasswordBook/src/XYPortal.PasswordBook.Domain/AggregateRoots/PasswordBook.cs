@@ -15,7 +15,7 @@ namespace XYPortal.PasswordBook.AggregateRoots;
 /// </summary>
 public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
 {
-    private readonly ILogger<PasswordBook> _logger = LoggerHelper.CreateLogger<PasswordBook>();
+    private readonly ILogger<PasswordBook> _logger = LoggerHelper.CreateLogger<PasswordBook>()!;
     
     /// <summary>
     /// Owner User ID
@@ -180,7 +180,7 @@ public class PasswordBook : AggregateRoot<Guid>, ISoftDelete
     /// <param name="queryKind">0 = active only, 1 = deleted only, -1 = any</param>
     public void RemovePasswordEntry(Guid entryId, int queryKind)
     {
-        PasswordEntry entry;
+        PasswordEntry? entry;
         if (queryKind == 0)
         {
             entry = _passwordEntries.FirstOrDefault(e => e.Id == entryId && !e.IsDeleted);
