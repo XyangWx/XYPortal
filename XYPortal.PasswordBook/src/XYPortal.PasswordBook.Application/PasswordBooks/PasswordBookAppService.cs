@@ -457,7 +457,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     /// <summary>
     /// Generate Random Password from Password Weak Level
     /// </summary>
-    public async Task<GenerateRandomPasswordFromWeakLevelResult> GenerateRandomPasswordAsync(GenerateRandomPasswordFromWeakLevelDto input)
+    public async Task<GenerateRandomPasswordFromWeakLevelResult> GenerateRandomPasswordFromWeakLevelAsync(GenerateRandomPasswordFromWeakLevelDto input)
     {
         // Determine length and character types based on target weak level
         var (length, characterTypes) = GetPasswordParamsForWeakLevel(input.WeakLevel, input.MinLength, input.MaxLength, input.PasswordType);

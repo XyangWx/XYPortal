@@ -74,7 +74,7 @@ public interface IPasswordBookAppService : ICrudAppService<PasswordBookDto, Guid
     Task<GenerateRandomPasswordResultDto> GenerateRandomPasswordAsync(GenerateRandomPasswordDto input);
     
     /// <summary>
-    /// Generate Random Password
+    /// Generate Random Password from Password Weak Level
     /// </summary>
-    Task<GenerateRandomPasswordFromWeakLevelResult> GenerateRandomPasswordAsync(GenerateRandomPasswordFromWeakLevelDto input);
+    Task<GenerateRandomPasswordFromWeakLevelResult> GenerateRandomPasswordFromWeakLevelAsync(GenerateRandomPasswordFromWeakLevelDto input);
 }

@@ -134,8 +134,8 @@ public class PasswordBookController : AbpControllerBase, IPasswordBookAppService
 
     [HttpPost]
     [Route("generate-random-password-from-weak-level")]
-    public Task<GenerateRandomPasswordFromWeakLevelResult> GenerateRandomPasswordAsync(GenerateRandomPasswordFromWeakLevelDto input)
+    public Task<GenerateRandomPasswordFromWeakLevelResult> GenerateRandomPasswordFromWeakLevelAsync(GenerateRandomPasswordFromWeakLevelDto input)
     {
-        return _passwordBookAppService.GenerateRandomPasswordAsync(input);
+        return _passwordBookAppService.GenerateRandomPasswordFromWeakLevelAsync(input);
     }
 }
