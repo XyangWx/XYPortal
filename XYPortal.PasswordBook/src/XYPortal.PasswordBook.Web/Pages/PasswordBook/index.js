@@ -50,7 +50,7 @@ $(function () {
             if (response.ok) {
                 abp.notify.success('PasswordBook created successfully');
                 $('#CreateModal').modal('hide');
-                location.reload();
+                loadPasswordBookList();
             } else {
                 return response.json().then(err => {
                     var errorMessage = 'Failed to create PasswordBook';
@@ -69,6 +69,56 @@ $(function () {
         })
         .catch(error => {
             abp.notify.error(error.message);
+        });
+    };
+
+    // Load PasswordBook list via AJAX and update table
+    window.loadPasswordBookList = function() {
+        fetch('/api/password-book', {
+            method: 'GET',
+            headers: {
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load password books');
+            return response.json();
+        })
+        .then(data => {
+            updatePasswordBookTable(data.items || []);
+        })
+        .catch(error => {
+            abp.notify.error(error.message);
+        });
+    };
+
+    // Update the PasswordBook table with new data
+    window.updatePasswordBookTable = function(books) {
+        var tbody = document.querySelector('#PasswordBookTable tbody');
+        if (!tbody) return;
+        
+        tbody.innerHTML = '';
+        
+        if (!books || books.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center">No password books found</td></tr>';
+            return;
+        }
+        
+        books.forEach(function(book) {
+            var allowedTypeText = book.allowedType === 1 ? 'General' : (book.allowedType === 0 ? 'NumericOnly' : book.allowedType);
+            var creationTime = book.creationTime ? new Date(book.creationTime).toLocaleString() : '-';
+            
+            var row = '<tr data-id="' + book.id + '">' +
+                '<td>' + (book.name || '') + '</td>' +
+                '<td>' + (book.description || '') + '</td>' +
+                '<td>' + allowedTypeText + '</td>' +
+                '<td>' + creationTime + '</td>' +
+                '<td>' +
+                '<button type="button" class="btn btn-primary btn-sm" onclick="viewPasswordBook(\'' + book.id + '\')"><i class="fa fa-eye"></i> View</button> ' +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="deletePasswordBook(\'' + book.id + '\')"><i class="fa fa-trash"></i> Delete</button>' +
+                '</td>' +
+                '</tr>';
+            tbody.innerHTML += row;
         });
     };
 
@@ -150,7 +200,7 @@ $(function () {
                     .then(response => {
                         if (response.ok) {
                             abp.notify.success('PasswordBook deleted successfully');
-                            location.reload();
+                            loadPasswordBookList();
                         } else {
                             throw new Error('Failed to delete PasswordBook');
                         }
