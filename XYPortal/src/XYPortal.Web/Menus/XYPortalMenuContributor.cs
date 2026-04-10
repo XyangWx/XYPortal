@@ -3,6 +3,7 @@ using XYPortal.LinkBoard.Permissions;
 using XYPortal.Localization;
 using XYPortal.MultiTenancy;
 using XYPortal.Permissions;
+using XYPortal.PasswordBook.Permissions;
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Identity.Web.Navigation;
 using Volo.Abp.SettingManagement.Web.Navigation;
@@ -113,6 +114,15 @@ public class XYPortalMenuContributor : IMenuContributor
         ).RequirePermissions(false, LinkBoardPermissions.LinkReview));
 
         administration.AddItem(linkBoardAdminMenu);
+
+        // PasswordBook Menu
+        context.Menu.AddItem(new ApplicationMenuItem(
+            "PasswordBook",
+            l["Menu:PasswordBook"],
+            "~/PasswordBook",
+            icon: "fa fa-lock",
+            order: 6
+        ).RequirePermissions(false, PasswordBookPermissions.PassWordBookUser));
 
         return Task.CompletedTask;
     }

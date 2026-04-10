@@ -90,6 +90,7 @@
     "LinkBoard:StatusDraft": "Draft",
     "LinkBoard:StatusPending": "Pending",
     "LinkBoard:StatusApproved": "Approved",
-    "LinkBoard:StatusRejected": "Rejected"
+    "LinkBoard:StatusRejected": "Rejected",
+    "Menu:PasswordBook": "Password Book"
   }
 }
