@@ -17,6 +17,10 @@
           <a-menu-item v-if="hasLinkCategoryManagerPermission" key="LinkBoardCategories" @click="$router.push('/linkboard/categories')">分类管理</a-menu-item>
           <a-menu-item v-if="hasLinkManagerPermission" key="LinkBoardLinks" @click="$router.push('/linkboard/links')">链接管理</a-menu-item>
         </a-sub-menu>
+        <a-menu-item v-if="hasPasswordBookPermission" key="PasswordBook" @click="$router.push('/password-book')">
+          <LockOutlined />
+          <span>密码本</span>
+        </a-menu-item>
         <a-sub-menu v-if="hasManagementPermission" key="Management">
           <template #title>
             <span>
@@ -109,6 +113,7 @@ import {
   MenuFoldOutlined,
   DownOutlined,
   LinkOutlined,
+  LockOutlined,
 } from '@ant-design/icons-vue';
 import { authService, authState } from './services/authService';
 import { permissionService, Permissions } from './services/permissionService';
@@ -135,6 +140,7 @@ const routeNameMap: Record<string, string> = {
   LinkBoardReview: '链接板审核',
   LinkBoardCategoryReview: '分类审核',
   LinkBoardLinkReview: '链接审核',
+  PasswordBook: '密码本',
 };
 
 // 计算面包屑
@@ -180,6 +186,8 @@ const breadcrumbItems = computed(() => {
     items.push('管理');
     items.push('链接板审核');
     items.push('链接审核');
+  } else if (name === 'PasswordBook') {
+    items.push('密码本');
   }
   
   return items;
@@ -275,6 +283,12 @@ const hasLinkCategoryReviewPermission = computed(() => {
 const hasLinkReviewPermission = computed(() => {
   if (!authState.isAuthenticated) return false;
   return permissionService.hasPermission(Permissions.LinkBoard.LinkReview);
+});
+
+// PasswordBook 权限检查
+const hasPasswordBookPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.PasswordBook.User);
 });
 
 // 监听路由变化更新菜单选中状态

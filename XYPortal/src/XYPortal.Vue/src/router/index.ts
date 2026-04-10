@@ -34,6 +34,11 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: '/password-book',
+    name: 'PasswordBook',
+    component: () => import('../views/PasswordBook.vue'),
+  },
+  {
     path: '/management',
     name: 'Management',
     redirect: '/management/identity',

@@ -49,6 +49,13 @@ export const Permissions = {
     LinkModify: 'LinkBoard.User.LinkManager.Modify',
     LinkDelete: 'LinkBoard.User.LinkManager.Delete',
   },
+  PasswordBook: {
+    User: 'PasswordBook.User',
+    Manage: 'PasswordBook.Manage',
+    Create: 'PasswordBook.Manage.Create',
+    Update: 'PasswordBook.Manage.Update',
+    Delete: 'PasswordBook.Manage.Delete',
+  },
 };
 
 // 权限状态
