@@ -1,0 +1,492 @@
+$(function () {
+    // Helper function to decode HTML entities in localization strings
+    // ABP's @L[] may return HTML-encoded strings (e.g., &#x5F3A; for Chinese characters)
+    window.decodeHtmlEntities = function(str) {
+        if (!str) return str;
+        var textarea = document.createElement('textarea');
+        textarea.innerHTML = str;
+        return textarea.value;
+    };
+
+    // Helper function to get localized WeakLevel string from number
+    window.getWeakLevelText = function(weakLevel) {
+        if (weakLevel == null) return '-';
+        switch (weakLevel) {
+            case 0: return window.decodeHtmlEntities(window.passwordBookLocales.VeryWeak);
+            case 1: return window.decodeHtmlEntities(window.passwordBookLocales.Weak);
+            case 2: return window.decodeHtmlEntities(window.passwordBookLocales.Medium);
+            case 3: return window.decodeHtmlEntities(window.passwordBookLocales.Strong);
+            case 4: return window.decodeHtmlEntities(window.passwordBookLocales.VeryStrong);
+            default: return '-';
+        }
+    };
+
+    window.createPasswordBook = function () {
+        var form = document.getElementById('CreateForm');
+        var formData = new FormData(form);
+
+        var input = {
+            name: formData.get('CreateInput.Name') || form.querySelector('[name="CreateInput.Name"]')?.value,
+            description: formData.get('CreateInput.Description') || form.querySelector('[name="CreateInput.Description"]')?.value || null,
+            allowedType: parseInt(formData.get('CreateInput.AllowedType') || form.querySelector('[name="CreateInput.AllowedType"]')?.value || 1),
+            minLength: parseInt(formData.get('CreateInput.MinLength') || form.querySelector('[name="CreateInput.MinLength"]')?.value || 8),
+            maxLength: parseInt(formData.get('CreateInput.MaxLength') || form.querySelector('[name="CreateInput.MaxLength"]')?.value || 20)
+        };
+
+        if (!input.name) {
+            abp.notify.error('Password book name is required');
+            return;
+        }
+
+        fetch('/api/password-book', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            },
+            body: JSON.stringify(input)
+        })
+        .then(response => {
+            if (response.ok) {
+                abp.notify.success('PasswordBook created successfully');
+                $('#CreateModal').modal('hide');
+                loadPasswordBookList();
+            } else {
+                return response.json().then(err => {
+                    var errorMessage = 'Failed to create PasswordBook';
+                    if (err && err.error) {
+                        if (typeof err.error === 'object') {
+                            errorMessage = err.error.message || err.error.code || JSON.stringify(err.error);
+                        } else {
+                            errorMessage = err.error;
+                        }
+                    } else if (err && err.message) {
+                        errorMessage = err.message;
+                    }
+                    throw new Error(errorMessage);
+                });
+            }
+        })
+        .catch(error => {
+            abp.notify.error(error.message);
+        });
+    };
+
+    // Load PasswordBook list via AJAX and update table
+    window.loadPasswordBookList = function() {
+        fetch('/api/password-book', {
+            method: 'GET',
+            headers: {
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load password books');
+            return response.json();
+        })
+        .then(data => {
+            updatePasswordBookTable(data.items || []);
+        })
+        .catch(error => {
+            abp.notify.error(error.message);
+        });
+    };
+
+    // Update the PasswordBook table with new data
+    window.updatePasswordBookTable = function(books) {
+        var tbody = document.querySelector('#PasswordBookTable tbody');
+        if (!tbody) return;
+        
+        tbody.innerHTML = '';
+        
+        if (!books || books.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center">No password books found</td></tr>';
+            return;
+        }
+        
+        books.forEach(function(book) {
+            var allowedTypeText = book.allowedType === 1 ? 'General' : (book.allowedType === 0 ? 'NumericOnly' : book.allowedType);
+            var creationTime = book.creationTime ? new Date(book.creationTime).toLocaleString() : '-';
+            
+            var row = '<tr data-id="' + book.id + '">' +
+                '<td>' + (book.name || '') + '</td>' +
+                '<td>' + (book.description || '') + '</td>' +
+                '<td>' + allowedTypeText + '</td>' +
+                '<td>' + creationTime + '</td>' +
+                '<td>' +
+                '<button type="button" class="btn btn-primary btn-sm" onclick="viewPasswordBook(\'' + book.id + '\')"><i class="fa fa-eye"></i> View</button> ' +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="deletePasswordBook(\'' + book.id + '\')"><i class="fa fa-trash"></i> Delete</button>' +
+                '</td>' +
+                '</tr>';
+            tbody.innerHTML += row;
+        });
+    };
+
+    window.viewPasswordBook = function (id) {
+        fetch('/api/password-book/' + id + '/with-entries', {
+            method: 'GET',
+            headers: {
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load PasswordBook');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('view-book-name').textContent = data.name || '';
+            document.getElementById('view-book-description').textContent = data.description || '-';
+            document.getElementById('view-book-allowedtype').textContent = data.allowedType === 1 ? 'General' : 'NumericOnly';
+            document.getElementById('view-book-creationtime').textContent = new Date(data.creationTime).toLocaleString();
+            document.getElementById('view-book-id').textContent = data.id;
+
+            // Set the password book ID for create entry form
+            document.getElementById('entry-passwordbook-id').value = data.id;
+
+            var tbody = document.getElementById('PasswordEntriesTableBody');
+            tbody.innerHTML = '';
+
+            if (data.passwordEntries && data.passwordEntries.length > 0) {
+                data.passwordEntries.forEach(function (entry) {
+                    var actionButtons = '';
+                    // Show Password 按钮始终显示（不论是否已删除）
+                    actionButtons = '<button type="button" class="btn btn-info btn-sm" onclick="showPasswordEntry(\'' + data.id + '\', \'' + entry.id + '\', ' + (entry.isDeleted ? 1 : 0) + ')"><i class="fa fa-eye"></i> ' + window.passwordBookLocales.ShowPassword + '</button>';
+
+                    if (entry.isDeleted) {
+                        // 已删除条目：显示恢复按钮
+                        actionButtons += ' <button type="button" class="btn btn-success btn-sm" onclick="restorePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-undo"></i> ' + window.passwordBookLocales.Restore + '</button>';
+                    } else {
+                        // 有效条目：显示复制和删除按钮
+                        actionButtons += ' <button type="button" class="btn btn-secondary btn-sm" onclick="copyPasswordToClipboard(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-copy"></i> ' + window.passwordBookLocales.Copy + '</button>'
+                            + ' <button type="button" class="btn btn-danger btn-sm" onclick="deletePasswordEntry(\'' + data.id + '\', \'' + entry.id + '\')"><i class="fa fa-trash"></i> ' + window.passwordBookLocales.Delete + '</button>';
+                    }
+                    
+                    var row = '<tr>' +
+                        '<td>' + (entry.title || '') + '</td>' +
+                        '<td>' + (entry.username || '-') + '</td>' +
+                        '<td>' + (entry.passwordType === 1 ? 'General' : 'NumericOnly') + '</td>' +
+                        '<td>' + window.getWeakLevelText(entry.weakLevel) + '</td>' +
+                        '<td>' + (entry.isDeleted ? '<span class="badge bg-secondary">' + window.passwordBookLocales.Voided + '</span>' : '<span class="badge bg-success">' + window.passwordBookLocales.Active + '</span>') + '</td>' +
+                        '<td>' + actionButtons + '</td>' +
+                        '</tr>';
+                    tbody.innerHTML += row;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No password entries</td></tr>';
+            }
+
+            var modal = new bootstrap.Modal(document.getElementById('ViewModal'));
+            modal.show();
+        })
+        .catch(error => {
+            abp.notify.error(error.message);
+        });
+    };
+
+    window.deletePasswordBook = function (id) {
+        abp.message.confirm(
+            'Are you sure you want to delete this PasswordBook?',
+            'Delete Confirmation',
+            function (confirmed) {
+                if (confirmed) {
+                    fetch('/api/password-book/' + id, {
+                        method: 'DELETE',
+                        headers: {
+                            'RequestVerificationToken': abp.security.antiForgery.getToken()
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            abp.notify.success('PasswordBook deleted successfully');
+                            loadPasswordBookList();
+                        } else {
+                            throw new Error('Failed to delete PasswordBook');
+                        }
+                    })
+                    .catch(error => {
+                        abp.notify.error(error.message);
+                    });
+                }
+            }
+        );
+    };
+
+    // 显示创建密码条目模态框
+    window.showCreateEntryModal = function() {
+        var modal = new bootstrap.Modal(document.getElementById('CreateEntryModal'));
+        modal.show();
+    };
+
+    // Show password tooltip on hover
+    window.showPasswordTooltip = function() {
+        var passwordField = document.getElementById('entry-password');
+        var tooltip = document.getElementById('password-tooltip');
+        if (passwordField && tooltip && passwordField.value) {
+            tooltip.textContent = passwordField.value;
+            tooltip.style.display = 'block';
+        }
+    };
+
+    // Hide password tooltip
+    window.hidePasswordTooltip = function() {
+        var tooltip = document.getElementById('password-tooltip');
+        if (tooltip) {
+            tooltip.style.display = 'none';
+        }
+    };
+
+    // Generate Random Password from WeakLevel
+    window.generateRandomPasswordFromWeakLevel = function() {
+        var passwordBookId = document.getElementById('entry-passwordbook-id')?.value;
+        if (!passwordBookId) {
+            abp.notify.error('PasswordBook ID is missing');
+            return;
+        }
+
+        var passwordTypeValue = document.getElementById('entry-passwordtype')?.value;
+        var passwordTypeInt = parseInt(passwordTypeValue);
+        if (isNaN(passwordTypeInt) || (passwordTypeInt !== 0 && passwordTypeInt !== 1)) {
+            passwordTypeInt = 1; // default to General
+        }
+
+        var weakLevelValue = document.getElementById('entry-weaklevel')?.value;
+        var weakLevel = parseInt(weakLevelValue);
+        if (isNaN(weakLevel)) {
+            // Default to Strong (3) if not selected
+            weakLevel = 3;
+        }
+
+        var minLength = parseInt(document.getElementById('entry-minlength')?.value) || 8;
+        var maxLength = parseInt(document.getElementById('entry-maxlength')?.value) || 20;
+
+        var input = {
+            passwordBookId: passwordBookId,
+            minLength: minLength,
+            maxLength: maxLength,
+            passwordType: passwordTypeInt,
+            weakLevel: weakLevel
+        };
+
+        fetch('/api/password-book/generate-random-password-from-weak-level', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            },
+            body: JSON.stringify(input)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to generate password');
+            }
+            return response.json();
+        })
+        .then(data => {
+            var passwordField = document.getElementById('entry-password');
+            var autoFill = document.getElementById('entry-auto-fill')?.checked;
+            if (autoFill) {
+                passwordField.value = data.password;
+            } else {
+                // Show in a notification for manual copy
+                abp.notify.success('Generated password: ' + data.password);
+            }
+        })
+        .catch(error => {
+            abp.notify.error(error.message || 'Failed to generate password');
+        });
+    };
+
+    // 创建密码条目
+    window.createPasswordEntry = function() {
+        var passwordBookId = document.getElementById('entry-passwordbook-id').value;
+        
+        var passwordTypeValue = document.getElementById('entry-passwordtype')?.value;
+        var passwordTypeInt = parseInt(passwordTypeValue);
+        if (isNaN(passwordTypeInt) || (passwordTypeInt !== 0 && passwordTypeInt !== 1)) {
+            passwordTypeInt = 1; // default to General
+        }
+        
+        var weakLevelValue = document.getElementById('entry-weaklevel')?.value;
+        console.log({ weakLevelValue: weakLevelValue});
+        var weakLevel = null;
+        if (weakLevelValue !== '') {
+            var weakLevelInt = parseInt(weakLevelValue);
+            weakLevel = isNaN(weakLevelInt) ? null : weakLevelInt;
+            console.log({ weakLeval: weakLevel });
+        }
+        
+        var input = {
+            title: document.getElementById('entry-title')?.value || '',
+            password: document.getElementById('entry-password')?.value || '',
+            hasUsername: document.getElementById('entry-hasusername')?.value === 'true',
+            username: document.getElementById('entry-username')?.value || null,
+            passwordType: passwordTypeInt,
+            WeakLevel: weakLevel,
+            remark: document.getElementById('entry-remark')?.value || null
+        };
+        debugger;
+        if (!input.title || !input.password) {
+            abp.notify.error('Title and Password are required');
+            return;
+        }
+        
+        console.log(input);
+        
+        fetch('/api/password-book/' + passwordBookId + '/entries', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            },
+            body: JSON.stringify(input)
+        })
+        .then(response => {
+            if (response.ok) {
+                abp.notify.success('Password entry created successfully');
+                $('#CreateEntryModal').modal('hide');
+                location.reload();
+            } else {
+                return response.json().then(err => {
+                    var errorMessage = 'Failed to create password entry';
+                    if (err && err.error) {
+                        if (typeof err.error === 'object') {
+                            errorMessage = err.error.message || err.error.code || JSON.stringify(err.error);
+                        } else {
+                            errorMessage = err.error;
+                        }
+                    } else if (err && err.message) {
+                        errorMessage = err.message;
+                    }
+                    throw new Error(errorMessage);
+                });
+            }
+        })
+        .catch(error => {
+            abp.notify.error(error.message);
+        });
+    };
+
+    // 删除密码条目
+    window.deletePasswordEntry = function(passwordBookId, entryId) {
+        abp.message.confirm(
+            'Are you sure you want to delete this password entry?',
+            'Delete Confirmation',
+            function(confirmed) {
+                if (confirmed) {
+                    fetch('/api/password-book/' + passwordBookId + '/entries/' + entryId, {
+                        method: 'DELETE',
+                        headers: {
+                            'RequestVerificationToken': abp.security.antiForgery.getToken()
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            abp.notify.success('Password entry deleted successfully');
+                            location.reload();
+                        } else {
+                            throw new Error('Failed to delete password entry');
+                        }
+                    })
+                    .catch(error => {
+                        abp.notify.error(error.message);
+                    });
+                }
+            }
+        );
+    };
+
+    // 恢复密码条目
+    window.restorePasswordEntry = function(passwordBookId, entryId) {
+        abp.message.confirm(
+            'Are you sure you want to restore this password entry?',
+            'Restore Confirmation',
+            function(confirmed) {
+                if (confirmed) {
+                    fetch('/api/password-book/' + passwordBookId + '/entries/' + entryId + '/restore', {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': abp.security.antiForgery.getToken()
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            abp.notify.success('Password entry restored successfully');
+                            location.reload();
+                        } else {
+                            throw new Error('Failed to restore password entry');
+                        }
+                    })
+                    .catch(error => {
+                        abp.notify.error(error.message);
+                    });
+                }
+            }
+        );
+    };
+
+    // 复制密码到剪贴板
+    window.copyPasswordToClipboard = function(passwordBookId, entryId) {
+        fetch('/api/password-book/' + passwordBookId + '/entries/' + entryId, {
+            method: 'GET',
+            headers: {
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to get password entry');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.currentPassword) {
+                throw new Error('Password not found');
+            }
+            navigator.clipboard.writeText(data.currentPassword).then(function() {
+                abp.notify.success('Password copied to clipboard');
+            }).catch(function(err) {
+                abp.notify.error('Failed to copy password: ' + err);
+            });
+        })
+        .catch(error => {
+            abp.notify.error(error.message);
+        });
+    };
+
+    // 显示密码明文（不消失模态框）
+    window.showPasswordEntry = function(passwordBookId, entryId, queryKind) {
+        queryKind = (typeof queryKind === 'number') ? queryKind : 0;
+        fetch('/api/password-book/' + passwordBookId + '/entries/' + entryId + '?queryKind=' + queryKind, {
+            method: 'GET',
+            headers: {
+                'RequestVerificationToken': abp.security.antiForgery.getToken()
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load password entry');
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('sp-title').textContent = data.title || '';
+            document.getElementById('sp-username').textContent = data.username || '-';
+            document.getElementById('sp-password').value = data.currentPassword || '';
+            document.getElementById('sp-remark').textContent = data.remark || '-';
+            document.getElementById('sp-weaklevel').textContent = window.getWeakLevelText(data.weakLevel);
+            var modal = new bootstrap.Modal(document.getElementById('ShowPasswordModal'));
+            modal.show();
+        })
+        .catch(error => abp.notify.error(error.message));
+    };
+
+    // 复制 ShowPasswordModal 中的密码
+    window.copySpPassword = function() {
+        var pwd = document.getElementById('sp-password').value;
+        navigator.clipboard.writeText(pwd).then(function() {
+            abp.notify.success('Password copied');
+        }).catch(function(err) {
+            abp.notify.error('Failed to copy password: ' + err);
+        });
+    };
+});

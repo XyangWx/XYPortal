@@ -11,9 +11,11 @@
   <ItemGroup>
     <ProjectReference Include="..\XYPortal.Domain.Shared\XYPortal.Domain.Shared.csproj" />
     <ProjectReference Include="..\..\..\XYPortal.LinkBoard\src\XYPortal.LinkBoard.Domain\XYPortal.LinkBoard.Domain.csproj" />
+    <ProjectReference Include="..\..\..\XYPortal.PasswordBook\src\XYPortal.PasswordBook.Domain\XYPortal.PasswordBook.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Scriban" Version="7.1.0" />
     <PackageReference Include="Volo.Abp.Emailing" Version="10.0.2" />
     <PackageReference Include="Volo.Abp.Identity.Domain" Version="10.0.2" />
     <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="10.0.2" />

@@ -41,6 +41,7 @@ using XYPortal.MultiTenancy;
 using XYPortal.Web.Filters;
 using XYPortal.Web.Menus;
 using XYPortal.RandomStringProvider.Web;
+using XYPortal.PasswordBook.Web;
 using XYPortal.RandomStringProvider;
 
 namespace XYPortal.Web;
@@ -49,6 +50,7 @@ namespace XYPortal.Web;
     typeof(XYPortalHttpApiModule),
     typeof(XYPortalApplicationModule),
     typeof(XYPortalEntityFrameworkCoreModule),
+    typeof(PasswordBookWebModule),
     typeof(AbpAutofacModule),
     typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpIdentityWebModule),
@@ -136,6 +138,20 @@ public class XYPortalWebModule : AbpModule
         {
             options.Filters.Add<RandomStringWidgetLoggingFilter>();
         });
+
+        context.Services.AddLogging(
+            builder =>
+            {
+                builder.ClearProviders();
+
+#if DEBUG
+                builder.SetMinimumLevel(LogLevel.Debug);
+#else
+                builder.SetMinimumLevel(LogLevel.Warning);
+#endif
+
+                builder.AddLog4Net("log4net.xml", true);
+            });
     }
 
     private void CheckSameSite(HttpContext httpContext, CookieOptions options)

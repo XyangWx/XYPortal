@@ -10,3 +10,4 @@ USER.md
 **/package-lock.json
 skills/
 *.skill
+\.cursor/

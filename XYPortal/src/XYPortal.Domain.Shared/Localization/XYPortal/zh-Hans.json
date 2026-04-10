@@ -93,6 +93,7 @@
         "LinkBoard:StatusDraft": "草稿",
         "LinkBoard:StatusPending": "待审核",
         "LinkBoard:StatusApproved": "已批准",
-        "LinkBoard:StatusRejected": "已拒绝"
+        "LinkBoard:StatusRejected": "已拒绝",
+        "Menu:PasswordBook": "密码本"
     }
 }

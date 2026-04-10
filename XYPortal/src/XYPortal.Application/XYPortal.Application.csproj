@@ -13,9 +13,11 @@
     <ProjectReference Include="..\XYPortal.Application.Contracts\XYPortal.Application.Contracts.csproj" />
     <ProjectReference Include="..\..\..\XYPortal.LinkBoard\src\XYPortal.LinkBoard.Application\XYPortal.LinkBoard.Application.csproj" />
     <ProjectReference Include="..\..\..\XYPortal.RandomStringProvider\src\XYPortal.RandomStringProvider.Application\XYPortal.RandomStringProvider.Application.csproj" />
+    <ProjectReference Include="..\..\..\XYPortal.PasswordBook\src\XYPortal.PasswordBook.Application\XYPortal.PasswordBook.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Scriban" Version="7.1.0" />
     <PackageReference Include="Volo.Abp.Account.Application" Version="10.0.2" />
     <PackageReference Include="Volo.Abp.Identity.Application" Version="10.0.2" />
     <PackageReference Include="Volo.Abp.PermissionManagement.Application" Version="10.0.2" />

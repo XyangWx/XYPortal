@@ -1,6 +1,7 @@
 ﻿using Localization.Resources.AbpUi;
 using XYPortal.LinkBoard;
 using XYPortal.Localization;
+using XYPortal.PasswordBook;
 using XYPortal.RandomStringProvider;
 using Volo.Abp.Account;
 using Volo.Abp.FeatureManagement;
@@ -16,6 +17,7 @@ namespace XYPortal;
 [DependsOn(
     typeof(XYPortalApplicationContractsModule),
     typeof(LinkBoardHttpApiModule),
+    typeof(PasswordBookHttpApiModule),
     typeof(AbpAccountHttpApiModule),
     typeof(AbpIdentityHttpApiModule),
     typeof(AbpPermissionManagementHttpApiModule),

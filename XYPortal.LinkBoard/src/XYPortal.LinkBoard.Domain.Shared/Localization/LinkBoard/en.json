@@ -24,6 +24,7 @@
     "LinkBoard:CategoryNotApproved": "Category is not approved yet",
     "LinkBoard:UrlExistsInPublic": "This URL already exists in public links",
     "LinkBoard:CategoryNameExistsInPublic": "This category name already exists in public categories",
-    "LinkBoard:PrivateNoReview": "Private items do not require review"
+    "LinkBoard:PrivateNoReview": "Private items do not require review",
+    "LinkBoard:NoPublicLinks": "No public links available"
   }
 }

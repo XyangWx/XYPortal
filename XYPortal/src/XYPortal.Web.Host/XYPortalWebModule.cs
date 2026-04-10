@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
@@ -41,6 +42,7 @@ using Volo.Abp.VirtualFileSystem;
 using XYPortal.LinkBoard;
 using XYPortal.Localization;
 using XYPortal.MultiTenancy;
+using XYPortal.PasswordBook.Web;
 using XYPortal.RandomStringProvider;
 using XYPortal.RandomStringProvider.Web;
 using XYPortal.Web.Menus;
@@ -51,6 +53,7 @@ namespace XYPortal.Web;
     typeof(XYPortalHttpApiClientModule),
     typeof(XYPortalHttpApiModule),
     typeof(LinkBoardHttpApiClientModule),
+    typeof(PasswordBookWebModule),
     typeof(AbpAspNetCoreAuthenticationOpenIdConnectModule),
     typeof(AbpAspNetCoreMvcClientModule),
     typeof(AbpHttpClientWebModule),
@@ -104,7 +107,23 @@ public class XYPortalWebModule : AbpModule
         ConfigureSwaggerServices(context.Services);
 
         context.Services.AddMapperlyObjectMapper<XYPortalWebModule>();
-    }
+
+
+
+		context.Services.AddLogging(
+			builder =>
+			{
+				builder.ClearProviders();
+
+#if DEBUG
+				builder.SetMinimumLevel(LogLevel.Debug);
+#else
+                builder.SetMinimumLevel(LogLevel.Warning);
+#endif
+
+				builder.AddLog4Net("log4net.xml", true);
+			});
+	}
 
     private void ConfigureBundles()
     {

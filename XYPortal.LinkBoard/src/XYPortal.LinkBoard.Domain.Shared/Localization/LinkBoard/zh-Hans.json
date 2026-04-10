@@ -24,6 +24,7 @@
     "LinkBoard:CategoryNotApproved": "分类尚未通过审批",
     "LinkBoard:UrlExistsInPublic": "该链接地址已存在于公开链接中",
     "LinkBoard:CategoryNameExistsInPublic": "该分类名称已存在于公开分类中",
-    "LinkBoard:PrivateNoReview": "私有内容无需审批"
+    "LinkBoard:PrivateNoReview": "私有内容无需审批",
+    "LinkBoard:NoPublicLinks": "暂无公开链接"
   }
 }

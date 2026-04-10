@@ -3,15 +3,15 @@
 @model XYPortal.Web.Components.LinkBoardWidget.LinkBoardWidgetViewModel
 @inject IHtmlLocalizer<XYPortalResource> L
 
-@if (Model.Categories.Any())
-{
-    <div class="card" id="linkBoardWidget" data-page-size="@Model.PageSize">
-        <div class="card-header">
-            <h5 class="card-title mb-0">
-                <i class="fas fa-link me-2"></i>@L["Menu:LinkBoard"]
-            </h5>
-        </div>
-        <div class="card-body p-0">
+<div class="card w-100" id="linkBoardWidget" data-page-size="@Model.PageSize">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-link me-2"></i>@L["Menu:LinkBoard"]
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Categories.Any())
+        {
             <ul class="nav nav-tabs px-3 pt-2" id="linkBoardTabs" role="tablist">
                 @for (var i = 0; i < Model.Categories.Count; i++)
                 {
@@ -20,7 +20,7 @@
                     var paneId = $"lb-pane-{category.Id}";
                     <li class="nav-item" role="presentation">
                         <button class="nav-link @(i == 0 ? "active" : "")" id="@tabId" data-bs-toggle="tab"
-                                data-bs-target="#@paneId" type="button" role="tab"
+                                data-bs-target="@paneId" type="button" role="tab"
                                 data-category-id="@category.Id"
                                 aria-controls="@paneId" aria-selected="@(i == 0 ? "true" : "false")">
                             @if (!string.IsNullOrEmpty(category.Icon))
@@ -100,9 +100,16 @@
                     </div>
                 }
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-link fs-1 mb-2 d-block opacity-25"></i>
+                <span>@L["LinkBoard:NoPublicLinks"]</span>
+            </div>
+        }
     </div>
-}
+</div>
 
 <style>
     .link-item {

@@ -1,7 +1,73 @@
 <template>
   <a-layout style="min-height: 100vh">
     <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
-      <div class="logo" />
+      <div class="logo">
+        <!-- Half sun (expanded) -->
+        <svg v-if="!collapsed" viewBox="0 0 120 32" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="sunGradientHalf" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" style="stop-color:#FF6B35;stop-opacity:1" />
+              <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#FFD700;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="skyGradientHalf" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#FFE4B5;stop-opacity:0.8" />
+            </linearGradient>
+            <filter id="sunGlow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Sky background -->
+          <rect x="2" y="2" width="116" height="28" rx="6" fill="url(#skyGradientHalf)"/>
+          <!-- Sun body (half, rising) -->
+          <circle cx="60" cy="28" r="12" fill="url(#sunGradientHalf)" filter="url(#sunGlow)"/>
+          <!-- Sun rays -->
+          <line x1="60" y1="10" x2="60" y2="6" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+          <line x1="75" y1="14" x2="78" y2="10" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+          <line x1="45" y1="14" x2="42" y2="10" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+          <line x1="72" y1="22" x2="76" y2="20" stroke="#FFA500" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="48" y1="22" x2="44" y2="20" stroke="#FFA500" stroke-width="1.5" stroke-linecap="round"/>
+          <!-- Horizon line -->
+          <path d="M 2 28 Q 30 26 60 28 Q 90 30 118 28" fill="none" stroke="#8B4513" stroke-width="1" opacity="0.5"/>
+        </svg>
+        <!-- Full sun (collapsed) -->
+        <svg v-else viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="sunGradientFull" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" style="stop-color:#FFFF00;stop-opacity:1" />
+              <stop offset="70%" style="stop-color:#FFA500;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#FF6B35;stop-opacity:1" />
+            </radialGradient>
+            <filter id="sunGlowFull">
+              <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Sun body -->
+          <circle cx="16" cy="16" r="10" fill="url(#sunGradientFull)" filter="url(#sunGlowFull)"/>
+          <!-- Sun rays -->
+          <line x1="16" y1="2" x2="16" y2="5" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+          <line x1="16" y1="27" x2="16" y2="30" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+          <line x1="2" y1="16" x2="5" y2="16" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+          <line x1="27" y1="16" x2="30" y2="16" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+          <line x1="6" y1="6" x2="8" y2="8" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+          <line x1="24" y1="6" x2="22" y2="8" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+          <line x1="6" y1="26" x2="8" y2="24" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+          <line x1="24" y1="26" x2="22" y2="24" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+          <!-- Happy face -->
+          <circle cx="13" cy="14" r="1.5" fill="#8B4513"/>
+          <circle cx="19" cy="14" r="1.5" fill="#8B4513"/>
+          <path d="M 12 18 Q 16 21 20 18" fill="none" stroke="#8B4513" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
       <a-menu v-model:selectedKeys="selectedKeys" theme="dark" mode="inline">
         <a-menu-item key="Home" @click="$router.push('/')">
           <user-outlined />
@@ -17,6 +83,10 @@
           <a-menu-item v-if="hasLinkCategoryManagerPermission" key="LinkBoardCategories" @click="$router.push('/linkboard/categories')">分类管理</a-menu-item>
           <a-menu-item v-if="hasLinkManagerPermission" key="LinkBoardLinks" @click="$router.push('/linkboard/links')">链接管理</a-menu-item>
         </a-sub-menu>
+        <a-menu-item v-if="hasPasswordBookPermission" key="PasswordBook" @click="$router.push('/password-book')">
+          <LockOutlined />
+          <span>密码本</span>
+        </a-menu-item>
         <a-sub-menu v-if="hasManagementPermission" key="Management">
           <template #title>
             <span>
@@ -109,6 +179,7 @@ import {
   MenuFoldOutlined,
   DownOutlined,
   LinkOutlined,
+  LockOutlined,
 } from '@ant-design/icons-vue';
 import { authService, authState } from './services/authService';
 import { permissionService, Permissions } from './services/permissionService';
@@ -135,6 +206,7 @@ const routeNameMap: Record<string, string> = {
   LinkBoardReview: '链接板审核',
   LinkBoardCategoryReview: '分类审核',
   LinkBoardLinkReview: '链接审核',
+  PasswordBook: '密码本',
 };
 
 // 计算面包屑
@@ -180,6 +252,8 @@ const breadcrumbItems = computed(() => {
     items.push('管理');
     items.push('链接板审核');
     items.push('链接审核');
+  } else if (name === 'PasswordBook') {
+    items.push('密码本');
   }
   
   return items;
@@ -277,6 +351,12 @@ const hasLinkReviewPermission = computed(() => {
   return permissionService.hasPermission(Permissions.LinkBoard.LinkReview);
 });
 
+// PasswordBook 权限检查
+const hasPasswordBookPermission = computed(() => {
+  if (!authState.isAuthenticated) return false;
+  return permissionService.hasPermission(Permissions.PasswordBook.User);
+});
+
 // 监听路由变化更新菜单选中状态
 watch(
   () => route.name,
@@ -329,7 +409,18 @@ const handleLogout = async () => {
 
 .logo {
   height: 32px;
-  background: rgba(255, 255, 255, 0.3);
   margin: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 6px;
 }
 </style>

@@ -1,4 +1,5 @@
 using XYPortal.LinkBoard;
+using XYPortal.PasswordBook;
 using XYPortal.Localization;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
@@ -18,6 +19,7 @@ namespace XYPortal;
 
 [DependsOn(
     typeof(LinkBoardDomainSharedModule),
+    typeof(PasswordBookDomainSharedModule),
     typeof(AbpAuditLoggingDomainSharedModule),
     typeof(AbpBackgroundJobsDomainSharedModule),
     typeof(AbpFeatureManagementDomainSharedModule),
