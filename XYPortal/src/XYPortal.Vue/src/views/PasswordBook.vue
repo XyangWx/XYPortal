@@ -148,7 +148,7 @@
       v-model:open="createEntryModalVisible"
       title="添加密码条目"
       :maskClosable="false"
-      width="600px"
+      width="640px"
       @ok="handleCreateEntry"
       @cancel="createEntryModalVisible = false"
     >
@@ -156,9 +156,60 @@
         <a-form-item label="标题" name="title" required>
           <a-input v-model:value="entryForm.title" placeholder="请输入标题" />
         </a-form-item>
+
+        <!-- 密码输入区域 -->
         <a-form-item label="密码" name="password" required>
-          <a-input-password v-model:value="entryForm.password" placeholder="请输入密码" />
+          <a-input-group compact style="display: flex">
+            <a-input-password
+              v-model:value="entryForm.password"
+              placeholder="请输入密码"
+              style="flex: 1"
+            />
+            <a-button type="primary" @click="generateRandomPassword" style="background-color: #52c41a; border-color: #52c41a">
+              生成密码
+            </a-button>
+          </a-input-group>
         </a-form-item>
+
+        <!-- 密码生成选项 -->
+        <a-row :gutter="16">
+          <a-col :span="8">
+            <a-form-item label="最小长度">
+              <a-input-number
+                v-model:value="entryForm.minLength"
+                :min="4"
+                :max="50"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="8">
+            <a-form-item label="最大长度">
+              <a-input-number
+                v-model:value="entryForm.maxLength"
+                :min="8"
+                :max="100"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="8">
+            <a-form-item label="自动填充">
+              <a-switch v-model:checked="entryForm.autoFill" />
+            </a-form-item>
+          </a-col>
+        </a-row>
+
+        <a-form-item label="密码强度">
+          <a-select v-model:value="entryForm.weakLevel" placeholder="请选择密码强度">
+            <a-select-option :value="0">VeryWeak</a-select-option>
+            <a-select-option :value="1">Weak</a-select-option>
+            <a-select-option :value="2">Medium</a-select-option>
+            <a-select-option :value="3">Strong</a-select-option>
+            <a-select-option :value="4">VeryStrong</a-select-option>
+          </a-select>
+        </a-form-item>
+
         <a-form-item label="是否有用户名">
           <a-switch v-model:checked="entryForm.hasUsername" />
         </a-form-item>
@@ -285,6 +336,10 @@ const entryForm = reactive({
   hasUsername: false,
   username: '',
   passwordType: 1,
+  weakLevel: 3, // Default to Strong
+  minLength: 8,
+  maxLength: 20,
+  autoFill: true,
   remark: '',
 });
 const entryFormRules = {
@@ -435,8 +490,51 @@ const fetchEntries = async (passwordBookId: string) => {
 };
 
 const showCreateEntryModal = () => {
-  Object.assign(entryForm, { title: '', password: '', hasUsername: false, username: '', passwordType: 1, remark: '' });
+  Object.assign(entryForm, {
+    title: '',
+    password: '',
+    hasUsername: false,
+    username: '',
+    passwordType: 1,
+    weakLevel: 3,
+    minLength: 8,
+    maxLength: 20,
+    autoFill: true,
+    remark: '',
+  });
   createEntryModalVisible.value = true;
+};
+
+// 生成随机密码
+const generateRandomPassword = async () => {
+  if (!viewData.id) {
+    message.error('密码本ID缺失');
+    return;
+  }
+
+  try {
+    const user = await authService.getUser();
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const response = await axios.post(
+      `${baseUrl}/api/password-book/generate-random-password-from-weak-level`,
+      {
+        passwordBookId: viewData.id,
+        minLength: entryForm.minLength,
+        maxLength: entryForm.maxLength,
+        passwordType: entryForm.passwordType,
+        weakLevel: entryForm.weakLevel,
+      },
+      { headers: { Authorization: `Bearer ${user?.access_token}` } }
+    );
+
+    if (entryForm.autoFill) {
+      entryForm.password = response.data.password;
+    } else {
+      message.success('生成的密码: ' + response.data.password);
+    }
+  } catch {
+    message.error('生成密码失败');
+  }
 };
 
 const handleCreateEntry = async () => {
@@ -452,6 +550,7 @@ const handleCreateEntry = async () => {
         hasUsername: entryForm.hasUsername,
         username: entryForm.hasUsername ? entryForm.username : null,
         passwordType: entryForm.passwordType,
+        weakLevel: entryForm.weakLevel,
         remark: entryForm.remark || null,
       },
       { headers: { Authorization: `Bearer ${user?.access_token}` } }
