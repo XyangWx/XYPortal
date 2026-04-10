@@ -124,7 +124,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     /// <summary>
     /// Add PasswordEntry
     /// </summary>
-    public async Task<PasswordEntryDto> AddPasswordEntryAsync(Guid passwordBookId, CreatePasswordEntryDto input)
+    public async Task<PasswordEntryDto?> AddPasswordEntryAsync(Guid passwordBookId, CreatePasswordEntryDto input)
     {
         var create_payload = JsonSerializer.Serialize(
             input,
@@ -147,7 +147,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         var passwordBook = await _passwordBookManager.GetByIdAsync(passwordBookId);
         
         _logger.LogDebug("[AddPasswordEntryAsync] DTO WeakLevel={WeakLevel}, PasswordType={PasswordType}", input.WeakLevel, input.PasswordType);
-        var entry = passwordBook.AddPasswordEntry(
+        var entry = passwordBook?.AddPasswordEntry(
             input.Title,
             input.HasUsername ?? false,
             input.Username,
@@ -157,9 +157,17 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
             input.Remark
         );
 
-        await Repository.UpdateAsync(passwordBook);
+        if (passwordBook != null)
+        {
+            await Repository.UpdateAsync(passwordBook);
 
-        return ObjectMapper.Map<PasswordEntry, PasswordEntryDto>(entry);
+
+            return ObjectMapper.Map<PasswordEntry, PasswordEntryDto>(entry);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /// <summary>
@@ -176,8 +184,12 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         }
 
         var passwordBook = await _passwordBookManager.GetByIdAsync(passwordBookId);
-        passwordBook.UpdatePasswordValue(entryId, input.NewPassword);
-        await Repository.UpdateAsync(passwordBook);
+        passwordBook?.UpdatePasswordValue(entryId, input.NewPassword);
+        
+        if (passwordBook != null)
+        {
+            await Repository.UpdateAsync(passwordBook);
+        }
     }
 
     /// <summary>
@@ -194,8 +206,12 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         }
 
         var passwordBook = await _passwordBookManager.GetByIdAsync(passwordBookId);
-        passwordBook.RemovePasswordEntry(entryId, queryKind);
-        await Repository.UpdateAsync(passwordBook);
+        passwordBook?.RemovePasswordEntry(entryId, queryKind);
+        
+        if (passwordBook != null)
+        {
+            await Repository.UpdateAsync(passwordBook);
+        }
     }
 
     /// <summary>
@@ -212,8 +228,12 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         }
 
         var passwordBook = await _passwordBookManager.GetByIdAsync(passwordBookId);
-        passwordBook.RestorePasswordEntry(entryId);
-        await Repository.UpdateAsync(passwordBook);
+        passwordBook?.RestorePasswordEntry(entryId);
+        
+        if (passwordBook != null)
+        {
+            await Repository.UpdateAsync(passwordBook);
+        }
     }
 
     /// <summary>
@@ -374,7 +394,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         }
 
         var passwordBook = await _passwordBookManager.GetByIdAsync(id);
-        passwordBook.UpdateInfo(input.Name, input.Description);
+        passwordBook?.UpdateInfo(input.Name, input.Description);
 
         var passwordFormat = new PasswordFormatRequirement(
             input.MinLength,
@@ -386,9 +406,13 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
             input.SpecialChars,
             input.AllowedType
         );
-        passwordBook.UpdatePasswordFormat(passwordFormat);
+        
+        passwordBook?.UpdatePasswordFormat(passwordFormat);
 
-        await Repository.UpdateAsync(passwordBook);
+        if (passwordBook != null)
+        {
+            await Repository.UpdateAsync(passwordBook);
+        }
 
         var dto = ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
         dto.PopulateComplexFields(passwordBook);
@@ -409,7 +433,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         }
 
         var passwordBook = await _passwordBookManager.GetByIdAsync(input.PasswordBookId);
-        var format = passwordBook.GetPasswordFormat();
+        //var format = passwordBook?.GetPasswordFormat();
 
         // Map PasswordCharacterType to RandomCategory
         var category = MapToRandomCategory(input.CharacterTypes);

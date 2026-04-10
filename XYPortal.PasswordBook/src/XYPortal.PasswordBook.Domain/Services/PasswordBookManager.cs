@@ -100,7 +100,7 @@ public class PasswordBookManager : DomainService
     /// <summary>
     /// Get PasswordBook details (with PasswordEntries loaded)
     /// </summary>
-    public async Task<PasswordBookEntity> GetByIdAsync(Guid id)
+    public async Task<PasswordBookEntity?> GetByIdAsync(Guid id)
     {
         var query = await _passwordBookRepository.GetQueryableAsync();
         return await query
