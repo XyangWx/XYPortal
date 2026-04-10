@@ -407,16 +407,16 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         
         passwordBook?.UpdatePasswordFormat(passwordFormat);
 
-        if (passwordBook != null)
+        if (passwordBook == null)
         {
-            await Repository.UpdateAsync(passwordBook);
-
-            var dto = ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
-            dto.PopulateComplexFields(passwordBook);
-            return dto;
+            throw new EntityNotFoundException("PasswordBook not found");
         }
 
-        return null;
+        await Repository.UpdateAsync(passwordBook);
+
+        var dto = ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
+        dto.PopulateComplexFields(passwordBook);
+        return dto;
     }
 
     /// <summary>
