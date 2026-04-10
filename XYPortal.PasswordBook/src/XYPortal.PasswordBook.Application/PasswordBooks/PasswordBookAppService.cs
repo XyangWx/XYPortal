@@ -272,7 +272,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         {
             Id = entry.Id,
             PasswordBookId = passwordBookId,
-            Title = entry.Title,
+            Title = entry.Title ?? string.Empty,
             HasUsername = entry.HasUsername,
             Username = entry.Username,
             PasswordType = entry.PasswordType,
