@@ -162,7 +162,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
             await Repository.UpdateAsync(passwordBook);
 
 
-            return ObjectMapper.Map<PasswordEntry, PasswordEntryDto>(entry);
+            return ObjectMapper.Map<PasswordEntry, PasswordEntryDto>(entry!);
         }
         else
         {
@@ -410,11 +410,13 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         if (passwordBook != null)
         {
             await Repository.UpdateAsync(passwordBook);
+
+            var dto = ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
+            dto.PopulateComplexFields(passwordBook);
+            return dto;
         }
 
-        var dto = ObjectMapper.Map<PasswordBookEntity, PasswordBookDto>(passwordBook);
-        dto.PopulateComplexFields(passwordBook);
-        return dto;
+        return null;
     }
 
     /// <summary>
