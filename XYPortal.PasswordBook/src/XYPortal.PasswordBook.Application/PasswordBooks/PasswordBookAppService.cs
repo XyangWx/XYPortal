@@ -124,7 +124,7 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     /// <summary>
     /// Add PasswordEntry
     /// </summary>
-    public async Task<PasswordEntryDto?> AddPasswordEntryAsync(Guid passwordBookId, CreatePasswordEntryDto input)
+    public async Task<PasswordEntryDto> AddPasswordEntryAsync(Guid passwordBookId, CreatePasswordEntryDto input)
     {
         var create_payload = JsonSerializer.Serialize(
             input,
@@ -157,17 +157,14 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
             input.Remark
         );
 
-        if (passwordBook != null)
+        if (passwordBook == null)
         {
-            await Repository.UpdateAsync(passwordBook);
-
-
-            return ObjectMapper.Map<PasswordEntry, PasswordEntryDto>(entry!);
+            throw new EntityNotFoundException("PasswordBook not found");
         }
-        else
-        {
-            return null;
-        }
+
+        await Repository.UpdateAsync(passwordBook);
+
+        return ObjectMapper.Map<PasswordEntry, PasswordEntryDto>(entry!);
     }
 
     /// <summary>
