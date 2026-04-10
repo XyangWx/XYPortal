@@ -250,19 +250,17 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
         }
 
         var passwordBook = await _passwordBookManager.GetByIdAsync(passwordBookId);
-        PasswordEntry? entry;
-        if (queryKind == 0)
+        if (passwordBook == null)
         {
-            entry = passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId && !e.IsDeleted);
+            throw new EntityNotFoundException("Password book not found");
         }
-        else if (queryKind == 1)
+
+        PasswordEntry? entry = queryKind switch
         {
-            entry = passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId && e.IsDeleted);
-        }
-        else
-        {
-            entry = passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId);
-        }
+            0 => passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId && !e.IsDeleted),
+            1 => passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId && e.IsDeleted),
+            _ => passwordBook.PasswordEntries.FirstOrDefault(e => e.Id == entryId)
+        };
         if (entry == null)
         {
             throw new EntityNotFoundException("Password entry not found");
