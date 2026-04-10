@@ -57,7 +57,7 @@ public class PasswordFormatRequirement
     public (bool IsValid, string? ErrorMessage) Validate(string password)
     {
         _logger?.LogDebug($"Password: {password}");
-        _logger.LogDebug($"[{SpecialChars}] => {Regex.IsMatch(password, $"[{SpecialChars}]")}");
+        _logger?.LogDebug($"[{SpecialChars}] => {Regex.IsMatch(password, $"[{SpecialChars}]")}");
 
         if (AllowedType == PasswordType.NumericOnly)
         {
