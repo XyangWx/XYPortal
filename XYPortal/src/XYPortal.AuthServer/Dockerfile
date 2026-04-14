@@ -1,6 +1,13 @@
 # XYPortal.AuthServer Dockerfile
-# 构建上下文必须为解决方案根目录: XYPortal/
-# 例如: docker build -f src/XYPortal.AuthServer/Dockerfile -t xyportal-authserver:latest .
+#
+# 构建上下文: /data/repositories/xyportal/ （XYPortal 父目录）
+# 构建命令:
+#   docker buildx build -f XYPortal/src/XYPortal.AuthServer/Dockerfile .. -t auth_server:1.0.1
+#
+# 说明:
+# - XYPortal.slnx 位于 XYPortal/ 目录下
+# - XYPortal.LinkBoard、XYPortal.PasswordBook 源码位于 XYPortal/ 同级目录
+# - 因此构建上下文须设为父目录，使所有模块源码均可被 COPY
 
 # ============================================
 # Stage 1: base —运行时基础镜像
@@ -31,42 +38,58 @@ RUN dotnet tool install -g Volo.Abp.Studio.Cli
 ENV PATH="$PATH:/root/.dotnet/tools"
 
 # ============================================================
-# 关键说明：
-# - XYPortal.AuthServer.csproj 引用了 ../../common.props（解决方案根目录）
-# - 它还通过相对路径引用 XYPortal.EntityFrameworkCore 项目
-# - 因此构建上下文必须设为 XYPortal 解决方案根目录，
-#   而非仅复制 AuthServer 子目录
+# 构建上下文为 /data/repositories/xyportal/
+# XYPortal/ 解决方案文件及主项目在 XYPortal/ 子目录下
+# LinkBoard / PasswordBook 等模块源码在 XYPortal/ 同级目录下
+#
+# 重要: XYPortal.Domain.Shared.csproj 中引用路径为 ../../../XYPortal.LinkBoard/src/...
+#       即从 /XYPortal/src/XYPortal.Domain.Shared/ 上跳3层到 /XYPortal/
+#       再进入 XYPortal.LinkBoard/src/，对应容器中 /XYPortal/XYPortal.LinkBoard/src/
 # ============================================================
-WORKDIR /src
 
-# 复制解决方案文件（含 .slnx + common.props）
-COPY XYPortal.slnx ./
-COPY common.props ./
+# 复制 LinkBoard 模块源码（放到 /XYPortal/XYPortal.LinkBoard/src/）
+COPY XYPortal.LinkBoard/src/ /XYPortal/XYPortal.LinkBoard/src/
+COPY XYPortal.LinkBoard/test/ /XYPortal/XYPortal.LinkBoard/test/
 
-# 复制所有源码项目（AuthServer 依赖 EntityFrameworkCore 等）
-COPY src/ ./src/
-COPY test/ ./test/
+# 复制 PasswordBook 模块源码（放到 /XYPortal/XYPortal.PasswordBook/src/）
+COPY XYPortal.PasswordBook/src/ /XYPortal/XYPortal.PasswordBook/src/
+COPY XYPortal.PasswordBook/test/ /XYPortal/XYPortal.PasswordBook/test/
 
-# 还原 NuGet 包
+WORKDIR /XYPortal
+
+# 复制解决方案文件
+COPY XYPortal/XYPortal.slnx ./
+COPY XYPortal/common.props ./
+
+# 复制主项目源码（XYPortal 下的 src 和 test）
+COPY XYPortal/src/  ./src/
+COPY XYPortal/test/ ./test/
+
+# 还原 NuGet 包（还原整个 slnx）
 RUN dotnet restore
 
 # ============================================================
 # 安装前端依赖并运行 abp install-libs
-# abp install-libs 必须从 AuthServer 目录执行，
-# 因为 abp.resourcemapping.js 位于 src/XYPortal.AuthServer/
 # ============================================================
-WORKDIR /src/src/XYPortal.AuthServer
+WORKDIR /XYPortal/src/XYPortal.AuthServer
 RUN yarn install --frozen-lockfile || yarn install
 RUN dotnet run --project . -- abp install-libs || true
 
 # ============================================================
-# 回到解决方案根目录执行发布
+# 回到 XYPortal 根目录执行发布
+# 关键: 先清除 obj 缓存，确保 publish 时 dotnet 重新完整解析
+#       LinkBoard/PasswordBook 的项目引用（而非使用已被缓存的"未找到"结果）
 # ============================================================
-WORKDIR /src
+WORKDIR /XYPortal
+
+# 清除 Domain.Shared 和 Domain 的 restore 缓存，
+# 让 publish 重新完整解析 LinkBoard/PasswordBook 传递依赖
+RUN find src/XYPortal.Domain.Shared/obj -type f -delete 2>/dev/null || true
+RUN find src/XYPortal.Domain/obj -type f -delete 2>/dev/null || true
+
 RUN dotnet publish src/XYPortal.AuthServer/XYPortal.AuthServer.csproj \
         -c Release \
-        -o /app/publish \
-        --no-restore
+        -o /app/publish
 
 # ============================================
 # Stage 3: final —运行时镜像
