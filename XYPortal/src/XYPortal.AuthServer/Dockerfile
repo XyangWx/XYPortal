@@ -133,7 +133,6 @@ WORKDIR /XYPortal/src/XYPortal.AuthServer
 RUN dotnet build XYPortal.AuthServer.csproj -c Release -o /app/build
 
 FROM build AS publish
-COPY . .
 RUN dotnet publish XYPortal.AuthServer.csproj -c Release -o /app/publish
 
 FROM base AS final
