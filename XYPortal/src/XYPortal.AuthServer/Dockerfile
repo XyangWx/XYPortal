@@ -27,24 +27,7 @@ ENV LC_ALL=zh_CN.UTF-8
 
 RUN update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-
-RUN apt-get clean && apt-get update && \
-    apt-get install -y --no-install-recommends \
-        locales \
-        tzdata \
-        curl \
-    && \
-    sed -i '/zh_CN.UTF-8/s/^# //g' /etc/locale.gen || echo 'zh_CN.UTF-8 UTF-8' >> /etc/locale.gen && \
-    locale-gen zh_CN.UTF-8 && \
-    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
-    rm -rf /var/lib/apt/lists/*
-
-ENV LANG=zh_CN.UTF-8
-ENV LANGUAGE=zh_CN:zh
-ENV LC_ALL=zh_CN.UTF-8
-
-RUN update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS restore
 
 # 加载主项目
 COPY ["XYPortal/XYPortal.slnx", "XYPortal/"]
@@ -139,9 +122,18 @@ RUN cd ../XYPortal && \
     echo $PATH && \
     abp install-libs
 
+FROM restore as build
 # 下面两部很关键否则dotnet build时会因为找不到Program.cs而编译失败
 COPY . .
 
 WORKDIR /XYPortal/src/XYPortal.AuthServer
 
-RUN dotnet build XYPortal.AuthServer.csproj -c Release
+RUN dotnet build XYPortal.AuthServer.csproj -c Release -o /app/build
+
+FROM build AS publish
+COPY . .
+RUN dotnet publish XYPortal.AuthServer.csproj -c Release -o /app/publish
+
+FROM base as final
+COPY --from=publish /app/publish .
+ENTRYPOINT [ "dotnet", "XYPortal.AuthServer.dll" ]
