@@ -109,7 +109,10 @@ RUN cd ../XYPortal.PasswordBook && \
     dotnet build -c Release
 
 RUN cd ../XYPortal && \
-    dotnet restore && \
+    dotnet restore
+
+FROM restore as build
+RUN cd /XYPortal && \ && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash && \
     NVM_DIR=$HOME/.nvm && \
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
@@ -121,8 +124,7 @@ RUN cd ../XYPortal && \
     export PATH=$PATH:$HOME/.dotnet/tools && \
     echo $PATH && \
     abp install-libs
-
-FROM restore as build
+    
 # 下面两部很关键否则dotnet build时会因为找不到Program.cs而编译失败
 COPY . .
 
