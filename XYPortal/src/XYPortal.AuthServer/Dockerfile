@@ -135,7 +135,10 @@ RUN cd ../XYPortal && \
     npm install -g npm@latest && \
     npm install -g yarn@latest && \
     dotnet tool install -g Volo.Abp.Studio.Cli && \
-    /root/.dotnet/tools/apb install-libs
+    echo "export PATH=$PATH:$HOME/.dotnet/tools" >> $HOME/.bashrc && \
+    bash -c "\. $HOME/.bashrc" && \
+    echo $PATH && \
+    abp install-libs
 
 # 下面两部很关键否则dotnet build时会因为找不到Program.cs而编译失败
 COPY . .
