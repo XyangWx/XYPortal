@@ -51,5 +51,15 @@ RUN dotnet tool install -g Volo.Abp.Studio.Cli && \
     NVM_DIR=$HOME/.nvm && \
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
     PATH=$PATH:$HOME/.dotnet/tools && \
-    nvm install v25.9.0
+    nvm install v25.9.0 && \
+    nvm use v25.9.0 && \
+    npm install -g npm@latest && \
+    npm install -g yarn@latest
 
+COPY ["XYPortal/XYPortal.slnx", "XYPortal/"]
+COPY ["XYPortal/common.props", "XYPortal/"]
+COPY ["XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj", "XYPortal/src/XYPortal.AuthServer/" ]
+
+WORKDIR XYPortal/src/XYPortal.AuthServer
+
+RUN dotnet restore
