@@ -135,8 +135,7 @@ RUN cd ../XYPortal && \
     npm install -g npm@latest && \
     npm install -g yarn@latest && \
     dotnet tool install -g Volo.Abp.Studio.Cli && \
-    echo "export PATH=$PATH:$HOME/.dotnet/tools" >> $HOME/.bashrc && \
-    bash -c "\. $HOME/.bashrc" && \
+    bash -c "export PATH=$PATH:$HOME/.dotnet/tools" && \
     echo $PATH && \
     abp install-libs
 
