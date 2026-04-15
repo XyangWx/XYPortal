@@ -127,7 +127,6 @@ RUN cd ../XYPortal.PasswordBook && \
 
 RUN cd ../XYPortal && \
     dotnet restore && \
-    dotnet tool install -g Volo.Abp.Studio.Cli && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash && \
     NVM_DIR=$HOME/.nvm && \
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
@@ -135,6 +134,7 @@ RUN cd ../XYPortal && \
     nvm use v25.9.0 && \
     npm install -g npm@latest && \
     npm install -g yarn@latest && \
+    dotnet tool install -g Volo.Abp.Studio.Cli && \
     /root/.dotnet/tools/apb install-libs
 
 # 下面两部很关键否则dotnet build时会因为找不到Program.cs而编译失败
