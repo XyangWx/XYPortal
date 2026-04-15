@@ -112,7 +112,7 @@ RUN cd ../XYPortal && \
     dotnet restore
 
 FROM restore AS build
-RUN cd /XYPortal && \ && \
+RUN cd /XYPortal && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash && \
     NVM_DIR=$HOME/.nvm && \
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
