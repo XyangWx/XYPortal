@@ -112,19 +112,6 @@ RUN cd ../XYPortal && \
     dotnet restore
 
 FROM restore AS build
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash && \
-    NVM_DIR=$HOME/.nvm && \
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
-    nvm install v25.9.0 && \
-    nvm use v25.9.0 && \
-    npm install -g npm@latest && \
-    npm install -g yarn@latest && \
-    cd /XYPortal && \
-    [ -s "XYportal.slnx" ] && echo "Found XYPortal.slnx" && \
-    dotnet tool install -g Volo.Abp.Studio.Cli && \
-    export PATH=$PATH:$HOME/.dotnet/tools && \
-    abp install-libs
-
 # 下面两部很关键否则dotnet build时会因为找不到Program.cs而编译失败
 COPY . .
 
