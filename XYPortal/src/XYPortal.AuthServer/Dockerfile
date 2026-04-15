@@ -111,7 +111,7 @@ RUN cd ../XYPortal.PasswordBook && \
 RUN cd ../XYPortal && \
     dotnet restore
 
-FROM restore as build
+FROM restore AS build
 RUN cd /XYPortal && \ && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash && \
     NVM_DIR=$HOME/.nvm && \
@@ -124,7 +124,7 @@ RUN cd /XYPortal && \ && \
     export PATH=$PATH:$HOME/.dotnet/tools && \
     echo $PATH && \
     abp install-libs
-    
+
 # 下面两部很关键否则dotnet build时会因为找不到Program.cs而编译失败
 COPY . .
 
@@ -136,6 +136,6 @@ FROM build AS publish
 COPY . .
 RUN dotnet publish XYPortal.AuthServer.csproj -c Release -o /app/publish
 
-FROM base as final
+FROM base AS final
 COPY --from=publish /app/publish .
 ENTRYPOINT [ "dotnet", "XYPortal.AuthServer.dll" ]
