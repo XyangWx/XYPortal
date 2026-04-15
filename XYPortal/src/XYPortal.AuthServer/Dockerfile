@@ -48,7 +48,8 @@ RUN update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
 
 RUN dotnet tool install -g Volo.Abp.Studio.Cli && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash && \
-    $HOME/.nvm/nvm.sh && \
+    NVM_DIR=$HOME/.nvm && \
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
     PATH=$PATH:$HOME/.dotnet/tools && \
     nvm install v25.9.0
 
