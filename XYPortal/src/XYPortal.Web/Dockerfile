@@ -15,6 +15,7 @@ RUN apt-get clean && apt-get update && \
     apt-get install -y --no-install-recommends \
         locales \
         tzdata \
+        libgssapi-krb5-2 \
     && \
     sed -i '/zh_CN.UTF-8/s/^# //g' /etc/locale.gen || echo 'zh_CN.UTF-8 UTF-8' >> /etc/locale.gen && \
     locale-gen zh_CN.UTF-8 && \
