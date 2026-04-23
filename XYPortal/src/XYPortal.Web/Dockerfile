@@ -1,15 +1,17 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 ARG ASPENV=Production
 ARG PORT=8080
+ARG SPORT=8082
 ENV ASPNETCORE_ENVIRONMENT=${ASPENV}
 ENV LANG="zh_CN.UTF-8"
 ENV LANGUAGE="zh_CN:zh"
 ENV LC_ALL="zh_CN.UTF-8"
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-ENV ASPNETCORE_URLS=http://+:${PORT}
+ENV ASPNETCORE_URLS=http://+:${PORT};https://+:${SPORT}
 ENV TZ=Asia/Shanghai
 EXPOSE ${PORT}
-VOLUME [ "/app/Log", "/app/Access_Log" ]
+EXPOSE ${SPORT}
+VOLUME [ "/app/Logs", "/app/Log" ]
 WORKDIR /app
 RUN apt-get clean && apt-get update && \
     apt-get install -y --no-install-recommends \
