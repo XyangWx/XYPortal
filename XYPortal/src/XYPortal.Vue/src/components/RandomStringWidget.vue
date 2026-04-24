@@ -154,6 +154,8 @@ const calculateSymbolCategories = (): number => {
   return result;
 };
 
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
 const generate = async () => {
   const symbolCategories = calculateSymbolCategories();
   if (symbolCategories === 0) {
@@ -170,7 +172,7 @@ const generate = async () => {
   loading.value = true;
   try {
     const headers = await getHeaders();
-    const response = await axios.post('/api/app/random-string/make', {
+    const response = await axios.post(`${baseUrl}/api/app/random-string/make`, {
       prefix: prefix.value || null,
       suffix: suffix.value || null,
       length: length.value,
