@@ -22,11 +22,13 @@ public class LinkBoardPermissionDefinitionProvider : PermissionDefinitionProvide
         categoryManager.AddChild(LinkBoardPermissions.LinkCategoryCreate, L("Permission:LinkCategoryCreate"));
         categoryManager.AddChild(LinkBoardPermissions.LinkCategoryModify, L("Permission:LinkCategoryModify"));
         categoryManager.AddChild(LinkBoardPermissions.LinkCategoryDelete, L("Permission:LinkCategoryDelete"));
+        categoryManager.AddChild(LinkBoardPermissions.LinkCategorySubmit, L("Permission:LinkCategorySubmit"));
 
         var linkManager = user.AddChild(LinkBoardPermissions.LinkManager, L("Permission:LinkManager"));
         linkManager.AddChild(LinkBoardPermissions.LinkCreate, L("Permission:LinkCreate"));
         linkManager.AddChild(LinkBoardPermissions.LinkModify, L("Permission:LinkModify"));
         linkManager.AddChild(LinkBoardPermissions.LinkDelete, L("Permission:LinkDelete"));
+        linkManager.AddChild(LinkBoardPermissions.LinkSubmit, L("Permission:LinkSubmit"));
     }
 
     private static LocalizableString L(string name)

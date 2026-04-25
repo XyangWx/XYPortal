@@ -161,6 +161,7 @@ public class LinkCategoryAppService : LinkBoardAppService, ILinkCategoryAppServi
         await _categoryRepository.DeleteAsync(entity);
     }
 
+    [Authorize(LinkBoardPermissions.LinkCategorySubmit)]
     public virtual async Task SubmitAsync(Guid id)
     {
         var entity = await _categoryRepository.GetAsync(id);
