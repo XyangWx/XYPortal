@@ -144,6 +144,7 @@ public class LinkAppService : LinkBoardAppService, ILinkAppService
         await _linkRepository.DeleteAsync(entity);
     }
 
+    [Authorize(LinkBoardPermissions.LinkSubmit)]
     public virtual async Task SubmitAsync(Guid id)
     {
         var entity = await _linkRepository.GetAsync(id);

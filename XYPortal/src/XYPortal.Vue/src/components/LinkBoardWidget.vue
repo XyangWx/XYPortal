@@ -140,8 +140,9 @@ const getHeaders = async () => {
 
 const fetchMaxLinks = async () => {
   try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
     const headers = await getHeaders();
-    const response = await axios.get<number>('/api/app/link/max-links', { headers });
+    const response = await axios.get<number>(`${baseUrl}/api/app/link/max-links`, { headers });
     const value = response.data;
     if (value && value > 0) {
       pageSize.value = value;
@@ -152,9 +153,10 @@ const fetchMaxLinks = async () => {
 };
 
 const fetchCategoryPage = async (categoryId: string, page: number) => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const headers = await getHeaders();
   const skipCount = (page - 1) * pageSize.value;
-  const response = await axios.get<PagedResult>('/api/app/link/public-board', {
+  const response = await axios.get<PagedResult>(`${baseUrl}/api/app/link/public-board`, {
     headers,
     params: {
       categoryId,
@@ -170,11 +172,9 @@ const fetchData = async () => {
   try {
     // First fetch MaxLinks from server
     await fetchMaxLinks();
-
-    const headers = await getHeaders();
-
     // Fetch public categories
-    const categoriesResponse = await axios.get('/api/app/link-category/public-list', { headers });
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const categoriesResponse = await axios.get(`${baseUrl}/api/app/link-category/public-list`, { headers });
     const allCategories: CategoryDto[] = (categoriesResponse.data || [])
       .sort((a: CategoryDto, b: CategoryDto) => a.sortOrder - b.sortOrder);
 
