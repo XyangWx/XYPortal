@@ -133,8 +133,9 @@ const getAccessToken = async () => {
 const fetchData = async () => {
   loading.value = true;
   try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
     const token = await getAccessToken();
-    const response = await axios.get('/api/app/link-review', {
+    const response = await axios.get(`${baseUrl}/api/app/link-review`, {
       params: {
         SkipCount: (pagination.current - 1) * pagination.pageSize,
         MaxResultCount: pagination.pageSize,
@@ -166,8 +167,9 @@ const handleApprove = (record: LinkDto) => {
     cancelText: '取消',
     onOk: async () => {
       try {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL;
         const token = await getAccessToken();
-        await axios.post(`/api/app/link-review/${record.id}/review`, {
+        await axios.post(`${baseUrl}/api/app/link-review/${record.id}/review`, {
           status: 2, // Approved
         }, {
           headers: { Authorization: `Bearer ${token}` },
@@ -199,8 +201,9 @@ const handleConfirmReject = async () => {
   
   modalLoading.value = true;
   try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
     const token = await getAccessToken();
-    await axios.post(`/api/app/link-review/${rejectingItem.value.id}/review`, {
+    await axios.post(`${baseUrl}/api/app/link-review/${rejectingItem.value.id}/review`, {
       status: 3, // Rejected
       reviewComment: rejectComment.value || undefined,
     }, {
