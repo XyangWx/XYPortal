@@ -114,4 +114,5 @@ RUN dotnet publish XYPortal.DbMigrator.csproj -c Release -o /app/publish
 
 FROM base AS final
 COPY --from=publish /app/publish .
-
+COPY ["/XYPortal/src/XYPortal.DbMigrator/execute.sh", "/app/"]
+RUN chmod +x /app/execute.sh
