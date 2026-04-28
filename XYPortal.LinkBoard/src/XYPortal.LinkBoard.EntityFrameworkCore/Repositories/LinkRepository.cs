@@ -63,6 +63,10 @@ public class LinkRepository
         var dbSet = await GetDbSetAsync();
         
 #if DEBUG
+        var objContent = SerializeQuery(categoryId, filter, status, isPublic, currentUserId, isAdmin);
+        
+        _logger.LogDebug($"LinkRepository.GetListAsync => {objContent}");
+        
         var query = ApplyFilter(dbSet, categoryId, filter, status, isPublic, currentUserId, isAdmin, _logger);
 #else
         var query = ApplyFilter(dbSet, categoryId, filter, status, isPublic, currentUserId, isAdmin);
@@ -88,6 +92,10 @@ public class LinkRepository
         var dbSet = await GetDbSetAsync();
         
 #if DEBUG
+        var objContent = SerializeQuery(categoryId, filter, status, isPublic, currentUserId, isAdmin);
+        
+        _logger.LogDebug($"LinkRepository.GetCountAsync => {objContent}");
+        
         var query = ApplyFilter(dbSet, categoryId, filter, status, isPublic, currentUserId, isAdmin, _logger);
 #else
         var query = ApplyFilter(dbSet, categoryId, filter, status, isPublic, currentUserId, isAdmin);
