@@ -11,6 +11,7 @@ using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using XYPortal.LinkBoard.Entities;
 using XYPortal.LinkBoard.EntityFrameworkCore;
+using XYPortal.LinkBoard.LinkCategories;
 using XYPortal.LinkBoard.Repositories;
 
 namespace XYPortal.LinkBoard.EntityFrameworkCore.Repositories;
@@ -115,6 +116,7 @@ public class LinkCategoryRepository
         };
 
         var obj_content = JsonSerializer.Serialize(
+            obj,
             new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -125,7 +127,11 @@ public class LinkCategoryRepository
 #endif
         
         var dbSet = await GetDbSetAsync();
+#if DEBUG
+        var query = ApplyFilter(dbSet, filter, status, isPublic, currentUserId, isAdmin, _logger);
+#else
         var query = ApplyFilter(dbSet, filter, status, isPublic, currentUserId, isAdmin);
+#endif
         return await query.LongCountAsync(cancellationToken);
     }
 
@@ -141,17 +147,27 @@ public class LinkCategoryRepository
         ReviewStatus? status,
         bool? isPublic,
         Guid? currentUserId,
-        bool isAdmin)
+        bool isAdmin,
+#if DEBUG
+        ILogger<LinkCategoryRepository>? logger = null
+#endif
+        )
     {
         IQueryable<LinkCategory> query = dbSet;
 
         if (isAdmin)
         {
+#if DEBUG
+            logger?.LogDebug("ApplyFilter => IsAdmin: {IsAdmin}", isAdmin);
+#endif
             // Admin sees all public records (including drafts of approved items)
             query = query.Where(x => x.IsPublic);
         }
         else if (currentUserId.HasValue)
         {
+#if DEBUG
+            logger?.LogDebug("ApplyFilter => CurrentUserId: {currentUserId}", currentUserId.Value);
+#endif
             // User sees own records + public approved (excluding draft versions)
             query = query.Where(x =>
                 x.CreatorId == currentUserId.Value ||
@@ -160,16 +176,25 @@ public class LinkCategoryRepository
 
         if (status.HasValue)
         {
+#if DEBUG
+            logger?.LogDebug("ApplyFilter => Status: {status}", status.Value);
+#endif
             query = query.Where(x => x.Status == status.Value);
         }
 
         if (isPublic.HasValue)
         {
+#if DEBUG
+            logger?.LogDebug("ApplyFilter => IsPublic: {isPublic}", isPublic.Value);
+#endif
             query = query.Where(x => x.IsPublic == isPublic.Value);
         }
 
         if (!string.IsNullOrWhiteSpace(filter))
         {
+#if DEBUG
+            logger?.LogDebug("ApplyFilter => Filter: {filter}", filter);
+#endif
             query = query.Where(x =>
                 x.Name.Contains(filter) ||
                 (x.DisplayName != null && x.DisplayName.Contains(filter)));
