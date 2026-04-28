@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using XYPortal.LinkBoard.Entities;
@@ -16,9 +18,12 @@ namespace XYPortal.LinkBoard.EntityFrameworkCore.Repositories;
 public class LinkCategoryRepository
     : EfCoreRepository<LinkBoardDbContext, LinkCategory, Guid>, ILinkCategoryRepository
 {
-    public LinkCategoryRepository(IDbContextProvider<LinkBoardDbContext> dbContextProvider)
+    private readonly ILogger<LinkCategoryRepository> _logger;
+    
+    public LinkCategoryRepository(IDbContextProvider<LinkBoardDbContext> dbContextProvider, ILogger<LinkCategoryRepository> logger)
         : base(dbContextProvider)
     {
+        _logger = logger;
     }
 
     public async Task<LinkCategory?> FindByNameAsync(string name, CancellationToken cancellationToken = default)
@@ -60,6 +65,25 @@ public class LinkCategoryRepository
         int maxResultCount,
         CancellationToken cancellationToken = default)
     {
+#if DEBUG
+        var obj = new
+        {
+            ReviewStatus = status,
+            IsPublic = isPublic,
+            CurrentUserId = currentUserId,
+            IsAdmin = isAdmin,
+        };
+
+        var obj_content = JsonSerializer.Serialize(
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IncludeFields = true,
+            });
+        
+        _logger.LogDebug($"GetListAsync.ApplyFilter: {obj_content}");
+#endif
+        
         var dbSet = await GetDbSetAsync();
         var query = ApplyFilter(dbSet, filter, status, isPublic, currentUserId, isAdmin);
 
@@ -78,6 +102,27 @@ public class LinkCategoryRepository
         bool isAdmin,
         CancellationToken cancellationToken = default)
     {
+        
+        
+#if DEBUG
+        var obj = new
+        {
+            ReviewStatus = status,
+            IsPublic = isPublic,
+            CurrentUserId = currentUserId,
+            IsAdmin = isAdmin,
+        };
+
+        var obj_content = JsonSerializer.Serialize(
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IncludeFields = true,
+            });
+        
+        _logger.LogDebug($"GetCountAsync.ApplyFilter: {obj_content}");
+#endif
+        
         var dbSet = await GetDbSetAsync();
         var query = ApplyFilter(dbSet, filter, status, isPublic, currentUserId, isAdmin);
         return await query.LongCountAsync(cancellationToken);
