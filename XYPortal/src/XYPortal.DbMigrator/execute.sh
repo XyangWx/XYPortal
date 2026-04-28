@@ -146,10 +146,9 @@ prompt_openiddict_apps() {
     # 先找到 OpenIddict 开始的行号
     start_line=$(grep -n '"OpenIddict"' "$CONFIG_FILE" | cut -d: -f1)
     if [ -n "$start_line" ]; then
-        # 删除从 OpenIddict 到文件末尾
+        # 确保 ConnectionStrings 末尾有逗号
         prev_line=$((start_line - 1))
-        # 删除之前一行末尾的逗号（如果有）
-        sed -i "${prev_line}s/,$//" "$CONFIG_FILE"
+        sed -i "${prev_line}s/[^,]$/&,/" "$CONFIG_FILE"
         # 删除从 OpenIddict 到文件末尾的行
         sed -i ''"$start_line"',$d' "$CONFIG_FILE"
     fi
