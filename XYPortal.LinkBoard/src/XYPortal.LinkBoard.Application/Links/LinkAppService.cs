@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Features;
@@ -18,13 +20,16 @@ public class LinkAppService : LinkBoardAppService, ILinkAppService
 {
     private readonly ILinkRepository _linkRepository;
     private readonly ILinkCategoryRepository _categoryRepository;
+    private readonly ILogger<LinkAppService> _logger;
 
     public LinkAppService(
         ILinkRepository linkRepository,
-        ILinkCategoryRepository categoryRepository)
+        ILinkCategoryRepository categoryRepository,
+        ILogger<LinkAppService> logger)
     {
         _linkRepository = linkRepository;
         _categoryRepository = categoryRepository;
+        _logger = logger;
     }
 
     public virtual async Task<LinkDto> GetAsync(Guid id)
@@ -36,6 +41,17 @@ public class LinkAppService : LinkBoardAppService, ILinkAppService
 
     public virtual async Task<PagedResultDto<LinkDto>> GetListAsync(GetLinkListInput input)
     {
+#if DEBUG
+        var input_content = JsonSerializer.Serialize(
+            input,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true,
+            });
+        
+        _logger.LogDebug("GetListAsync Input => {0}", input_content);
+#endif
         var isAdmin = await IsAdminAsync();
 
         var totalCount = await _linkRepository.GetCountAsync(
