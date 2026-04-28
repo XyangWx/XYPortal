@@ -40,7 +40,7 @@ public class LinkCategoryAppService : LinkBoardAppService, ILinkCategoryAppServi
             new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                IncludeFields = true,
+                WriteIndented = true
             });
         
         _logger.LogDebug($"Input => {input_string}");

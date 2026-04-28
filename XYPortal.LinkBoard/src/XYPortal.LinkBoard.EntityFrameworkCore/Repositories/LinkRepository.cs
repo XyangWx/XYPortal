@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using XYPortal.LinkBoard.Entities;
@@ -16,9 +18,12 @@ namespace XYPortal.LinkBoard.EntityFrameworkCore.Repositories;
 public class LinkRepository
     : EfCoreRepository<LinkBoardDbContext, Link, Guid>, ILinkRepository
 {
-    public LinkRepository(IDbContextProvider<LinkBoardDbContext> dbContextProvider)
+    private readonly ILogger<LinkRepository> _logger;
+    
+    public LinkRepository(IDbContextProvider<LinkBoardDbContext> dbContextProvider, ILogger<LinkRepository> logger)
         : base(dbContextProvider)
     {
+        _logger = logger;
     }
 
     public async Task<Link?> FindPrivateByUrlAndCreatorAsync(string url, Guid creatorId, CancellationToken cancellationToken = default)
@@ -56,7 +61,12 @@ public class LinkRepository
         CancellationToken cancellationToken = default)
     {
         var dbSet = await GetDbSetAsync();
+        
+#if DEBUG
+        var query = ApplyFilter(dbSet, categoryId, filter, status, isPublic, currentUserId, isAdmin, _logger);
+#else
         var query = ApplyFilter(dbSet, categoryId, filter, status, isPublic, currentUserId, isAdmin);
+#endif
 
         return await query
             .Include(x => x.Category)
@@ -76,7 +86,12 @@ public class LinkRepository
         CancellationToken cancellationToken = default)
     {
         var dbSet = await GetDbSetAsync();
+        
+#if DEBUG
+        var query = ApplyFilter(dbSet, categoryId, filter, status, isPublic, currentUserId, isAdmin, _logger);
+#else
         var query = ApplyFilter(dbSet, categoryId, filter, status, isPublic, currentUserId, isAdmin);
+#endif
         return await query.LongCountAsync(cancellationToken);
     }
 
@@ -147,17 +162,29 @@ public class LinkRepository
         ReviewStatus? status,
         bool? isPublic,
         Guid? currentUserId,
-        bool isAdmin)
+#if DEBUG
+        bool isAdmin,
+        ILogger<LinkRepository>? logger = null
+#else
+        bool isAdmin
+#endif
+        )
     {
         IQueryable<Link> query = dbSet;
 
         if (isAdmin)
         {
+#if DEBUG
+            logger?.LogDebug($"IsAdmin: {isAdmin}");
+#endif
             // Admin sees all public records (including drafts of approved items)
             query = query.Where(x => x.IsPublic);
         }
         else if (currentUserId.HasValue)
         {
+#if DEBUG
+            logger?.LogDebug($"CurrentUserId: {currentUserId.Value}");
+#endif
             // User sees own records + public approved (excluding draft versions)
             query = query.Where(x =>
                 x.CreatorId == currentUserId.Value ||
@@ -166,21 +193,33 @@ public class LinkRepository
 
         if (categoryId.HasValue)
         {
+#if DEBUG
+            logger?.LogDebug($"CategoryId: {categoryId.Value}");
+#endif
             query = query.Where(x => x.CategoryId == categoryId.Value);
         }
 
         if (status.HasValue)
         {
+#if DEBUG
+            logger?.LogDebug($"Status: {status.Value}");
+#endif
             query = query.Where(x => x.Status == status.Value);
         }
 
         if (isPublic.HasValue)
         {
+#if DEBUG
+            logger?.LogDebug($"IsPublic: {isPublic.Value}");
+#endif
             query = query.Where(x => x.IsPublic == isPublic.Value);
         }
 
         if (!string.IsNullOrWhiteSpace(filter))
         {
+#if DEBUG
+            logger?.LogDebug($"Filter: {filter}");
+#endif
             query = query.Where(x =>
                 x.Title.Contains(filter) ||
                 x.Url.Contains(filter));
@@ -188,4 +227,35 @@ public class LinkRepository
 
         return query;
     }
+
+#if DEBUG
+    private static string SerializeQuery(
+        Guid? categoryId,
+        string? filter,
+        ReviewStatus? status,
+        bool? isPublic,
+        Guid? currentUserId,
+        bool isAdmin)
+    {
+        var obj = new
+        {
+            CategoryId = categoryId,
+            Filter = filter,
+            Status = status,
+            IsPublic = isPublic,
+            CurrentUserId = currentUserId,
+            IsAdmin = isAdmin,
+        };
+
+        var objContent = JsonSerializer.Serialize(
+            obj,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true,
+            });
+        
+        return objContent;
+    }
+#endif
 }

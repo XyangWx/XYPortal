@@ -124,9 +124,11 @@ public class LinkCategoryRepository
         ReviewStatus? status,
         bool? isPublic,
         Guid? currentUserId,
-        bool isAdmin,
 #if DEBUG
+        bool isAdmin,
         ILogger<LinkCategoryRepository>? logger = null
+#else
+        bool isAdmin
 #endif
         )
     {
@@ -199,7 +201,7 @@ public class LinkCategoryRepository
             new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                IncludeFields = true,
+                WriteIndented = true
             });
 
         return objContent;
