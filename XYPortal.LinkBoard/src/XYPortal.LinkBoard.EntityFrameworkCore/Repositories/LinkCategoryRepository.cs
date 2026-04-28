@@ -137,8 +137,8 @@ public class LinkCategoryRepository
 #if DEBUG
             logger?.LogDebug("ApplyFilter => IsAdmin: {IsAdmin}", isAdmin);
 #endif
-            // Admin sees all public records (including drafts of approved items)
-            query = query.Where(x => x.IsPublic);
+            // Admin has full access to all categories (public and private)
+            // No IsPublic restriction applied
         }
         else if (currentUserId.HasValue)
         {
