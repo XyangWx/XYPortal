@@ -142,15 +142,15 @@ prompt_openiddict_apps() {
     echo "========================================"
     echo ""
 
-    # 清空现有 OpenIddict 部分
+    # 清空现有 OpenIddict 部分并准备追加
     # 先找到 OpenIddict 开始的行号
     start_line=$(grep -n '"OpenIddict"' "$CONFIG_FILE" | cut -d: -f1)
     if [ -n "$start_line" ]; then
-        # 确保 ConnectionStrings 末尾有逗号
-        prev_line=$((start_line - 1))
-        sed -i "${prev_line}s/[^,]$/&,/" "$CONFIG_FILE"
-        # 删除从 OpenIddict 到文件末尾的行
+        # 删除从 OpenIddict 开始到文件末尾的行
         sed -i ''"$start_line"',$d' "$CONFIG_FILE"
+        # 确保最后一行（ConnectionStrings 闭合行）末尾有逗号
+        last_line=$((start_line - 1))
+        sed -i "${last_line}s/[^,]$/&,/" "$CONFIG_FILE"
     fi
 
     APPS_JSON=""
@@ -218,11 +218,13 @@ prompt_openiddict_apps() {
     done
 
     # 构建完整的 OpenIddict JSON
-    OPENIDDICT_JSON="  \"OpenIddict\": {
+    OPENIDDICT_JSON="
+  \"OpenIddict\": {
     \"Applications\": {
       $APPS_JSON
     }
-  }"
+  }
+}"
 
     # 在文件末尾添加 OpenIddict 配置
     # 先确保最后有换行
