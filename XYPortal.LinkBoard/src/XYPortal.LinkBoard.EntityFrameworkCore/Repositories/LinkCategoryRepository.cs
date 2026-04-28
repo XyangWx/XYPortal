@@ -75,6 +75,7 @@ public class LinkCategoryRepository
         };
 
         var obj_content = JsonSerializer.Serialize(
+            obj,
             new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,

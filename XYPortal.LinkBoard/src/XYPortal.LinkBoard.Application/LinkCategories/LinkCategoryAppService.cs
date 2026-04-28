@@ -34,7 +34,9 @@ public class LinkCategoryAppService : LinkBoardAppService, ILinkCategoryAppServi
 
     public virtual async Task<PagedResultDto<LinkCategoryDto>> GetListAsync(GetLinkCategoryListInput input)
     {
+#if DEBUG
         var input_string = JsonSerializer.Serialize(
+            input,
             new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -42,6 +44,7 @@ public class LinkCategoryAppService : LinkBoardAppService, ILinkCategoryAppServi
             });
         
         _logger.LogDebug($"Input => {input_string}");
+#endif
         
         var isAdmin = await IsAdminAsync();
 
