@@ -67,27 +67,18 @@ public class LinkCategoryRepository
         CancellationToken cancellationToken = default)
     {
 #if DEBUG
-        var obj = new
-        {
-            ReviewStatus = status,
-            IsPublic = isPublic,
-            CurrentUserId = currentUserId,
-            IsAdmin = isAdmin,
-        };
-
-        var obj_content = JsonSerializer.Serialize(
-            obj,
-            new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                IncludeFields = true,
-            });
+        var objContent = SerializeQuery(status, isPublic, currentUserId, isAdmin);
         
-        _logger.LogDebug($"GetListAsync.ApplyFilter: {obj_content}");
+        _logger.LogDebug($"GetListAsync.ApplyFilter: {objContent}");
 #endif
         
         var dbSet = await GetDbSetAsync();
+        
+#if DEBUG
+        var query = ApplyFilter(dbSet, filter, status, isPublic, currentUserId, isAdmin, _logger);
+#else
         var query = ApplyFilter(dbSet, filter, status, isPublic, currentUserId, isAdmin);
+#endif
 
         return await query
             .OrderBy(string.IsNullOrWhiteSpace(sorting) ? nameof(LinkCategory.SortOrder) : sorting)
@@ -107,23 +98,9 @@ public class LinkCategoryRepository
         
         
 #if DEBUG
-        var obj = new
-        {
-            ReviewStatus = status,
-            IsPublic = isPublic,
-            CurrentUserId = currentUserId,
-            IsAdmin = isAdmin,
-        };
-
-        var obj_content = JsonSerializer.Serialize(
-            obj,
-            new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                IncludeFields = true,
-            });
+        var objContent = SerializeQuery(status, isPublic, currentUserId, isAdmin);
         
-        _logger.LogDebug($"GetCountAsync.ApplyFilter: {obj_content}");
+        _logger.LogDebug($"GetCountAsync.ApplyFilter: {objContent}");
 #endif
         
         var dbSet = await GetDbSetAsync();
@@ -202,4 +179,30 @@ public class LinkCategoryRepository
 
         return query;
     }
+
+#if DEBUG
+    private static string SerializeQuery(
+        ReviewStatus? status,
+        bool? isPublic,
+        Guid? currentUserId,
+        bool isAdmin)
+    {var obj = new
+        {
+            ReviewStatus = status,
+            IsPublic = isPublic,
+            CurrentUserId = currentUserId,
+            IsAdmin = isAdmin,
+        };
+
+        var objContent = JsonSerializer.Serialize(
+            obj,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IncludeFields = true,
+            });
+
+        return objContent;
+    }
+#endif
 }
