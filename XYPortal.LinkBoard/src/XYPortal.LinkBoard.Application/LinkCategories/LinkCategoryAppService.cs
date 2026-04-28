@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using XYPortal.LinkBoard.Entities;
@@ -15,10 +17,12 @@ namespace XYPortal.LinkBoard.LinkCategories;
 public class LinkCategoryAppService : LinkBoardAppService, ILinkCategoryAppService
 {
     private readonly ILinkCategoryRepository _categoryRepository;
+    private readonly ILogger<LinkCategoryAppService> _logger;
 
-    public LinkCategoryAppService(ILinkCategoryRepository categoryRepository)
+    public LinkCategoryAppService(ILinkCategoryRepository categoryRepository, ILogger<LinkCategoryAppService> logger)
     {
         _categoryRepository = categoryRepository;
+        _logger = logger;
     }
 
     public virtual async Task<LinkCategoryDto> GetAsync(Guid id)
@@ -30,6 +34,15 @@ public class LinkCategoryAppService : LinkBoardAppService, ILinkCategoryAppServi
 
     public virtual async Task<PagedResultDto<LinkCategoryDto>> GetListAsync(GetLinkCategoryListInput input)
     {
+        var input_string = JsonSerializer.Serialize(
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IncludeFields = true,
+            });
+        
+        _logger.LogDebug($"Input => {input_string}");
+        
         var isAdmin = await IsAdminAsync();
 
         var totalCount = await _categoryRepository.GetCountAsync(
