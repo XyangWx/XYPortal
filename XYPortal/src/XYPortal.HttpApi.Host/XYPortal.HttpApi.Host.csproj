@@ -29,6 +29,7 @@
     <ProjectReference Include="..\XYPortal.Application\XYPortal.Application.csproj" />
     <ProjectReference Include="..\XYPortal.EntityFrameworkCore\XYPortal.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\XYPortal.HttpApi\XYPortal.HttpApi.csproj" />
+    <ProjectReference Include="..\..\..\XYPortal.LinkBoard\src\XYPortal.LinkBoard.HttpApi\XYPortal.LinkBoard.HttpApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>
