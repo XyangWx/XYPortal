@@ -124,6 +124,35 @@ function Test-PortAvailable {
     return $true
 }
 
+# Function to wait for a service to be ready (port is listening)
+function Wait-ForServiceReady {
+    param(
+        [int]$Port,
+        [string]$ServiceName,
+        [int]$TimeoutSeconds = 60
+    )
+    
+    Write-Host "  Waiting for $ServiceName to be ready on port $Port..." -ForegroundColor Cyan
+    
+    $elapsed = 0
+    $checkInterval = 2
+    
+    while ($elapsed -lt $TimeoutSeconds) {
+        Start-Sleep -Seconds $checkInterval
+        $elapsed += $checkInterval
+        
+        if (-not (Test-PortAvailable -Port $Port)) {
+            Write-Host "  [$ServiceName] Ready (port $Port is listening)" -ForegroundColor Green
+            return $true
+        }
+        
+        Write-Host "  [$ServiceName] Still starting... (${elapsed}s/${TimeoutSeconds}s)" -ForegroundColor Gray
+    }
+    
+    Write-Host "  [$ServiceName] WARNING: Timeout waiting for port $Port" -ForegroundColor Yellow
+    return $false
+}
+
 # Function to gracefully stop a process by PID
 function Stop-ProcessGracefully {
     param(
@@ -318,7 +347,7 @@ Write-Host ""
 Write-Host "All dependency projects built successfully." -ForegroundColor Green
 
 # =============================================
-# Phase 2: Run AuthServer, HttpApi.Host, Web.Host
+# Phase 2: Run AuthServer, HttpApi.Host, then Web.Host
 # =============================================
 Write-Host ""
 Write-Host "Phase 2: Starting services..." -ForegroundColor Cyan
@@ -331,34 +360,53 @@ Test-ProjectExists -Path $AuthServerPath -ProjectName "XYPortal.AuthServer"
 Test-ProjectExists -Path $HttpApiHostPath -ProjectName "XYPortal.HttpApi.Host"
 Test-ProjectExists -Path $WebHostPath -ProjectName "XYPortal.Web.Host"
 
-Write-Host ""
-Write-Host "Starting AuthServer, HttpApi.Host, and Web.Host..." -ForegroundColor Green
-Write-Host "Type /q and press Enter to stop all services and exit." -ForegroundColor Yellow
-Write-Host ""
-
 $runningProcesses = @{}
 
 try {
     # Start AuthServer
+    Write-Host ""
     Write-Host "[AuthServer] Starting dotnet run..." -ForegroundColor Yellow
     $authProc = Start-Process -FilePath "dotnet" -ArgumentList "run" -NoNewWindow -PassThru -WorkingDirectory $AuthServerPath
     $runningProcesses["AuthServer"] = $authProc
     Write-Host "[AuthServer] Started (PID: $($authProc.Id))" -ForegroundColor Green
     
+    # Wait for AuthServer to be ready (port 44367)
+    $authReady = Wait-ForServiceReady -Port 44367 -ServiceName "AuthServer" -TimeoutSeconds 60
+    if (-not $authReady) {
+        Write-Host ""
+        Write-Host "ERROR: AuthServer failed to start within timeout" -ForegroundColor Red
+        Stop-AllServices -Processes $runningProcesses
+        exit 1
+    }
+    
     # Start HttpApi.Host
+    Write-Host ""
     Write-Host "[HttpApi.Host] Starting dotnet run..." -ForegroundColor Yellow
     $httpApiProc = Start-Process -FilePath "dotnet" -ArgumentList "run" -NoNewWindow -PassThru -WorkingDirectory $HttpApiHostPath
     $runningProcesses["HttpApi.Host"] = $httpApiProc
     Write-Host "[HttpApi.Host] Started (PID: $($httpApiProc.Id))" -ForegroundColor Green
     
-    # Start Web.Host
+    # Wait for HttpApi.Host to be ready (port 44373)
+    $httpApiReady = Wait-ForServiceReady -Port 44373 -ServiceName "HttpApi.Host" -TimeoutSeconds 60
+    if (-not $httpApiReady) {
+        Write-Host ""
+        Write-Host "ERROR: HttpApi.Host failed to start within timeout" -ForegroundColor Red
+        Stop-AllServices -Processes $runningProcesses
+        exit 1
+    }
+    
+    # Only after both AuthServer and HttpApi.Host are ready, start Web.Host
+    Write-Host ""
     Write-Host "[Web.Host] Starting dotnet run..." -ForegroundColor Yellow
     $webHostProc = Start-Process -FilePath "dotnet" -ArgumentList "run" -NoNewWindow -PassThru -WorkingDirectory $WebHostPath
     $runningProcesses["Web.Host"] = $webHostProc
     Write-Host "[Web.Host] Started (PID: $($webHostProc.Id))" -ForegroundColor Green
     
     Write-Host ""
+    Write-Host "========================================" -ForegroundColor Green
     Write-Host "All three services are running." -ForegroundColor Green
+    Write-Host "========================================" -ForegroundColor Green
+    Write-Host "Type /q and press Enter to stop all services and exit." -ForegroundColor Yellow
     Write-Host ""
 }
 catch {

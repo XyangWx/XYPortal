@@ -174,6 +174,7 @@ const fetchData = async () => {
     await fetchMaxLinks();
     // Fetch public categories
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const headers = await getHeaders();
     const categoriesResponse = await axios.get(`${baseUrl}/api/app/link-category/public-list`, { headers });
     const allCategories: CategoryDto[] = (categoriesResponse.data || [])
       .sort((a: CategoryDto, b: CategoryDto) => a.sortOrder - b.sortOrder);
