@@ -152,41 +152,21 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        console.log('[LinkBoard] DOMContentLoaded 初始化开始');
         var widget = document.getElementById('linkBoardWidget');
-        console.log('[LinkBoard] widget 元素:', widget);
-        if (!widget) {
-            console.log('[LinkBoard] widget 未找到，初始化中止');
-            return;
-        }
+        if (!widget) return;
 
         var pageSize = parseInt(widget.dataset.pageSize) || 15;
-        console.log('[LinkBoard] pageSize:', pageSize);
 
-        // Listen for pagination button clicks
         widget.addEventListener('click', function (e) {
-            console.log('[LinkBoard] [分页] click 事件触发');
-            console.log('[LinkBoard] [分页] e.target:', e.target);
-            // 忽略 Tab 切换按钮的点击，避免干扰
-            if (e.target.closest('[data-bs-toggle="tab"]')) {
-                console.log('[LinkBoard] [分页] e.target 是 Tab 切换按钮，忽略此次点击');
-                return;
-            }
+            if (e.target.closest('[data-bs-toggle="tab"]')) return;
+
             var btn = e.target.closest('.lb-pagination button');
-            console.log('[LinkBoard] [分页] btn (最近的的分页按钮):', btn);
-            if (!btn || btn.disabled) {
-                console.log('[LinkBoard] [分页] btn 不存在或已禁用，中止');
-                return;
-            }
+            if (!btn || btn.disabled) return;
 
             var pane = btn.closest('.tab-pane');
-            console.log('[LinkBoard] [分页] pane (最近的tab-pane):', pane);
             var categoryId = pane.dataset.categoryId;
-            console.log('[LinkBoard] [分页] categoryId:', categoryId);
             var currentPage = parseInt(pane.dataset.currentPage);
-            console.log('[LinkBoard] [分页] currentPage:', currentPage);
             var totalPages = parseInt(pane.dataset.totalPages);
-            console.log('[LinkBoard] [分页] totalPages:', totalPages);
             var newPage = currentPage;
 
             if (btn.classList.contains('lb-page-first')) newPage = 1;
@@ -194,59 +174,31 @@
             else if (btn.classList.contains('lb-page-next')) newPage = Math.min(totalPages, currentPage + 1);
             else if (btn.classList.contains('lb-page-last')) newPage = totalPages;
 
-            console.log('[LinkBoard] [分页] newPage:', newPage, '(原 currentPage:', currentPage + ')');
             if (newPage !== currentPage) {
-                console.log('[LinkBoard] [分页] 调用 loadPage');
                 loadPage(pane, categoryId, newPage, pageSize);
-            } else {
-                console.log('[LinkBoard] [分页] newPage === currentPage，不调用 loadPage');
             }
         });
 
-        // Listen for tab switching events (native click, works with Bootstrap 5 native events)
         var tabNav = document.getElementById('linkBoardTabs');
-        console.log('[LinkBoard] [Tab] tabNav (nav 元素):', tabNav);
         if (tabNav) {
-            console.log('[LinkBoard] [Tab] 开始注册 Tab 按钮原生 click 监听器');
             tabNav.addEventListener('click', function (e) {
                 var tabBtn = e.target.closest('button[data-bs-toggle="tab"]');
-                if (!tabBtn) {
-                    console.log('[LinkBoard] [Tab] click 目标不是 Tab 按钮，忽略');
-                    return;
-                }
-                console.log('[LinkBoard] [Tab] Tab 按钮被点击:', tabBtn);
-                console.log('[LinkBoard] [Tab] tabBtn.dataset:', tabBtn.dataset);
+                if (!tabBtn) return;
 
-                // 从被点击按钮的 data-bs-target 拿到 pane ID（格式如 "lb-pane-xxx"，无 #）
                 var paneId = tabBtn.dataset.bsTarget;
-                console.log('[LinkBoard] [Tab] paneId (来自 button data-bs-target):', paneId);
-
-                // 拼接成 CSS 选择器（需要加 #）
                 var targetPane = paneId ? document.querySelector('#' + paneId) : null;
-                console.log('[LinkBoard] [Tab] targetPane:', targetPane);
+                if (!targetPane) return;
 
-                if (!targetPane) {
-                    console.log('[LinkBoard] [Tab] targetPane 未找到，中止');
-                    return;
-                }
-
-                // Bootstrap 切换是异步的，等 DOM 更新完成再加载数据
                 var tryLoad = function () {
                     var $activePane = $('#' + paneId);
-                    console.log('[LinkBoard] [Tab] $activePane (jQuery):', $activePane);
                     if ($activePane.length === 0) {
-                        console.log('[LinkBoard] [Tab] $activePane 未找到，重试');
                         setTimeout(tryLoad, 50);
                         return;
                     }
                     var categoryId = $activePane.data('categoryId');
-                    console.log('[LinkBoard] [Tab] categoryId:', categoryId);
                     var currentPage = parseInt($activePane.data('currentPage')) || 1;
-                    console.log('[LinkBoard] [Tab] currentPage:', currentPage);
-                    console.log('[LinkBoard] [Tab] 调用 loadPage');
                     loadPage(targetPane, categoryId, currentPage, pageSize);
 
-                    // 手动切换 Bootstrap active class（ABP 环境中 Bootstrap 事件可能不完整）
                     tabNav.querySelectorAll('.nav-link').forEach(function (btn) {
                         btn.classList.remove('active');
                         btn.removeAttribute('aria-selected');
@@ -265,41 +217,22 @@
                 };
                 setTimeout(tryLoad, 50);
             });
-        } else {
-            console.log('[LinkBoard] [Tab] tabNav 未找到，Tab切换监听未注册');
         }
 
         function loadPage(pane, categoryId, page, size) {
-            console.log('[LinkBoard] [loadPage] 调用开始');
-            console.log('[LinkBoard] [loadPage] pane:', pane);
-            console.log('[LinkBoard] [loadPage] categoryId:', categoryId);
-            console.log('[LinkBoard] [loadPage] page:', page, ', size:', size);
-
             var skipCount = (page - 1) * size;
             var url = '/api/app/link/public-board?categoryId=' + categoryId + '&skipCount=' + skipCount + '&maxResultCount=' + size;
-            console.log('[LinkBoard] [loadPage] 请求 URL:', url);
 
             var container = pane.querySelector('.lb-links-container');
-            console.log('[LinkBoard] [loadPage] container:', container);
-            if (!container) {
-                console.log('[LinkBoard] [loadPage] container 未找到，中止');
-                return;
-            }
+            if (!container) return;
             container.style.opacity = '0.5';
 
-            console.log('[LinkBoard] [loadPage] 发起 fetch 请求...');
             fetch(url, { credentials: 'include' })
-                .then(function (res) {
-                    console.log('[LinkBoard] [loadPage] fetch 收到响应，status:', res.status);
-                    return res.json();
-                })
+                .then(function (res) { return res.json(); })
                 .then(function (data) {
-                    console.log('[LinkBoard] [loadPage] 解析 JSON 成功，data:', data);
                     var items = data.items || [];
-                    console.log('[LinkBoard] [loadPage] items 数量:', items.length);
                     var html = '';
-                    items.forEach(function (link, index) {
-                        console.log('[LinkBoard] [loadPage] 链接实例[' + index + ']:', link);
+                    items.forEach(function (link) {
                         var icon = link.icon
                             ? '<i class="' + escapeHtml(link.icon) + ' me-3 text-primary"></i>'
                             : '<i class="fas fa-external-link-alt me-3 text-primary"></i>';
@@ -314,11 +247,7 @@
                             + desc
                             + '</div></div></a>';
                     });
-                    console.log('[LinkBoard] [loadPage] 构建的 HTML:', html);
-                    console.log('[LinkBoard] [loadPage] 更新 container.innerHTML');
                     container.innerHTML = html;
-                    console.log('[LinkBoard] [loadPage] 设置后 container.innerHTML:', container.innerHTML);
-                    console.log('[LinkBoard] [loadPage] 设置后 container.children.length:', container.children.length);
                     container.style.opacity = '1';
 
                     var totalPages = parseInt(pane.dataset.totalPages);
@@ -336,10 +265,8 @@
                     if (prevBtn) prevBtn.disabled = (page <= 1);
                     if (nextBtn) nextBtn.disabled = (page >= totalPages);
                     if (lastBtn) lastBtn.disabled = (page >= totalPages);
-                    console.log('[LinkBoard] [loadPage] 完成');
                 })
-                .catch(function (err) {
-                    console.error('[LinkBoard] [loadPage] fetch 错误:', err);
+                .catch(function () {
                     container.style.opacity = '1';
                 });
         }
