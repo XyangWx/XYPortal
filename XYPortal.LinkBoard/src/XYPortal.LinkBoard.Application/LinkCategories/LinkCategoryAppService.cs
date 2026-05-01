@@ -79,6 +79,26 @@ public class LinkCategoryAppService : LinkBoardAppService, ILinkCategoryAppServi
         return items.Select(MapToDto).ToList();
     }
 
+    [AllowAnonymous]
+    public virtual async Task<List<LinkCategoryDto>> GetPrivateListAsync()
+    {
+        // 获取当前用户的私有分类（IsPublic = false）
+        var items = await _categoryRepository.GetListAsync(
+            filter: null,
+            status: null,  // 包含所有状态：草稿、待审核、已拒绝等
+            isPublic: false,  // 只取私有分类
+            currentUserId: CurrentUser.Id,
+            isAdmin: false,
+            sorting: nameof(LinkCategory.SortOrder),
+            skipCount: 0,
+            maxResultCount: 100);
+
+        return items
+            .Where(c => c.CreatorId == CurrentUser.Id)
+            .Select(MapToDto)
+            .ToList();
+    }
+
     [Authorize(LinkBoardPermissions.LinkCategoryCreate)]
     public virtual async Task<LinkCategoryDto> CreateAsync(CreateLinkCategoryDto input)
     {

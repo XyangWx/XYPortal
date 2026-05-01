@@ -38,6 +38,12 @@ public class LinkCategoryController : LinkBoardController, ILinkCategoryAppServi
         return _categoryAppService.GetPublicListAsync();
     }
 
+    [HttpGet("private-list")]
+    public virtual Task<List<LinkCategoryDto>> GetPrivateListAsync()
+    {
+        return _categoryAppService.GetPrivateListAsync();
+    }
+
     [HttpPost]
     public virtual Task<LinkCategoryDto> CreateAsync([FromBody] CreateLinkCategoryDto input)
     {

@@ -158,6 +158,8 @@
         var pageSize = parseInt(widget.dataset.pageSize) || 15;
 
         widget.addEventListener('click', function (e) {
+            if (e.target.closest('[data-bs-toggle="tab"]')) return;
+
             var btn = e.target.closest('.lb-pagination button');
             if (!btn || btn.disabled) return;
 
@@ -177,11 +179,52 @@
             }
         });
 
+        var tabNav = document.getElementById('linkBoardTabs');
+        if (tabNav) {
+            tabNav.addEventListener('click', function (e) {
+                var tabBtn = e.target.closest('button[data-bs-toggle="tab"]');
+                if (!tabBtn) return;
+
+                var paneId = tabBtn.dataset.bsTarget;
+                var targetPane = paneId ? document.querySelector('#' + paneId) : null;
+                if (!targetPane) return;
+
+                var tryLoad = function () {
+                    var $activePane = $('#' + paneId);
+                    if ($activePane.length === 0) {
+                        setTimeout(tryLoad, 50);
+                        return;
+                    }
+                    var categoryId = $activePane.data('categoryId');
+                    var currentPage = parseInt($activePane.data('currentPage')) || 1;
+                    loadPage(targetPane, categoryId, currentPage, pageSize);
+
+                    tabNav.querySelectorAll('.nav-link').forEach(function (btn) {
+                        btn.classList.remove('active');
+                        btn.removeAttribute('aria-selected');
+                        btn.setAttribute('aria-selected', 'false');
+                    });
+                    tabBtn.classList.add('active');
+                    tabBtn.setAttribute('aria-selected', 'true');
+
+                    var tabContent = document.getElementById('linkBoardTabContent');
+                    if (tabContent) {
+                        tabContent.querySelectorAll('.tab-pane').forEach(function (p) {
+                            p.classList.remove('show', 'active');
+                        });
+                        targetPane.classList.add('show', 'active');
+                    }
+                };
+                setTimeout(tryLoad, 50);
+            });
+        }
+
         function loadPage(pane, categoryId, page, size) {
             var skipCount = (page - 1) * size;
             var url = '/api/app/link/public-board?categoryId=' + categoryId + '&skipCount=' + skipCount + '&maxResultCount=' + size;
 
             var container = pane.querySelector('.lb-links-container');
+            if (!container) return;
             container.style.opacity = '0.5';
 
             fetch(url, { credentials: 'include' })
