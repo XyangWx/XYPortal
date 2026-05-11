@@ -6,7 +6,7 @@
       </template>
       <a-spin :spinning="loading">
         <div class="mb-3">
-          <a-label>生成结果</a-label>
+          <label class="ant-form-item-label">生成结果</label>
           <a-input-group compact>
             <a-input
               v-model:value="generatedString"
@@ -50,7 +50,7 @@
         
         <a-form-item label="忽略字符">
           <a-input v-model:value="ignoreChars" placeholder="a,b,c (用逗号分隔)" />
-          <a-text type="secondary" style="font-size: 12px">多个字符用逗号分隔</a-text>
+          <span style="font-size: 12px; color: rgba(0, 0, 0, 0.45);">多个字符用逗号分隔</span>
         </a-form-item>
         
         <a-form-item label="字符类型">

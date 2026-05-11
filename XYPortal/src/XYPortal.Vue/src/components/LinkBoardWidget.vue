@@ -170,17 +170,25 @@ const fetchCategoryPage = async (categoryId: string, page: number) => {
 const fetchData = async () => {
   loading.value = true;
   try {
-    // First fetch MaxLinks from server
     await fetchMaxLinks();
-    // Fetch public categories
+
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    const categoriesResponse = await axios.get(`${baseUrl}/api/app/link-category/public-list`, { headers });
-    const allCategories: CategoryDto[] = (categoriesResponse.data || [])
+    const headers = await getHeaders();
+
+    // Fetch both public and private categories in parallel
+    const [publicRes, privateRes] = await Promise.all([
+      axios.get(`${baseUrl}/api/app/link-category/public-list`, { headers }),
+      axios.get(`${baseUrl}/api/app/link-category/private-list`, { headers })
+    ]);
+
+    const publicCategories: CategoryDto[] = (publicRes.data || [])
+      .sort((a: CategoryDto, b: CategoryDto) => a.sortOrder - b.sortOrder);
+    const privateCategories: CategoryDto[] = (privateRes.data || [])
       .sort((a: CategoryDto, b: CategoryDto) => a.sortOrder - b.sortOrder);
 
     // Fetch first page for each category to determine which have links
     const validCategories: CategoryDto[] = [];
-    for (const cat of allCategories) {
+    for (const cat of [...publicCategories, ...privateCategories]) {
       const result = await fetchCategoryPage(cat.id, 1);
       if (result.totalCount > 0) {
         validCategories.push(cat);
