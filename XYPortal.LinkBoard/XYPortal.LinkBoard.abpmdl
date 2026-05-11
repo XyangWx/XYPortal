@@ -1,0 +1,58 @@
+{
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "XYPortal.LinkBoard.Domain": {
+      "path": "src/XYPortal.LinkBoard.Domain/XYPortal.LinkBoard.Domain.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.LinkBoard.Application.Contracts": {
+      "path": "src/XYPortal.LinkBoard.Application.Contracts/XYPortal.LinkBoard.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.LinkBoard.Application": {
+      "path": "src/XYPortal.LinkBoard.Application/XYPortal.LinkBoard.Application.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.LinkBoard.EntityFrameworkCore": {
+      "path": "src/XYPortal.LinkBoard.EntityFrameworkCore/XYPortal.LinkBoard.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.LinkBoard.HttpApi": {
+      "path": "src/XYPortal.LinkBoard.HttpApi/XYPortal.LinkBoard.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.LinkBoard.HttpApi.Client": {
+      "path": "src/XYPortal.LinkBoard.HttpApi.Client/XYPortal.LinkBoard.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.LinkBoard.TestBase": {
+      "path": "test/XYPortal.LinkBoard.TestBase/XYPortal.LinkBoard.TestBase.abppkg",
+      "folder": "test"
+    },
+    "XYPortal.LinkBoard.EntityFrameworkCore.Tests": {
+      "path": "test/XYPortal.LinkBoard.EntityFrameworkCore.Tests/XYPortal.LinkBoard.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "XYPortal.LinkBoard.Domain.Tests": {
+      "path": "test/XYPortal.LinkBoard.Domain.Tests/XYPortal.LinkBoard.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "XYPortal.LinkBoard.Application.Tests": {
+      "path": "test/XYPortal.LinkBoard.Application.Tests/XYPortal.LinkBoard.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "XYPortal.LinkBoard.Domain.Shared": {
+      "path": "src/XYPortal.LinkBoard.Domain.Shared/XYPortal.LinkBoard.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.LinkBoard.Installer": {
+       "path": "src/XYPortal.LinkBoard.Installer/XYPortal.LinkBoard.Installer.abppkg",
+       "folder": "src"
+    }
+  }
+}

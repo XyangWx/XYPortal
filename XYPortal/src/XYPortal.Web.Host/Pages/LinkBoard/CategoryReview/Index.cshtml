@@ -1,0 +1,24 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using XYPortal.Localization
+@model XYPortal.Web.Pages.LinkBoard.CategoryReview.IndexModel
+@inject IAuthorizationService AuthorizationService
+@inject IHtmlLocalizer<XYPortalResource> L
+@* ReSharper disable once Razor.SectionNotResolved *@
+@section styles {
+    <abp-style src="/Pages/LinkBoard/CategoryReview/index.css" />
+}
+@* ReSharper disable once Razor.SectionNotResolved *@
+@section scripts {
+    <abp-script src="/Pages/LinkBoard/CategoryReview/index.js" />
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">@L["Menu:LinkBoardAdmin:CategoryReview"]</h5>
+    </div>
+    <div class="card-body">
+        <table id="CategoryReviewTable" class="table table-striped"></table>
+    </div>
+</div>

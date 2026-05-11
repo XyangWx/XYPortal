@@ -1,0 +1,271 @@
+@page
+@using Microsoft.Extensions.Localization
+@using XYPortal.PasswordBook.Localization
+@using XYPortal.PasswordBook.Web.Pages.PasswordBook
+@using XYPortal.PasswordBook.Enums
+@model XYPortal.PasswordBook.Web.Pages.PasswordBook.IndexModel
+@inject IStringLocalizer<PasswordBookResource> L
+
+@section scripts {
+    <script>
+        // Localized strings for JavaScript
+        window.passwordBookLocales = {
+            Delete: '@L["Delete"]',
+            Restore: '@L["Restore"]',
+            Active: '@L["Active"]',
+            Copy: '@L["CopyPassword"]',
+            Voided: '@L["Voided"]',
+            ShowPassword: '@L["ShowPassword"]',
+            VeryWeak: '@L["VeryWeak"]',
+            Weak: '@L["Weak"]',
+            Medium: '@L["Medium"]',
+            Strong: '@L["Strong"]',
+            VeryStrong: '@L["VeryStrong"]'
+        };
+    </script>
+    <script src="/Pages/PasswordBook/index.js"></script>
+}
+
+<abp-card>
+    <abp-card-header>
+        <abp-row>
+            <abp-column size-md="_6">
+                <h2>@L["PasswordBook"]</h2>
+            </abp-column>
+            <abp-column size-md="_6" class="text-end">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateModal">
+                    <i class="fa fa-plus"></i> @L["Create"]
+                </button>
+            </abp-column>
+        </abp-row>
+    </abp-card-header>
+    <abp-card-body>
+        <abp-table striped-rows="true" id="PasswordBookTable">
+            <thead>
+                <tr>
+                    <th>@L["Name"]</th>
+                    <th>@L["Description"]</th>
+                    <th>@L["AllowedType"]</th>
+                    <th>@L["CreationTime"]</th>
+                    <th>@L["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model.PasswordBooks)
+                {
+                    <tr data-id="@book.Id">
+                        <td>@book.Name</td>
+                        <td>@book.Description</td>
+                        <td>@book.AllowedType</td>
+                        <td>@book.CreationTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>
+                            <abp-button button-type="Primary" size="Small" text="@L["View"]" onclick="viewPasswordBook('@book.Id')" />
+                            <abp-button button-type="Danger" size="Small" text="@L["Delete"]" onclick="deletePasswordBook('@book.Id')" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </abp-table>
+    </abp-card-body>
+</abp-card>
+
+@* View Modal *@
+<abp-modal id="ViewModal" size="ExtraLarge">
+    <abp-modal-header title="@L["PasswordBookDetails"].Value"></abp-modal-header>
+    <abp-modal-body>
+        <div id="ViewModalContent">
+            <dl class="row">
+                <dt class="col-sm-3">@L["Name"]:</dt>
+                <dd class="col-sm-9" id="view-book-name"></dd>
+                <dt class="col-sm-3">@L["Description"]:</dt>
+                <dd class="col-sm-9" id="view-book-description"></dd>
+                <dt class="col-sm-3">@L["AllowedType"]:</dt>
+                <dd class="col-sm-9" id="view-book-allowedtype"></dd>
+                <dt class="col-sm-3">@L["CreationTime"]:</dt>
+                <dd class="col-sm-9" id="view-book-creationtime"></dd>
+                <dt class="col-sm-3">@L["PasswordBookId"]:</dt>
+                <dd class="col-sm-9" id="view-book-id"></dd>
+            </dl>
+            <h5>@L["PasswordEntries"] 
+                <button type="button" class="btn btn-primary btn-sm" onclick="showCreateEntryModal()">
+                    <i class="fa fa-plus"></i> @L["AddEntry"]
+                </button>
+            </h5>
+            <abp-table striped-rows="true" id="PasswordEntriesTable">
+                <thead>
+                    <tr>
+                        <th>@L["Title"]</th>
+                        <th>@L["Username"]</th>
+                        <th>@L["PasswordType"]</th>
+                        <th>@L["WeakLevel"]</th>
+                        <th>@L["IsDeleted"]</th>
+                        <th>@L["Actions"]</th>
+                    </tr>
+                </thead>
+                <tbody id="PasswordEntriesTableBody">
+                </tbody>
+            </abp-table>
+        </div>
+    </abp-modal-body>
+    <abp-modal-footer>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@L["Close"]</button>
+    </abp-modal-footer>
+</abp-modal>
+
+@* Create Entry Modal *@
+<abp-modal id="CreateEntryModal">
+    <abp-modal-header title="@L["CreatePasswordEntry"].Value"></abp-modal-header>
+    <abp-modal-body>
+        <form id="CreateEntryForm">
+            <input type="hidden" id="entry-passwordbook-id" />
+            <div class="mb-3">
+                <label class="form-label">@L["Title"] *</label>
+                <input type="text" class="form-control" id="entry-title" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["Password"] *</label>
+                <div class="input-group password-input-group">
+                    <input type="password" class="form-control" id="entry-password" required
+                           onmouseenter="showPasswordTooltip()" onmouseleave="hidePasswordTooltip()" />
+                    <button type="button" class="btn btn-outline-secondary" id="btn-generate-password" onclick="generateRandomPasswordFromWeakLevel()">@L["GeneratePassword"]</button>
+                    <div class="password-tooltip" id="password-tooltip"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4">
+                    <label class="form-label">@L["MinLength"]</label>
+                    <input type="number" class="form-control" id="entry-minlength" value="8" min="4" max="50" />
+                </div>
+                <div class="col-4">
+                    <label class="form-label">@L["MaxLength"]</label>
+                    <input type="number" class="form-control" id="entry-maxlength" value="20" min="8" max="100" />
+                </div>
+                <div class="col-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="entry-auto-fill" checked />
+                        <label class="form-check-label" for="entry-auto-fill">@L["AutoFill"]</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["HasUsername"]</label>
+                <select class="form-select" id="entry-hasusername">
+                    <option value="false">@L["No"]</option>
+                    <option value="true">@L["Yes"]</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["Username"]</label>
+                <input type="text" class="form-control" id="entry-username" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["PasswordType"]</label>
+                <select class="form-select" id="entry-passwordtype">
+                    <option value="@( (int)PasswordType.General )">@L["General"]</option>
+                    <option value="@( (int)PasswordType.NumericOnly )">@L["NumericOnly"]</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["WeakLevel"]</label>
+                <select class="form-select" id="entry-weaklevel">
+                    <option value="">@L["SelectWeakLevel"]</option>
+                    <option value="@( (int)PasswordWeakLevel.VeryWeak )">@L["VeryWeak"]</option>
+                    <option value="@( (int)PasswordWeakLevel.Strong )">@L["Strong"]</option>
+                    <option value="@( (int)PasswordWeakLevel.Medium )">@L["Medium"]</option>
+                    <option value="@( (int)PasswordWeakLevel.Weak )">@L["Weak"]</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["Remark"]</label>
+                <textarea class="form-control" id="entry-remark" rows="2"></textarea>
+            </div>
+        </form>
+    </abp-modal-body>
+    <abp-modal-footer>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@L["Cancel"]</button>
+        <button type="button" class="btn btn-primary" onclick="createPasswordEntry()">@L["Save"]</button>
+    </abp-modal-footer>
+</abp-modal>
+
+@* Show Password Modal (Non-dismissible) *@
+<abp-modal id="ShowPasswordModal" data-bs-backdrop="static" data-bs-keyboard="false">
+    <abp-modal-header title="@L["ShowPassword"].Value"></abp-modal-header>
+    <abp-modal-body>
+        <dl class="row">
+            <dt class="col-sm-3">@L["Title"]:</dt>
+            <dd class="col-sm-9" id="sp-title"></dd>
+            <dt class="col-sm-3">@L["Username"]:</dt>
+            <dd class="col-sm-9" id="sp-username"></dd>
+            <dt class="col-sm-3">@L["Password"]:</dt>
+            <dd class="col-sm-9">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="sp-password" readonly style="user-select: all;" />
+                    <button class="btn btn-outline-secondary" type="button" onclick="copySpPassword()">
+                        <i class="fa fa-copy"></i>
+                    </button>
+                </div>
+            </dd>
+            <dt class="col-sm-3">@L["Remark"]:</dt>
+            <dd class="col-sm-9" id="sp-remark"></dd>
+            <dt class="col-sm-3">@L["WeakLevel"]:</dt>
+            <dd class="col-sm-9" id="sp-weaklevel"></dd>
+        </dl>
+    </abp-modal-body>
+    <abp-modal-footer>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@L["Close"]</button>
+    </abp-modal-footer>
+</abp-modal>
+
+@* Create Modal *@
+<abp-modal id="CreateModal">
+    <abp-modal-header title="@L["CreatePasswordBook"].Value"></abp-modal-header>
+    <abp-modal-body>
+        <form id="CreateForm" method="post" asp-page-handler="Create">
+            <abp-input asp-for="CreateInput.Name" label="@L["Name"]" required />
+            <abp-input asp-for="CreateInput.Description" label="@L["Description"]" />
+            <abp-select asp-for="CreateInput.AllowedType" label="@L["AllowedType"]">
+                <option value="@( (int)PasswordType.NumericOnly )">@L["NumericOnly"]</option>
+                <option value="@( (int)PasswordType.General )">@L["General"]</option>
+            </abp-select>
+            <abp-input asp-for="CreateInput.MinLength" label="@L["MinLength"]" value="8" />
+            <abp-input asp-for="CreateInput.MaxLength" label="@L["MaxLength"]" value="20" />
+        </form>
+    </abp-modal-body>
+    <abp-modal-footer>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@L["Cancel"]</button>
+        <button type="button" class="btn btn-primary" onclick="createPasswordBook()">@L["Save"]</button>
+    </abp-modal-footer>
+</abp-modal>
+
+<style>
+    .password-input-group {
+        position: relative;
+    }
+
+    .password-tooltip {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        background-color: #333;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        max-width: 300px;
+        word-wrap: break-word;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        margin-top: 4px;
+    }
+
+    .password-tooltip::before {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 10px;
+        border-width: 0 6px 6px 6px;
+        border-style: solid;
+        border-color: transparent transparent #333 transparent;
+    }
+</style>

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>XYPortal.LinkBoard</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\XYPortal.LinkBoard.Domain\XYPortal.LinkBoard.Domain.csproj" />
+    <ProjectReference Include="..\XYPortal.LinkBoard.TestBase\XYPortal.LinkBoard.TestBase.csproj" />
+  </ItemGroup>
+
+
+</Project>

@@ -1,45 +1,48 @@
 using System;
-using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using XYPortal.EntityFrameworkCore;
-using XYPortal.Localization;
-using XYPortal.MultiTenancy;
-using XYPortal.Web.Menus;
 using Microsoft.OpenApi.Models;
+using OpenIddict.Server.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
+using System.IO;
+using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.Localization;
-using Volo.Abp.AspNetCore.Mvc.UI;
-using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
-using Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
+using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared.Toolbars;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
-using Volo.Abp.Mapperly;
+using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity.Web;
-using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
-using Volo.Abp.PermissionManagement.Web;
+using Volo.Abp.OpenIddict;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.SettingManagement.Web;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.TenantManagement.Web;
-using Volo.Abp.OpenIddict;
-using Volo.Abp.UI.Navigation.Urls;
-using Volo.Abp.UI;
 using Volo.Abp.UI.Navigation;
+using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using XYPortal.EntityFrameworkCore;
+using XYPortal.Localization;
+using XYPortal.MultiTenancy;
+using XYPortal.Web.Filters;
+using XYPortal.Web.Menus;
+using XYPortal.RandomStringProvider.Web;
+using XYPortal.PasswordBook.Web;
+using XYPortal.RandomStringProvider;
 
 namespace XYPortal.Web;
 
@@ -47,14 +50,19 @@ namespace XYPortal.Web;
     typeof(XYPortalHttpApiModule),
     typeof(XYPortalApplicationModule),
     typeof(XYPortalEntityFrameworkCoreModule),
+    typeof(PasswordBookWebModule),
     typeof(AbpAutofacModule),
+    typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpIdentityWebModule),
     typeof(AbpSettingManagementWebModule),
     typeof(AbpAccountWebOpenIddictModule),
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
+    typeof(AbpFeatureManagementWebModule),
     typeof(AbpTenantManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(RandomStringProviderApplicationModule),
+    typeof(RandomStringProviderWebModule)
     )]
 public class XYPortalWebModule : AbpModule
 {
@@ -85,6 +93,12 @@ public class XYPortalWebModule : AbpModule
             });
         });
 
+        // Disable HTTPS requirement for development/HTTP mode
+        PreConfigure<OpenIddictServerBuilder>(serverBuilder =>
+        {
+            serverBuilder.UseAspNetCore().DisableTransportSecurityRequirement();
+        });
+
         if (!hostingEnvironment.IsDevelopment())
         {
             PreConfigure<AbpOpenIddictAspNetCoreOptions>(options =>
@@ -104,7 +118,12 @@ public class XYPortalWebModule : AbpModule
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
 
-        ConfigureAuthentication(context);
+		if (!configuration.GetValue<bool>("App:RequireHttps"))
+		{
+			context.Services.AddSameSiteCookiePolicy();
+		}
+
+		ConfigureAuthentication(context);
         ConfigureUrls(configuration);
         ConfigureBundles();
         ConfigureVirtualFileSystem(hostingEnvironment);
@@ -113,6 +132,60 @@ public class XYPortalWebModule : AbpModule
         ConfigureSwaggerServices(context.Services);
 
         context.Services.AddMapperlyObjectMapper<XYPortalWebModule>();
+
+        // Add logging filter for RandomStringWidget debugging
+        context.Services.AddMvc(options =>
+        {
+            options.Filters.Add<RandomStringWidgetLoggingFilter>();
+        });
+
+        context.Services.AddLogging(
+            builder =>
+            {
+                builder.ClearProviders();
+
+#if DEBUG
+                builder.SetMinimumLevel(LogLevel.Debug);
+#else
+                builder.SetMinimumLevel(LogLevel.Warning);
+#endif
+
+                builder.AddLog4Net("log4net.xml", true);
+            });
+    }
+
+    private void CheckSameSite(HttpContext httpContext, CookieOptions options)
+    {
+        if (options.SameSite == SameSiteMode.None)
+        {
+            var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+            if (DisallowsSameSiteNone(userAgent))
+            {
+                options.SameSite = SameSiteMode.Unspecified;
+            }
+        }
+    }
+
+    private bool DisallowsSameSiteNone(string userAgent)
+    {
+        if (userAgent.Contains("CPU iPhone OS 12") ||
+            userAgent.Contains("iPad; CPU OS 12"))
+        {
+            return true;
+        }
+
+        if (userAgent.Contains("Macintosh; Intel Mac OS X 10_14") &&
+            userAgent.Contains("Version/") && userAgent.Contains("Safari"))
+        {
+            return true;
+        }
+
+        if (userAgent.Contains("Chrome/5") || userAgent.Contains("Chrome/6"))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
@@ -126,10 +199,20 @@ public class XYPortalWebModule : AbpModule
 
     private void ConfigureUrls(IConfiguration configuration)
     {
-        Configure<AppUrlOptions>(options =>
+        if (!configuration.GetValue<bool>("App:RequireHttps"))
         {
-            options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"];
-        });
+            Configure<OpenIddictServerAspNetCoreOptions>(
+                options =>
+                {
+                    options.DisableTransportSecurityRequirement = true;
+                });
+
+            Configure<ForwardedHeadersOptions>(
+                options =>
+                {
+                    options.ForwardedHeaders = ForwardedHeaders.XForwardedProto;
+                });
+        }
     }
 
     private void ConfigureBundles()
@@ -167,7 +250,12 @@ public class XYPortalWebModule : AbpModule
         {
             options.MenuContributors.Add(new XYPortalMenuContributor());
         });
-    }
+
+		Configure<AbpToolbarOptions>(options =>
+		{
+			options.Contributors.Add(new XYPortalToolbarContributor());
+		});
+	}
 
     private void ConfigureAutoApiControllers()
     {
@@ -193,7 +281,15 @@ public class XYPortalWebModule : AbpModule
     {
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
-
+        var configuration = context.GetConfiguration();
+        
+        ILogger<XYPortalWebModule> logger = app.ApplicationServices.GetRequiredService<ILogger<XYPortalWebModule>>();
+        var vfs = app.ApplicationServices.GetRequiredService<IVirtualFileProvider>();
+        var file = vfs.GetFileInfo("/Views/Shared/Components/RandomStringWidget/Default.cshtml");
+        
+        logger.LogInformation($"/Views/Shared/Components/RandomStringWidget/Default.cshtml => {file}");
+        ListFiles(vfs, "/", logger);
+        
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -206,13 +302,17 @@ public class XYPortalWebModule : AbpModule
             app.UseErrorPage();
         }
 
+        if (!configuration.GetValue<bool>("App:RequireHttps"))
+        {
+            app.UseCookiePolicy(); // Add this line before UseCorrelationId
+        }
         app.UseCorrelationId();
         app.MapAbpStaticAssets();
         app.UseRouting();
         app.UseAuthentication();
         app.UseAbpOpenIddictValidation();
 
-        if (MultiTenancyConsts.IsEnabled)
+        if (IsMultiTenancyEnabled())
         {
             app.UseMultiTenancy();
         }
@@ -230,5 +330,30 @@ public class XYPortalWebModule : AbpModule
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+    }
+    
+    private static bool IsMultiTenancyEnabled()
+    {
+        return MultiTenancyConsts.IsEnabled;
+    }
+    
+    private void ListFiles(IVirtualFileProvider fileProvider, string path, ILogger<XYPortalWebModule> logger)
+    {
+        var directory = fileProvider.GetDirectoryContents(path);
+
+        foreach (var item in directory)
+        {
+            if (item.IsDirectory)
+            {
+                // 递归子目录
+                ListFiles(fileProvider, item.Name.StartsWith("/") ? item.Name : $"{path.EnsureEndsWith('/')}{item.Name}", logger);
+            }
+            else if (item.Name.EndsWith(".cshtml"))
+            {
+                // 打印找到的 .cshtml 资源路径
+                var fullPath = path.EnsureEndsWith('/') + item.Name;
+                logger.LogDebug($"[VFS Resource]: {fullPath}");
+            }
+        }
     }
 }

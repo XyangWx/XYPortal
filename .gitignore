@@ -1,0 +1,13 @@
+\.idea
+.openclaw/
+AGENTS.md
+HEARTBEAT.md
+IDENTITY.md
+SOUL.md
+TOOLS.md
+USER.md
+**/yarn.lock
+**/package-lock.json
+skills/
+*.skill
+\.cursor/

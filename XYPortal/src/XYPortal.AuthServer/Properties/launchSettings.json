@@ -3,8 +3,8 @@
     "windowsAuthentication": false, 
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "https://localhost:44325",
-      "sslPort": 44325
+      "applicationUrl": "http://localhost:44367",
+      "sslPort": 0
     }
   },
   "profiles": {
@@ -18,7 +18,7 @@
     "XYPortal.AuthServer": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:44325",
+      "applicationUrl": "http://localhost:44367",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

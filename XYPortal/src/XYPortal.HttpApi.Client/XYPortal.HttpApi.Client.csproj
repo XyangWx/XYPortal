@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\XYPortal.Application.Contracts\XYPortal.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\XYPortal.LinkBoard\src\XYPortal.LinkBoard.HttpApi.Client\XYPortal.LinkBoard.HttpApi.Client.csproj" />
+    <ProjectReference Include="..\..\..\XYPortal.PasswordBook\src\XYPortal.PasswordBook.HttpApi.Client\XYPortal.PasswordBook.HttpApi.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

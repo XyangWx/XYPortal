@@ -1,0 +1,110 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using XYPortal.Localization
+@model XYPortal.Web.Pages.OpenIddict.Applications.CreateModalModel
+@inject IHtmlLocalizer<XYPortalResource> L
+@{
+    Layout = null;
+}
+
+<form method="post" asp-page="/OpenIddict/Applications/CreateModal">
+    <abp-modal>
+        <abp-modal-header title="@L["NewApplication"].Value"></abp-modal-header>
+        <abp-modal-body>
+            <div class="mb-3">
+                <label asp-for="Input.ClientId" class="form-label">@L["ClientId"]</label>
+                <input asp-for="Input.ClientId" class="form-control" />
+                <span asp-validation-for="Input.ClientId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.DisplayName" class="form-label">@L["DisplayName"]</label>
+                <input asp-for="Input.DisplayName" class="form-control" />
+                <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.ClientType" class="form-label">@L["ClientType"]</label>
+                <select asp-for="Input.ClientType" class="form-select" id="CreateClientType">
+                    <option value="public">public</option>
+                    <option value="confidential">confidential</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.ConsentType" class="form-label">@L["ConsentType"]</label>
+                <select asp-for="Input.ConsentType" class="form-select">
+                    <option value="explicit">explicit</option>
+                    <option value="implicit">implicit</option>
+                    <option value="external">external</option>
+                    <option value="systematic">systematic</option>
+                </select>
+            </div>
+            <div class="mb-3" id="CreateClientSecretGroup" style="display:none;">
+                <label asp-for="Input.ClientSecret" class="form-label">@L["ClientSecret"]</label>
+                <input asp-for="Input.ClientSecret" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.ClientUri" class="form-label">@L["ClientUri"]</label>
+                <input asp-for="Input.ClientUri" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["GrantTypes"]</label>
+                <div class="form-check">
+                    <input type="checkbox" name="Input.GrantTypes" value="authorization_code" class="form-check-input" id="create_gt_auth_code" />
+                    <label class="form-check-label" for="create_gt_auth_code">authorization_code</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="Input.GrantTypes" value="client_credentials" class="form-check-input" id="create_gt_client_cred" />
+                    <label class="form-check-label" for="create_gt_client_cred">client_credentials</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="Input.GrantTypes" value="implicit" class="form-check-input" id="create_gt_implicit" />
+                    <label class="form-check-label" for="create_gt_implicit">implicit</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="Input.GrantTypes" value="password" class="form-check-input" id="create_gt_password" />
+                    <label class="form-check-label" for="create_gt_password">password</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="Input.GrantTypes" value="refresh_token" class="form-check-input" id="create_gt_refresh" />
+                    <label class="form-check-label" for="create_gt_refresh">refresh_token</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="Input.GrantTypes" value="device_code" class="form-check-input" id="create_gt_device" />
+                    <label class="form-check-label" for="create_gt_device">urn:ietf:params:oauth:grant-type:device_code</label>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["Scopes"]</label>
+                @foreach (var scope in Model.AvailableScopes)
+                {
+                    <div class="form-check">
+                        <input type="checkbox" name="Input.Scopes" value="@scope.Name"
+                               class="form-check-input" id="create_scope_@scope.Name" />
+                        <label class="form-check-label" for="create_scope_@scope.Name">@(scope.DisplayName ?? scope.Name)</label>
+                    </div>
+                }
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.RedirectUris" class="form-label">@L["RedirectUris"]</label>
+                <textarea asp-for="Input.RedirectUris" class="form-control" rows="3" placeholder="https://example.com/callback"></textarea>
+                <small class="text-muted">@L["OnePerLine"]</small>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.PostLogoutRedirectUris" class="form-label">@L["PostLogoutRedirectUris"]</label>
+                <textarea asp-for="Input.PostLogoutRedirectUris" class="form-control" rows="3" placeholder="https://example.com/signout-callback"></textarea>
+                <small class="text-muted">@L["OnePerLine"]</small>
+            </div>
+        </abp-modal-body>
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel | AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>
+
+<script>
+    $('#CreateClientType').change(function () {
+        if ($(this).val() === 'confidential') {
+            $('#CreateClientSecretGroup').show();
+        } else {
+            $('#CreateClientSecretGroup').hide();
+        }
+    }).trigger('change');
+</script>

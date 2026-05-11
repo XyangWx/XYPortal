@@ -1,0 +1,281 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using XYPortal.Localization
+@model XYPortal.Web.Components.LinkBoardWidget.LinkBoardWidgetViewModel
+@inject IHtmlLocalizer<XYPortalResource> L
+
+<div class="card w-100" id="linkBoardWidget" data-page-size="@Model.PageSize">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-link me-2"></i>@L["Menu:LinkBoard"]
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Categories.Any())
+        {
+            <ul class="nav nav-tabs px-3 pt-2" id="linkBoardTabs" role="tablist">
+                @for (var i = 0; i < Model.Categories.Count; i++)
+                {
+                    var category = Model.Categories[i];
+                    var tabId = $"lb-tab-{category.Id}";
+                    var paneId = $"lb-pane-{category.Id}";
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link @(i == 0 ? "active" : "")" id="@tabId" data-bs-toggle="tab"
+                                data-bs-target="@paneId" type="button" role="tab"
+                                data-category-id="@category.Id"
+                                aria-controls="@paneId" aria-selected="@(i == 0 ? "true" : "false")">
+                            @if (!string.IsNullOrEmpty(category.Icon))
+                            {
+                                <i class="@category.Icon me-1"></i>
+                            }
+                            @(category.DisplayName ?? category.Name)
+                        </button>
+                    </li>
+                }
+            </ul>
+            <div class="tab-content" id="linkBoardTabContent">
+                @for (var i = 0; i < Model.Categories.Count; i++)
+                {
+                    var category = Model.Categories[i];
+                    var paneId = $"lb-pane-{category.Id}";
+                    var tabId = $"lb-tab-{category.Id}";
+                    var totalCount = Model.TotalCountByCategory.GetValueOrDefault(category.Id);
+                    var totalPages = (int)Math.Ceiling((double)totalCount / Model.PageSize);
+                    <div class="tab-pane fade @(i == 0 ? "show active" : "")" id="@paneId"
+                         role="tabpanel" aria-labelledby="@tabId"
+                         data-category-id="@category.Id"
+                         data-total-count="@totalCount"
+                         data-total-pages="@totalPages"
+                         data-current-page="1">
+                        <div class="lb-info-bar px-3 py-1 text-muted small d-flex justify-content-between align-items-center">
+                            <span>共 <strong>@totalCount</strong> 条链接</span>
+                            @if (totalPages > 1)
+                            {
+                                <span>第 <span class="lb-current-page">1</span>/@totalPages 页</span>
+                            }
+                        </div>
+                        <div class="list-group list-group-flush lb-links-container">
+                            @if (Model.LinksByCategory.TryGetValue(category.Id, out var links))
+                            {
+                                @foreach (var link in links)
+                                {
+                                    <a href="@link.Url" target="_blank" class="list-group-item list-group-item-action link-item">
+                                        <div class="d-flex align-items-center">
+                                            @if (!string.IsNullOrEmpty(link.Icon))
+                                            {
+                                                <i class="@link.Icon me-3 text-primary"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-external-link-alt me-3 text-primary"></i>
+                                            }
+                                            <div class="text-truncate">
+                                                <div class="fw-semibold text-truncate">@link.Title</div>
+                                                @if (!string.IsNullOrEmpty(link.Description))
+                                                {
+                                                    <small class="text-muted text-truncate d-block">@link.Description</small>
+                                                }
+                                            </div>
+                                        </div>
+                                    </a>
+                                }
+                            }
+                        </div>
+                        @if (totalPages > 1)
+                        {
+                            <div class="lb-pagination px-3 py-2 d-flex justify-content-center gap-1">
+                                <button class="btn btn-sm btn-outline-secondary lb-page-first" title="第一页" disabled>
+                                    <i class="fas fa-angle-double-left"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary lb-page-prev" title="前一页" disabled>
+                                    <i class="fas fa-angle-left"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary lb-page-next" title="后一页">
+                                    <i class="fas fa-angle-right"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary lb-page-last" title="最后一页">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-link fs-1 mb-2 d-block opacity-25"></i>
+                <span>@L["LinkBoard:NoPublicLinks"]</span>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .link-item {
+        transition: background-color 0.15s;
+        border-left: 0;
+        border-right: 0;
+        padding: 10px 12px;
+    }
+    .link-item:hover {
+        background-color: #f0f7ff;
+    }
+    #linkBoardTabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+    }
+    #linkBoardTabs::-webkit-scrollbar {
+        height: 3px;
+    }
+    #linkBoardTabs::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 3px;
+    }
+    #linkBoardTabs .nav-link {
+        white-space: nowrap;
+        font-size: 0.875rem;
+        padding: 0.4rem 0.75rem;
+    }
+    .lb-info-bar {
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .lb-pagination .btn {
+        min-width: 32px;
+    }
+    .lb-pagination .btn:disabled {
+        opacity: 0.4;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var widget = document.getElementById('linkBoardWidget');
+        if (!widget) return;
+
+        var pageSize = parseInt(widget.dataset.pageSize) || 15;
+
+        widget.addEventListener('click', function (e) {
+            if (e.target.closest('[data-bs-toggle="tab"]')) return;
+
+            var btn = e.target.closest('.lb-pagination button');
+            if (!btn || btn.disabled) return;
+
+            var pane = btn.closest('.tab-pane');
+            var categoryId = pane.dataset.categoryId;
+            var currentPage = parseInt(pane.dataset.currentPage);
+            var totalPages = parseInt(pane.dataset.totalPages);
+            var newPage = currentPage;
+
+            if (btn.classList.contains('lb-page-first')) newPage = 1;
+            else if (btn.classList.contains('lb-page-prev')) newPage = Math.max(1, currentPage - 1);
+            else if (btn.classList.contains('lb-page-next')) newPage = Math.min(totalPages, currentPage + 1);
+            else if (btn.classList.contains('lb-page-last')) newPage = totalPages;
+
+            if (newPage !== currentPage) {
+                loadPage(pane, categoryId, newPage, pageSize);
+            }
+        });
+
+        var tabNav = document.getElementById('linkBoardTabs');
+        if (tabNav) {
+            tabNav.addEventListener('click', function (e) {
+                var tabBtn = e.target.closest('button[data-bs-toggle="tab"]');
+                if (!tabBtn) return;
+
+                var paneId = tabBtn.dataset.bsTarget;
+                var targetPane = paneId ? document.querySelector('#' + paneId) : null;
+                if (!targetPane) return;
+
+                var tryLoad = function () {
+                    var $activePane = $('#' + paneId);
+                    if ($activePane.length === 0) {
+                        setTimeout(tryLoad, 50);
+                        return;
+                    }
+                    var categoryId = $activePane.data('categoryId');
+                    var currentPage = parseInt($activePane.data('currentPage')) || 1;
+                    loadPage(targetPane, categoryId, currentPage, pageSize);
+
+                    tabNav.querySelectorAll('.nav-link').forEach(function (btn) {
+                        btn.classList.remove('active');
+                        btn.removeAttribute('aria-selected');
+                        btn.setAttribute('aria-selected', 'false');
+                    });
+                    tabBtn.classList.add('active');
+                    tabBtn.setAttribute('aria-selected', 'true');
+
+                    var tabContent = document.getElementById('linkBoardTabContent');
+                    if (tabContent) {
+                        tabContent.querySelectorAll('.tab-pane').forEach(function (p) {
+                            p.classList.remove('show', 'active');
+                        });
+                        targetPane.classList.add('show', 'active');
+                    }
+                };
+                setTimeout(tryLoad, 50);
+            });
+        }
+
+        function loadPage(pane, categoryId, page, size) {
+            var skipCount = (page - 1) * size;
+            var url = '/api/app/link/public-board?categoryId=' + categoryId + '&skipCount=' + skipCount + '&maxResultCount=' + size;
+
+            var container = pane.querySelector('.lb-links-container');
+            if (!container) return;
+            container.style.opacity = '0.5';
+
+            fetch(url, { credentials: 'include' })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    var items = data.items || [];
+                    var html = '';
+                    items.forEach(function (link) {
+                        var icon = link.icon
+                            ? '<i class="' + escapeHtml(link.icon) + ' me-3 text-primary"></i>'
+                            : '<i class="fas fa-external-link-alt me-3 text-primary"></i>';
+                        var desc = link.description
+                            ? '<small class="text-muted text-truncate d-block">' + escapeHtml(link.description) + '</small>'
+                            : '';
+                        html += '<a href="' + escapeHtml(link.url) + '" target="_blank" class="list-group-item list-group-item-action link-item">'
+                            + '<div class="d-flex align-items-center">'
+                            + icon
+                            + '<div class="text-truncate">'
+                            + '<div class="fw-semibold text-truncate">' + escapeHtml(link.title) + '</div>'
+                            + desc
+                            + '</div></div></a>';
+                    });
+                    container.innerHTML = html;
+                    container.style.opacity = '1';
+
+                    var totalPages = parseInt(pane.dataset.totalPages);
+                    pane.dataset.currentPage = page;
+
+                    var pageSpan = pane.querySelector('.lb-current-page');
+                    if (pageSpan) pageSpan.textContent = page;
+
+                    var firstBtn = pane.querySelector('.lb-page-first');
+                    var prevBtn = pane.querySelector('.lb-page-prev');
+                    var nextBtn = pane.querySelector('.lb-page-next');
+                    var lastBtn = pane.querySelector('.lb-page-last');
+
+                    if (firstBtn) firstBtn.disabled = (page <= 1);
+                    if (prevBtn) prevBtn.disabled = (page <= 1);
+                    if (nextBtn) nextBtn.disabled = (page >= totalPages);
+                    if (lastBtn) lastBtn.disabled = (page >= totalPages);
+                })
+                .catch(function () {
+                    container.style.opacity = '1';
+                });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            var div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    });
+</script>

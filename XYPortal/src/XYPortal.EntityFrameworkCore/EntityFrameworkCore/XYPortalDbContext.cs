@@ -12,16 +12,27 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using XYPortal.LinkBoard.Entities;
+using XYPortal.LinkBoard.EntityFrameworkCore;
+using XYPortal.PasswordBook;
+using XYPortal.PasswordBook.EntityFrameworkCore;
+using XYPortal.PasswordBook.AggregateRoots;
+using XYPortal.PasswordBook.Entities;
+using PasswordBookEntity = XYPortal.PasswordBook.AggregateRoots.PasswordBook;
 
 namespace XYPortal.EntityFrameworkCore;
 
 [ReplaceDbContext(typeof(IIdentityDbContext))]
 [ReplaceDbContext(typeof(ITenantManagementDbContext))]
+[ReplaceDbContext(typeof(IPasswordBookDbContext))]
+[ReplaceDbContext(typeof(ILinkBoardDbContext))]
 [ConnectionStringName("Default")]
 public class XYPortalDbContext :
     AbpDbContext<XYPortalDbContext>,
     IIdentityDbContext,
-    ITenantManagementDbContext
+    ITenantManagementDbContext,
+    ILinkBoardDbContext,
+    IPasswordBookDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
@@ -51,6 +62,15 @@ public class XYPortalDbContext :
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
 
+    // LinkBooks
+    public DbSet<LinkCategory> LinkCategories { get; set; }
+    public DbSet<Link> Links { get; set; }
+
+    // PasswordBook
+    public DbSet<PasswordBookEntity> PasswordBooks { get; set; }
+    public DbSet<PasswordEntry> PasswordEntries { get; set; }
+    public DbSet<PasswordHistory> PasswordHistories { get; set; }
+
     #endregion
 
     public XYPortalDbContext(DbContextOptions<XYPortalDbContext> options)
@@ -73,6 +93,8 @@ public class XYPortalDbContext :
         builder.ConfigureOpenIddict();
         builder.ConfigureFeatureManagement();
         builder.ConfigureTenantManagement();
+        builder.ConfigureLinkBoard();
+        builder.ConfigurePasswordBook();
 
         /* Configure your own tables/entities inside here */
 

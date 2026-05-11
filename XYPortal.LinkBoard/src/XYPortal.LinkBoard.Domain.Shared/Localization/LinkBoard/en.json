@@ -1,0 +1,32 @@
+{
+  "culture": "en",
+  "texts": {
+    "MyAccount": "My account",
+    "Permission:LinkBoard": "LinkBoard",
+    "Permission:LinkBoardAdmin": "LinkBoard Admin",
+    "Permission:LinkReview": "Link Review",
+    "Permission:LinkCategoryReview": "Category Review",
+    "Permission:LinkBoardUser": "LinkBoard User",
+    "Permission:LinkCategoryManager": "Category Management",
+    "Permission:LinkCategoryCreate": "Create",
+    "Permission:LinkCategoryModify": "Modify",
+    "Permission:LinkCategoryDelete": "Delete",
+    "Permission:LinkCategorySubmit": "Submit for Review",
+    "Permission:LinkManager": "Link Management",
+    "Permission:LinkCreate": "Create",
+    "Permission:LinkModify": "Modify",
+    "Permission:LinkDelete": "Delete",
+    "Permission:LinkSubmit": "Submit for Review",
+    "Feature:LinkBoard": "LinkBoard",
+    "Feature:LinkBoard.MaxLinks": "Max Links",
+    "Feature:LinkBoard.MaxLinksDescription": "Maximum number of links displayed on the LinkBoard widget",
+    "LinkBoard:DuplicateCategoryName": "Category name '{Name}' already exists",
+    "LinkBoard:CategoryHasLinks": "Cannot delete category that contains links",
+    "LinkBoard:InvalidStatusTransition": "Cannot transition from {From} to {To}",
+    "LinkBoard:CategoryNotApproved": "Category is not approved yet",
+    "LinkBoard:UrlExistsInPublic": "This URL already exists in public links",
+    "LinkBoard:CategoryNameExistsInPublic": "This category name already exists in public categories",
+    "LinkBoard:PrivateNoReview": "Private items do not require review",
+    "LinkBoard:NoPublicLinks": "No public links available"
+  }
+}

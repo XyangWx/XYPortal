@@ -1,0 +1,376 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 11.95kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for mcr.microsoft.com/dotnet/sdk:10.0
+#2 DONE 0.0s
+
+#3 [internal] load metadata for mcr.microsoft.com/dotnet/aspnet:10.0
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [restore  1/67] FROM mcr.microsoft.com/dotnet/sdk:10.0
+#5 DONE 0.0s
+
+#6 [base 1/4] FROM mcr.microsoft.com/dotnet/aspnet:10.0
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 132.17kB 0.1s done
+#7 DONE 0.1s
+
+#8 [restore 56/67] COPY [XYPortal.PasswordBook/src/XYPortal.PasswordBook.HttpApi/XYPortal.PasswordBook.HttpApi.csproj, XYPortal.PasswordBook/src/XYPortal.PasswordBook.HttpApi/]
+#8 CACHED
+
+#9 [restore  3/67] COPY [XYPortal/common.props, XYPortal/]
+#9 CACHED
+
+#10 [restore 27/67] COPY [XYPortal.LinkBoard/src/XYPortal.LinkBoard.HttpApi.Client/XYPortal.LinkBoard.HttpApi.Client.csproj, XYPortal.LinkBoard/src/XYPortal.LinkBoard.HttpApi.Client/]
+#10 CACHED
+
+#11 [restore  8/67] COPY [XYPortal/src/XYPortal.Application.Contracts/XYPortal.Application.Contracts.csproj,XYPortal/src/XYPortal.Application.Contracts/]
+#11 CACHED
+
+#12 [restore 20/67] COPY [XYPortal.LinkBoard/XYPortal.LinkBoard.slnx, XYPortal.LinkBoard/]
+#12 CACHED
+
+#13 [restore  5/67] COPY [XYPortal/src/XYPortal.Domain/XYPortal.Domain.csproj, XYPortal/src/XYPortal.Domain/]
+#13 CACHED
+
+#14 [restore 40/67] COPY [XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.EntityFrameworkCore/XYPortal.RandomStringProvider.EntityFrameworkCore.csproj, XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.EntityFrameworkCore/]
+#14 CACHED
+
+#15 [restore 52/67] COPY [XYPortal.PasswordBook/src/XYPortal.PasswordBook.Application.Contracts/XYPortal.PasswordBook.Application.Contracts.csproj, XYPortal.PasswordBook/src/XYPortal.PasswordBook.Application.Contracts/]
+#15 CACHED
+
+#16 [restore 21/67] COPY [XYPortal.LinkBoard/common.props, XYPortal.LinkBoard/]
+#16 CACHED
+
+#17 [restore 30/67] COPY [XYPortal.LinkBoard/test/XYPortal.LinkBoard.Application.Tests/XYPortal.LinkBoard.Application.Tests.csproj, XYPortal.LinkBoard/test/XYPortal.LinkBoard.Application.Tests/]
+#17 CACHED
+
+#18 [restore  2/67] COPY [XYPortal/XYPortal.slnx, XYPortal/]
+#18 CACHED
+
+#19 [restore 64/67] RUN cd XYPortal.LinkBoard &&     dotnet restore &&     dotnet build -c Release
+#19 CACHED
+
+#20 [restore 61/67] COPY [XYPortal.PasswordBook/test/XYPortal.PasswordBook.Domain.Tests/XYPortal.PasswordBook.Domain.Tests.csproj, XYPortal.PasswordBook/test/XYPortal.PasswordBook.Domain.Tests/]
+#20 CACHED
+
+#21 [restore 24/67] COPY [XYPortal.LinkBoard/src/XYPortal.LinkBoard.Domain.Shared/XYPortal.LinkBoard.Domain.Shared.csproj, XYPortal.LinkBoard/src/XYPortal.LinkBoard.Domain.Shared/]
+#21 CACHED
+
+#22 [restore 35/67] COPY [XYPortal.RandomStringProvider/common.props, XYPortal.RandomStringProvider/]
+#22 CACHED
+
+#23 [restore 62/67] COPY [XYPortal.PasswordBook/test/XYPortal.PasswordBook.EntityFrameworkCore.Tests/XYPortal.PasswordBook.EntityFrameworkCore.Tests.csproj, XYPortal.PasswordBook/test/XYPortal.PasswordBook.EntityFrameworkCore.Tests/]
+#23 CACHED
+
+#24 [restore 45/67] COPY [XYPortal.RandomStringProvider/test/XYPortal.RandomStringProvider.Application.Tests/XYPortal.RandomStringProvider.Application.Tests.csproj, XYPortal.RandomStringProvider/test/XYPortal.RandomStringProvider.Application.Tests/]
+#24 CACHED
+
+#25 [restore 50/67] COPY [XYPortal.PasswordBook/common.props, XYPortal.PasswordBook/]
+#25 CACHED
+
+#26 [restore 28/67] COPY [XYPortal.LinkBoard/src/XYPortal.LinkBoard.HttpApi/XYPortal.LinkBoard.HttpApi.csproj, XYPortal.LinkBoard/src/XYPortal.LinkBoard.HttpApi/]
+#26 CACHED
+
+#27 [restore 32/67] COPY [XYPortal.LinkBoard/test/XYPortal.LinkBoard.EntityFrameworkCore.Tests/XYPortal.LinkBoard.EntityFrameworkCore.Tests.csproj, XYPortal.LinkBoard/test/XYPortal.LinkBoard.EntityFrameworkCore.Tests/]
+#27 CACHED
+
+#28 [restore 12/67] COPY [XYPortal/src/XYPortal.HttpApi.Host/XYPortal.HttpApi.Host.csproj,XYPortal/src/XYPortal.HttpApi.Host/]
+#28 CACHED
+
+#29 [restore 63/67] COPY [XYPortal.PasswordBook/test/XYPortal.PasswordBook.TestBase/XYPortal.PasswordBook.TestBase.csproj, XYPortal.PasswordBook/test/XYPortal.PasswordBook.TestBase/]
+#29 CACHED
+
+#30 [restore 16/67] COPY [XYPortal/test/XYPortal.Application.Tests/XYPortal.Application.Tests.csproj,XYPortal/test/XYPortal.Application.Tests/]
+#30 CACHED
+
+#31 [restore  7/67] COPY [XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj, XYPortal/src/XYPortal.EntityFrameworkCore/]
+#31 CACHED
+
+#32 [restore 18/67] COPY [XYPortal/test/XYPortal.EntityFrameworkCore.Tests/XYPortal.EntityFrameworkCore.Tests.csproj,XYPortal/test/XYPortal.EntityFrameworkCore.Tests/]
+#32 CACHED
+
+#33 [restore 44/67] COPY [XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Web/XYPortal.RandomStringProvider.Web.csproj, XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Web/]
+#33 CACHED
+
+#34 [restore 43/67] COPY [XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Installer/XYPortal.RandomStringProvider.Installer.csproj, XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Installer/]
+#34 CACHED
+
+#35 [restore 22/67] COPY [XYPortal.LinkBoard/src/XYPortal.LinkBoard.Application.Contracts/XYPortal.LinkBoard.Application.Contracts.csproj, XYPortal.LinkBoard/src/XYPortal.LinkBoard.Application.Contracts/]
+#35 CACHED
+
+#36 [restore 46/67] COPY [XYPortal.RandomStringProvider/test/XYPortal.RandomStringProvider.Domain.Tests/XYPortal.RandomStringProvider.Domain.Tests.csproj, XYPortal.RandomStringProvider/test/XYPortal.RandomStringProvider.Domain.Tests/]
+#36 CACHED
+
+#37 [restore  9/67] COPY [XYPortal/src/XYPortal.Application/XYPortal.Application.csproj,XYPortal/src/XYPortal.Application/]
+#37 CACHED
+
+#38 [restore 59/67] COPY [XYPortal.PasswordBook/src/XYPortal.PasswordBook.Web/XYPortal.PasswordBook.Web.csproj, XYPortal.PasswordBook/src/XYPortal.PasswordBook.Web/]
+#38 CACHED
+
+#39 [restore 34/67] COPY [XYPortal.RandomStringProvider/XYPortal.RandomStringProvider.slnx, XYPortal.RandomStringProvider/]
+#39 CACHED
+
+#40 [restore 31/67] COPY [XYPortal.LinkBoard/test/XYPortal.LinkBoard.Domain.Tests/XYPortal.LinkBoard.Domain.Tests.csproj, XYPortal.LinkBoard/test/XYPortal.LinkBoard.Domain.Tests/]
+#40 CACHED
+
+#41 [restore 13/67] COPY [XYPortal/src/XYPortal.HttpApi/XYPortal.HttpApi.csproj,XYPortal/src/XYPortal.HttpApi/]
+#41 CACHED
+
+#42 [restore 29/67] COPY [XYPortal.LinkBoard/src/XYPortal.LinkBoard.Installer/XYPortal.LinkBoard.Installer.csproj, XYPortal.LinkBoard/src/XYPortal.LinkBoard.Installer/]
+#42 CACHED
+
+#43 [restore 23/67] COPY [XYPortal.LinkBoard/src/XYPortal.LinkBoard.Application/XYPortal.LinkBoard.Application.csproj, XYPortal.LinkBoard/src/XYPortal.LinkBoard.Application/]
+#43 CACHED
+
+#44 [restore 49/67] COPY [XYPortal.PasswordBook/XYPortal.PasswordBook.slnx, XYPortal.PasswordBook/]
+#44 CACHED
+
+#45 [restore 26/67] COPY [XYPortal.LinkBoard/src/XYPortal.LinkBoard.EntityFrameworkCore/XYPortal.LinkBoard.EntityFrameworkCore.csproj, XYPortal.LinkBoard/src/XYPortal.LinkBoard.EntityFrameworkCore/]
+#45 CACHED
+
+#46 [restore 11/67] COPY [XYPortal/src/XYPortal.HttpApi.Client/XYPortal.HttpApi.Client.csproj,XYPortal/src/XYPortal.HttpApi.Client/]
+#46 CACHED
+
+#47 [restore 42/67] COPY [XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.HttpApi.Client/XYPortal.RandomStringProvider.HttpApi.Client.csproj, XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.HttpApi.Client/]
+#47 CACHED
+
+#48 [restore 65/67] RUN cd ../XYPortal.RandomStringProvider &&     dotnet restore &&     dotnet build -c Release
+#48 CACHED
+
+#49 [restore 15/67] COPY [XYPortal/src/XYPortal.Web/XYPortal.Web.csproj,XYPortal/src/XYPortal.Web/]
+#49 CACHED
+
+#50 [restore 60/67] COPY [XYPortal.PasswordBook/test/XYPortal.PasswordBook.Application.Tests/XYPortal.PasswordBook.Application.Tests.csproj, XYPortal.PasswordBook/test/XYPortal.PasswordBook.Application.Tests/]
+#50 CACHED
+
+#51 [restore 10/67] COPY [XYPortal/src/XYPortal.DbMigrator/XYPortal.DbMigrator.csproj,XYPortal/src/XYPortal.DbMigrator/]
+#51 CACHED
+
+#52 [restore  6/67] COPY [XYPortal/src/XYPortal.Domain.Shared/XYPortal.Domain.Shared.csproj, XYPortal/src/XYPortal.Domain.Shared/]
+#52 CACHED
+
+#53 [restore 51/67] COPY [XYPortal.PasswordBook/src/XYPortal.PasswordBook.Application/XYPortal.PasswordBook.Application.csproj, XYPortal.PasswordBook/src/XYPortal.PasswordBook.Application/]
+#53 CACHED
+
+#54 [restore 25/67] COPY [XYPortal.LinkBoard/src/XYPortal.LinkBoard.Domain/XYPortal.LinkBoard.Domain.csproj, XYPortal.LinkBoard/src/XYPortal.LinkBoard.Domain/]
+#54 CACHED
+
+#55 [restore 36/67] COPY [XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Application/XYPortal.RandomStringProvider.Application.csproj, XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Application/]
+#55 CACHED
+
+#56 [restore 17/67] COPY [XYPortal/test/XYPortal.Domain.Tests/XYPortal.Domain.Tests.csproj,XYPortal/test/XYPortal.Domain.Tests/]
+#56 CACHED
+
+#57 [restore 38/67] COPY [XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Domain/XYPortal.RandomStringProvider.Domain.csproj, XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Domain/]
+#57 CACHED
+
+#58 [restore 39/67] COPY [XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Domain.Shared/XYPortal.RandomStringProvider.Domain.Shared.csproj, XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Domain.Shared/]
+#58 CACHED
+
+#59 [restore 19/67] COPY [XYPortal/test/XYPortal.TestBase/XYPortal.TestBase.csproj,XYPortal/test/XYPortal.TestBase/]
+#59 CACHED
+
+#60 [restore 47/67] COPY [XYPortal.RandomStringProvider/test/XYPortal.RandomStringProvider.EntityFrameworkCore.Tests/XYPortal.RandomStringProvider.EntityFrameworkCore.Tests.csproj, XYPortal.RandomStringProvider/test/XYPortal.RandomStringProvider.EntityFrameworkCore.Tests/]
+#60 CACHED
+
+#61 [restore 66/67] RUN cd ../XYPortal.PasswordBook &&     dotnet restore &&     dotnet build -c Release
+#61 CACHED
+
+#62 [restore 37/67] COPY [XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Application.Contracts/XYPortal.RandomStringProvider.Application.Contracts.csproj, XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Application.Contracts/]
+#62 CACHED
+
+#63 [restore 14/67] COPY [XYPortal/src/XYPortal.Web.Host/XYPortal.Web.Host.csproj,XYPortal/src/XYPortal.Web.Host/]
+#63 CACHED
+
+#64 [restore 55/67] COPY [XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj, XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/]
+#64 CACHED
+
+#65 [restore 54/67] COPY [XYPortal.PasswordBook/src/XYPortal.PasswordBook.Domain.Shared/XYPortal.PasswordBook.Domain.Shared.csproj, XYPortal.PasswordBook/src/XYPortal.PasswordBook.Domain.Shared/]
+#65 CACHED
+
+#66 [restore  4/67] COPY [XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj, XYPortal/src/XYPortal.AuthServer/ ]
+#66 CACHED
+
+#67 [restore 58/67] COPY [XYPortal.PasswordBook/src/XYPortal.PasswordBook.Installer/XYPortal.PasswordBook.Installer.csproj, XYPortal.PasswordBook/src/XYPortal.PasswordBook.Installer/]
+#67 CACHED
+
+#68 [restore 33/67] COPY [XYPortal.LinkBoard/test/XYPortal.LinkBoard.TestBase/XYPortal.LinkBoard.TestBase.csproj, XYPortal.LinkBoard/test/XYPortal.LinkBoard.TestBase/]
+#68 CACHED
+
+#69 [restore 53/67] COPY [XYPortal.PasswordBook/src/XYPortal.PasswordBook.Domain/XYPortal.PasswordBook.Domain.csproj, XYPortal.PasswordBook/src/XYPortal.PasswordBook.Domain/]
+#69 CACHED
+
+#70 [restore 48/67] COPY [XYPortal.RandomStringProvider/test/XYPortal.RandomStringProvider.TestBase/XYPortal.RandomStringProvider.TestBase.csproj, XYPortal.RandomStringProvider/test/XYPortal.RandomStringProvider.TestBase/]
+#70 CACHED
+
+#71 [restore 41/67] COPY [XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.HttpApi/XYPortal.RandomStringProvider.HttpApi.csproj, XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.HttpApi/]
+#71 CACHED
+
+#72 [restore 57/67] COPY [XYPortal.PasswordBook/src/XYPortal.PasswordBook.HttpApi.Client/XYPortal.PasswordBook.HttpApi.Client.csproj, XYPortal.PasswordBook/src/XYPortal.PasswordBook.HttpApi.Client/]
+#72 CACHED
+
+#73 [restore 67/67] RUN cd ../XYPortal &&     dotnet restore
+#73 CACHED
+
+#74 [build 1/4] RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash &&     NVM_DIR=$HOME/.nvm &&     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" &&     nvm install v25.9.0 &&     nvm use v25.9.0 &&     npm install -g npm@latest &&     npm install -g yarn@latest &&     cd /XYPortal &&     dotnet tool install -g Volo.Abp.Studio.Cli &&     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOME/.dotnet/tools &&     abp install-libs &&     [ -d "/XYPortal/src/XYPortal.AuthServer/wwwroot/libs" ] && echo '存在' || echo '不存在！'
+#74 0.214   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+#74 0.214                                  Dload  Upload   Total   Spent    Left  Speed
+#74 0.214   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100 16774  100 16774    0     0   314k      0 --:--:-- --:--:-- --:--:--  315k
+#74 0.285 => Downloading nvm from git to '/root/.nvm'
+#74 0.285 => Cloning into '/root/.nvm'...
+#74 2.492 * (HEAD detached at FETCH_HEAD)
+#74 2.492   master
+#74 2.495 => Compressing and cleaning up git repository
+#74 2.500 
+#74 2.504 => Appending nvm source string to /root/.bashrc
+#74 2.511 => Appending bash_completion source string to /root/.bashrc
+#74 2.551 => Close and reopen your terminal to start using nvm or run the following to use it now:
+#74 2.551 
+#74 2.551 export NVM_DIR="$HOME/.nvm"
+#74 2.551 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+#74 2.551 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+#74 3.103 Downloading and installing node v25.9.0...
+#74 3.258 Downloading https://nodejs.org/dist/v25.9.0/node-v25.9.0-linux-x64.tar.gz...
+#74 3.398                                                                            0.1%################                                                          22.8%###################                                                       27.5%#######################                                                   32.8%############################                                              39.1%###############################                                           44.4%####################################                                      50.2%########################################                                  55.7%############################################                              61.2%###############################################                           66.3%###################################################                       71.5%#######################################################                   76.9%###########################################################               82.4%###############################################################           87.9%###################################################################       93.6%#######################################################################   99.2%######################################################################## 100.0%
+#74 7.333 Computing checksum with sha256sum
+#74 7.507 Checksums matched!
+#74 9.404 Now using node v25.9.0 (npm v11.12.1)
+#74 9.502 Creating default alias: default -> v25.9.0 *
+#74 9.703 Now using node v25.9.0 (npm v11.12.1)
+#74 13.46 
+#74 13.46 changed 10 packages in 4s
+#74 13.46 
+#74 13.46 15 packages are looking for funding
+#74 13.46   run `npm fund` for details
+#74 14.44 
+#74 14.44 added 1 package in 838ms
+#74 24.41 Tools directory '/root/.dotnet/tools' is not currently on the PATH environment variable.
+#74 24.41 If you are using bash, you can add it to your profile by running the following command:
+#74 24.41 
+#74 24.41 cat << \EOF >> ~/.bash_profile
+#74 24.41 # Add .NET Core SDK tools
+#74 24.41 export PATH="$PATH:/root/.dotnet/tools"
+#74 24.41 EOF
+#74 24.41 
+#74 24.41 You can add it to the current session by running the following command:
+#74 24.41 
+#74 24.41 export PATH="$PATH:/root/.dotnet/tools"
+#74 24.41 
+#74 24.41 You can invoke the tool using the following command: abp
+#74 24.41 Tool 'volo.abp.studio.cli' (version '2.2.6') was successfully installed.
+#74 26.35 [09:02:45 WRN] Volo.Abp.Studio.Extensions.StandardSolutionTemplates extension not found in the NuGet cache. Directory: /root/.nuget/packages/volo.abp.studio.extensions.standardsolutiontemplates/2.2.6/lib/net10.0
+#74 26.35 [09:02:45 INF] Volo.Abp.Studio.Extensions.StandardSolutionTemplates (v: 2.2.6) extension trying install from the NuGet
+#74 26.36 📌 ABP CLI 2.2.6
+#74 26.40 Checking extensions...
+#74 42.41 [09:03:01 INF] Volo.Abp.Studio.Extensions.StandardSolutionTemplates (v: 2.2.6) package downloaded from https://api.nuget.org/v3/index.json and saved to (/root/.nuget/packages/)
+#74 42.42 🧩 Extensions downloaded: Volo.Abp.Studio.Extensions.StandardSolutionTemplates
+#74 42.42 🚲 The CLI is restarting to apply the changes with arguments: install-libs
+#74 42.46 不存在！
+#74 DONE 42.9s
+
+#75 [build 2/4] COPY . .
+#75 DONE 0.6s
+
+#76 [build 3/4] WORKDIR /XYPortal/src/XYPortal.AuthServer
+#76 DONE 0.1s
+
+#77 [build 4/4] RUN dotnet build XYPortal.AuthServer.csproj -c Release -o /app/build
+#77 1.253   Determining projects to restore...
+#77 3.215 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#77 3.216 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#77 4.232 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#77 4.234 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#77 4.513   Restored /XYPortal/src/XYPortal.Domain/XYPortal.Domain.csproj (in 1.23 sec).
+#77 4.518   Restored /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj (in 1.41 sec).
+#77 4.603   Restored /XYPortal/src/XYPortal.Domain.Shared/XYPortal.Domain.Shared.csproj (in 47 ms).
+#77 4.897   Restored /XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj (in 345 ms).
+#77 4.901   9 of 13 projects are up-to-date for restore.
+#77 6.016 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+#77 6.017 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+#77 6.077 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+#77 6.077 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+#77 12.38   XYPortal.RandomStringProvider.Domain.Shared -> /app/build/XYPortal.RandomStringProvider.Domain.Shared.dll
+#77 12.40   XYPortal.LinkBoard.Domain.Shared -> /app/build/XYPortal.LinkBoard.Domain.Shared.dll
+#77 13.16   XYPortal.LinkBoard.Application.Contracts -> /app/build/XYPortal.LinkBoard.Application.Contracts.dll
+#77 13.25   XYPortal.PasswordBook.Domain.Shared -> /app/build/XYPortal.PasswordBook.Domain.Shared.dll
+#77 13.70   XYPortal.RandomStringProvider.Domain -> /app/build/XYPortal.RandomStringProvider.Domain.dll
+#77 15.25   XYPortal.Domain.Shared -> /app/build/XYPortal.Domain.Shared.dll
+#77 16.53   XYPortal.PasswordBook.Domain -> /app/build/XYPortal.PasswordBook.Domain.dll
+#77 17.64   XYPortal.PasswordBook.EntityFrameworkCore -> /app/build/XYPortal.PasswordBook.EntityFrameworkCore.dll
+#77 17.70   XYPortal.LinkBoard.Domain -> /app/build/XYPortal.LinkBoard.Domain.dll
+#77 18.96   XYPortal.LinkBoard.EntityFrameworkCore -> /app/build/XYPortal.LinkBoard.EntityFrameworkCore.dll
+#77 19.01   XYPortal.Domain -> /app/build/XYPortal.Domain.dll
+#77 21.04   XYPortal.EntityFrameworkCore -> /app/build/XYPortal.EntityFrameworkCore.dll
+#77 26.20   XYPortal.AuthServer -> /app/build/XYPortal.AuthServer.dll
+#77 26.30 
+#77 26.30 Build succeeded.
+#77 26.30 
+#77 26.31 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#77 26.31 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#77 26.31 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#77 26.31 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#77 26.31 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+#77 26.31 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+#77 26.31 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+#77 26.31 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+#77 26.31     8 Warning(s)
+#77 26.31     0 Error(s)
+#77 26.31 
+#77 26.31 Time Elapsed 00:00:25.67
+#77 DONE 26.4s
+
+#78 [publish 1/1] RUN dotnet publish XYPortal.AuthServer.csproj -c Release -o /app/publish
+#78 1.181   Determining projects to restore...
+#78 3.070 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#78 3.071 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#78 3.072 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#78 3.072 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf [/XYPortal/src/XYPortal.AuthServer/XYPortal.AuthServer.csproj]
+#78 3.073   All projects are up-to-date for restore.
+#78 4.038 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+#78 4.038 /XYPortal/src/XYPortal.EntityFrameworkCore/XYPortal.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+#78 4.102 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+#78 4.103 /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/XYPortal.PasswordBook.EntityFrameworkCore.csproj : warning NU1901: Package 'System.Security.Cryptography.Xml' 9.0.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+#78 4.509   XYPortal.RandomStringProvider.Domain.Shared -> /XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Domain.Shared/bin/Release/net10.0/XYPortal.RandomStringProvider.Domain.Shared.dll
+#78 4.536   XYPortal.LinkBoard.Domain.Shared -> /XYPortal.LinkBoard/src/XYPortal.LinkBoard.Domain.Shared/bin/Release/net10.0/XYPortal.LinkBoard.Domain.Shared.dll
+#78 10.25   XYPortal.PasswordBook.Domain.Shared -> /XYPortal.PasswordBook/src/XYPortal.PasswordBook.Domain.Shared/bin/Release/net10.0/XYPortal.PasswordBook.Domain.Shared.dll
+#78 10.26   XYPortal.LinkBoard.Application.Contracts -> /XYPortal.LinkBoard/src/XYPortal.LinkBoard.Application.Contracts/bin/Release/net10.0/XYPortal.LinkBoard.Application.Contracts.dll
+#78 10.87   XYPortal.RandomStringProvider.Domain -> /XYPortal.RandomStringProvider/src/XYPortal.RandomStringProvider.Domain/bin/Release/net10.0/XYPortal.RandomStringProvider.Domain.dll
+#78 12.38   XYPortal.Domain.Shared -> /XYPortal/src/XYPortal.Domain.Shared/bin/Release/net10.0/XYPortal.Domain.Shared.dll
+#78 13.58   XYPortal.PasswordBook.Domain -> /XYPortal.PasswordBook/src/XYPortal.PasswordBook.Domain/bin/Release/net10.0/XYPortal.PasswordBook.Domain.dll
+#78 14.40   XYPortal.PasswordBook.EntityFrameworkCore -> /XYPortal.PasswordBook/src/XYPortal.PasswordBook.EntityFrameworkCore/bin/Release/net10.0/XYPortal.PasswordBook.EntityFrameworkCore.dll
+#78 14.42   XYPortal.LinkBoard.Domain -> /XYPortal.LinkBoard/src/XYPortal.LinkBoard.Domain/bin/Release/net10.0/XYPortal.LinkBoard.Domain.dll
+#78 15.74   XYPortal.LinkBoard.EntityFrameworkCore -> /XYPortal.LinkBoard/src/XYPortal.LinkBoard.EntityFrameworkCore/bin/Release/net10.0/XYPortal.LinkBoard.EntityFrameworkCore.dll
+#78 15.86   XYPortal.Domain -> /XYPortal/src/XYPortal.Domain/bin/Release/net10.0/XYPortal.Domain.dll
+#78 17.96   XYPortal.EntityFrameworkCore -> /XYPortal/src/XYPortal.EntityFrameworkCore/bin/Release/net10.0/XYPortal.EntityFrameworkCore.dll
+#78 23.50   XYPortal.AuthServer -> /XYPortal/src/XYPortal.AuthServer/bin/Release/net10.0/XYPortal.AuthServer.dll
+#78 24.10   XYPortal.AuthServer -> /app/publish/
+#78 DONE 24.3s
+
+#79 [base 3/4] RUN apt-get clean && apt-get update &&     apt-get install -y --no-install-recommends         locales         tzdata     &&     sed -i '/zh_CN.UTF-8/s/^# //g' /etc/locale.gen || echo 'zh_CN.UTF-8 UTF-8' >> /etc/locale.gen &&     locale-gen zh_CN.UTF-8 &&     ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone &&     rm -rf /var/lib/apt/lists/*
+#79 CACHED
+
+#80 [base 2/4] WORKDIR /app
+#80 CACHED
+
+#81 [base 4/4] RUN update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
+#81 CACHED
+
+#82 [final 1/1] COPY --from=publish /app/publish .
+#82 DONE 0.2s
+
+#83 exporting to image
+#83 exporting layers
+#83 exporting layers 0.4s done
+#83 writing image sha256:5833e8fba055d21a5232b32d85caa6bb6b9e38d2d47a76833171b4ce81573720 done
+#83 naming to docker.io/library/xyportal_authserver:1.0.1 done
+#83 DONE 0.4s

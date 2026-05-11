@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using Medallion.Threading;
 using Medallion.Threading.Redis;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -9,18 +7,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using XYPortal.Localization;
-using XYPortal.MultiTenancy;
-using XYPortal.Web.Menus;
-using StackExchange.Redis;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
+using System;
+using System.IO;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Authentication.OpenIdConnect;
 using Volo.Abp.AspNetCore.Mvc.Client;
 using Volo.Abp.AspNetCore.Mvc.Localization;
-using Volo.Abp.AspNetCore.Mvc.UI;
-using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
@@ -28,7 +24,6 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared.Toolbars;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
-using Volo.Abp.Mapperly;
 using Volo.Abp.Caching;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.DistributedLocking;
@@ -37,21 +32,28 @@ using Volo.Abp.Http.Client.Web;
 using Volo.Abp.Identity.Web;
 using Volo.Abp.Modularity;
 using Volo.Abp.MultiTenancy;
-using Volo.Abp.PermissionManagement.Web;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.SettingManagement.Web;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.TenantManagement.Web;
-using Volo.Abp.UI.Navigation.Urls;
-using Volo.Abp.UI;
 using Volo.Abp.UI.Navigation;
+using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using XYPortal.LinkBoard;
+using XYPortal.Localization;
+using XYPortal.MultiTenancy;
+using XYPortal.PasswordBook.Web;
+using XYPortal.RandomStringProvider;
+using XYPortal.RandomStringProvider.Web;
+using XYPortal.Web.Menus;
 
 namespace XYPortal.Web;
 
 [DependsOn(
     typeof(XYPortalHttpApiClientModule),
     typeof(XYPortalHttpApiModule),
+    typeof(LinkBoardHttpApiClientModule),
+    typeof(PasswordBookWebModule),
     typeof(AbpAspNetCoreAuthenticationOpenIdConnectModule),
     typeof(AbpAspNetCoreMvcClientModule),
     typeof(AbpHttpClientWebModule),
@@ -64,7 +66,9 @@ namespace XYPortal.Web;
     typeof(AbpIdentityWebModule),
     typeof(AbpTenantManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(RandomStringProviderWebModule),
+    typeof(RandomStringProviderApplicationModule)
     )]
 public class XYPortalWebModule : AbpModule
 {
@@ -86,6 +90,11 @@ public class XYPortalWebModule : AbpModule
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
 
+        if (!configuration.GetValue<bool>("App:RequireHttps"))
+        {
+            context.Services.AddSameSiteCookiePolicy();
+        }
+
         ConfigureBundles();
         ConfigureCache();
         ConfigureDataProtection(context, configuration, hostingEnvironment);
@@ -98,7 +107,23 @@ public class XYPortalWebModule : AbpModule
         ConfigureSwaggerServices(context.Services);
 
         context.Services.AddMapperlyObjectMapper<XYPortalWebModule>();
-    }
+
+
+
+		context.Services.AddLogging(
+			builder =>
+			{
+				builder.ClearProviders();
+
+#if DEBUG
+				builder.SetMinimumLevel(LogLevel.Debug);
+#else
+                builder.SetMinimumLevel(LogLevel.Warning);
+#endif
+
+				builder.AddLog4Net("log4net.xml", true);
+			});
+	}
 
     private void ConfigureBundles()
     {
@@ -284,6 +309,7 @@ public class XYPortalWebModule : AbpModule
     {
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
+        var configuration = context.GetConfiguration();
 
         if (env.IsDevelopment())
         {
@@ -297,12 +323,17 @@ public class XYPortalWebModule : AbpModule
             app.UseErrorPage();
         }
 
-        app.UseCorrelationId();
+		if (!configuration.GetValue<bool>("App:RequireHttps"))
+		{
+			app.UseCookiePolicy(); // Add this line before UseCorrelationId
+		}
+
+		app.UseCorrelationId();
         app.MapAbpStaticAssets();
         app.UseRouting();
         app.UseAuthentication();
 
-        if (MultiTenancyConsts.IsEnabled)
+        if (IsMultiTenancyEnabled())
         {
             app.UseMultiTenancy();
         }
@@ -316,5 +347,10 @@ public class XYPortalWebModule : AbpModule
         });
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+    }
+    
+    private static bool IsMultiTenancyEnabled()
+    {
+        return MultiTenancyConsts.IsEnabled;
     }
 }
