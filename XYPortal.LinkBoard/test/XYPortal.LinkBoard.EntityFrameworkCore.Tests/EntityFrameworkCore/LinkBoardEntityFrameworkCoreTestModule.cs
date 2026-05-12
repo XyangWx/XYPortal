@@ -1,10 +1,11 @@
-﻿using Microsoft.Data.Sqlite;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Sqlite;
 using Volo.Abp.Modularity;
+using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.Uow;
 
 namespace XYPortal.LinkBoard.EntityFrameworkCore;
@@ -12,15 +13,16 @@ namespace XYPortal.LinkBoard.EntityFrameworkCore;
 [DependsOn(
     typeof(LinkBoardApplicationTestModule),
     typeof(LinkBoardEntityFrameworkCoreModule),
-    typeof(AbpEntityFrameworkCoreSqliteModule)
+    typeof(AbpEntityFrameworkCoreSqliteModule),
+    typeof(AbpPermissionManagementEntityFrameworkCoreModule)
 )]
 public class LinkBoardEntityFrameworkCoreTestModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
-        PreConfigure<AbpSqliteOptions>(x => x.BusyTimeout = null);
+        PreConfigure<AbpSqliteOptions>(x => { x.BusyTimeout = null; });
     }
-    
+
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         context.Services.AddAlwaysDisableUnitOfWorkTransaction();
