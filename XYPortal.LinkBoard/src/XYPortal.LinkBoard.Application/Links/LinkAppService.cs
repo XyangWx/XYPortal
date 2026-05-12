@@ -225,6 +225,18 @@ public class LinkAppService : LinkBoardAppService, ILinkAppService
         return await FeatureChecker.GetAsync<int>(LinkBoardFeatures.MaxLinks);
     }
 
+    public virtual async Task<QueryMaxIndexOutput> QueryMaxIndexAsync(QueryMaxIndexInput input)
+    {
+        var maxSortOrder = input.CategoryId.HasValue
+            ? await _linkRepository.GetMaxSortOrderAsync(input.CategoryId.Value)
+            : null;
+
+        return new QueryMaxIndexOutput
+        {
+            Index = (maxSortOrder ?? 0) + 1
+        };
+    }
+
     private async Task<LinkDto> CreateOrUpdateDraftAsync(Link original, UpdateLinkDto input)
     {
         var draft = await _linkRepository.FindDraftByOriginalIdAsync(original.Id);

@@ -47,4 +47,6 @@ public interface ILinkRepository : IRepository<Link, Guid>
         Guid? currentUserId,
         Guid? categoryId,
         CancellationToken cancellationToken = default);
+
+    Task<int?> GetMaxSortOrderAsync(Guid categoryId, CancellationToken cancellationToken = default);
 }
