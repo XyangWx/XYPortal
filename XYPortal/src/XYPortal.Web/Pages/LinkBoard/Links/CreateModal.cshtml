@@ -9,12 +9,12 @@
 }
 
 <form method="post" asp-page="/LinkBoard/Links/CreateModal">
-    <abp-modal>
+    <abp-modal id="createLinkModal">
         <abp-modal-header title="@L["LinkBoard:NewLink"].Value"></abp-modal-header>
         <abp-modal-body>
             <div class="mb-3">
                 <label asp-for="Input.CategoryId" class="form-label">@L["LinkBoard:Category"]</label>
-                <select asp-for="Input.CategoryId" asp-items="Model.Categories" class="form-select" onchange="refreshSortOrder()"></select>
+                <select asp-for="Input.CategoryId" asp-items="Model.Categories" class="form-select" id="LinkCategorySelect"></select>
                 <span asp-validation-for="Input.CategoryId" class="text-danger"></span>
             </div>
             <div class="mb-3">
@@ -37,7 +37,7 @@
             </div>
             <div class="mb-3">
                 <label asp-for="Input.SortOrder" class="form-label">@L["LinkBoard:SortOrder"]</label>
-                <input asp-for="Input.SortOrder" type="number" class="form-control" />
+                <input asp-for="Input.SortOrder" type="number" class="form-control" id="LinkSortOrderInput" />
             </div>
             <div class="mb-3 form-check">
                 <input asp-for="Input.IsPublic" class="form-check-input" type="checkbox" />
@@ -47,25 +47,3 @@
         <abp-modal-footer buttons="@(AbpModalButtons.Cancel | AbpModalButtons.Save)"></abp-modal-footer>
     </abp-modal>
 </form>
-
-@section scripts {
-    <script>
-        async function refreshSortOrder() {
-            var categoryId = document.getElementById('Input_CategoryId').value;
-            var sortOrderInput = document.getElementById('Input_SortOrder');
-            
-            if (!categoryId) {
-                sortOrderInput.value = '';
-                return;
-            }
-            
-            try {
-                var response = await fetch('/api/app/link/max-index?categoryId=' + categoryId);
-                var result = await response.json();
-                sortOrderInput.value = result.index;
-            } catch (e) {
-                console.error('Failed to get max index:', e);
-            }
-        }
-    </script>
-}

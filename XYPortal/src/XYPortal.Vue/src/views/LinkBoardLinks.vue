@@ -161,25 +161,43 @@ const fetchData = async () => {
 
 const handleTableChange = (pag: any) => { pagination.current = pag.current; pagination.pageSize = pag.pageSize; fetchData(); };
 
+const debugLog = (...args: any[]) => {
+  if (import.meta.env.DEV) {
+    console.debug('[LinkBoard]', ...args);
+  }
+};
+
 const handleCreate = () => {
   editingItem.value = null;
-  Object.assign(form, { categoryId: '', title: '', url: '', description: '', icon: '', sortOrder: 0, isPublic: false });
+  // Auto-select first category if available
+  const firstCat = categories.value.length > 0 ? categories.value[0].id : '';
+  Object.assign(form, { categoryId: firstCat, title: '', url: '', description: '', icon: '', sortOrder: 0, isPublic: false });
   modalVisible.value = true;
+  // Refresh sort order for the selected category
+  if (firstCat) {
+    debugLog('handleCreate: auto-selected category', firstCat, ', triggering refreshSortOrder');
+    setTimeout(() => refreshSortOrder(), 100);
+  }
 };
 
 const refreshSortOrder = async () => {
+  debugLog('refreshSortOrder called, categoryId:', form.categoryId);
   if (!form.categoryId) {
     form.sortOrder = 0;
+    debugLog('No category selected, cleared sortOrder');
     return;
   }
   try {
+    debugLog('Fetching max-index for category:', form.categoryId);
     const user = await authService.getUser();
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
     const response = await axios.get(`${baseUrl}/api/app/link/max-index`, {
       headers: { Authorization: `Bearer ${user?.access_token}` },
       params: { categoryId: form.categoryId }
     });
+    debugLog('API response:', response.data);
     form.sortOrder = response.data.index;
+    debugLog('Set sortOrder to:', response.data.index);
   } catch (error) {
     console.error('获取最大排序索引失败:', error);
   }

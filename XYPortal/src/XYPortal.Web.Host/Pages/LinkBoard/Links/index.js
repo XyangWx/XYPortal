@@ -3,6 +3,49 @@ $(function () {
     var createModal = new abp.ModalManager(abp.appPath + 'LinkBoard/Links/CreateModal');
     var editModal = new abp.ModalManager(abp.appPath + 'LinkBoard/Links/EditModal');
 
+    // Global refreshSortOrder function for CreateModal
+    window.refreshSortOrder = function() {
+        var categorySelect = document.getElementById('LinkCategorySelect');
+        var sortOrderInput = document.getElementById('LinkSortOrderInput');
+        
+        console.log('[LinkBoard] refreshSortOrder called');
+        
+        if (!categorySelect || !sortOrderInput) {
+            console.log('[LinkBoard] Elements not found yet');
+            return;
+        }
+        
+        var categoryId = categorySelect.value;
+        console.log('[LinkBoard] categoryId:', categoryId);
+        
+        if (!categoryId) {
+            sortOrderInput.value = '';
+            return;
+        }
+        
+        fetch('/api/app/link/max-index?categoryId=' + categoryId)
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                console.log('[LinkBoard] API result:', result);
+                sortOrderInput.value = result.index;
+            })
+            .catch(function(e) {
+                console.error('[LinkBoard] Failed to get max index:', e);
+            });
+    };
+
+    // Hook into createModal events
+    createModal.onOpen(function() {
+        console.log('[LinkBoard] CreateModal opened');
+        // Wait a bit for the modal content to be fully rendered
+        setTimeout(window.refreshSortOrder, 100);
+    });
+
+    // Also watch for category select changes (when user switches category)
+    $(document).on('change', '#LinkCategorySelect', function() {
+        window.refreshSortOrder();
+    });
+
     var getStatusText = function (status) {
         switch (status) {
             case 0: return l('LinkBoard:StatusDraft');
