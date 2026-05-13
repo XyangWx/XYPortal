@@ -34,6 +34,8 @@ public class CreateModalModel : XYPortalPageModel
     {
         Input = new CreateViewModel();
         await LoadCategoriesAsync();
+        var maxIndexResult = await _linkAppService.QueryMaxIndexAsync(new QueryMaxIndexInput { CategoryId = null });
+        Input.SortOrder = (int)maxIndexResult.Index;
     }
 
     public async Task<IActionResult> OnPostAsync()
