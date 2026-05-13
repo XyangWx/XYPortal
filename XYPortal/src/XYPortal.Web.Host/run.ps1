@@ -112,9 +112,8 @@ function Test-PortAvailable {
         $listening = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
     }
     else {
-        # ss -tlnp only shows LISTEN sockets by default, TIME_WAIT does not appear here
-        $ssCmd = "ss -tlnp 2>/dev/null | grep ':$Port'"
-        $output = Invoke-Expression $ssCmd
+        # Use netstat to check for LISTEN state on the port
+        $output = & netstat -tlnp 2>/dev/null | grep ":$Port"
         $listening = $output
     }
     

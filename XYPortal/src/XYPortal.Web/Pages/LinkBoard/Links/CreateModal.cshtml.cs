@@ -34,6 +34,12 @@ public class CreateModalModel : XYPortalPageModel
     {
         Input = new CreateViewModel();
         await LoadCategoriesAsync();
+        // Auto-select first category if available
+        if (Categories.Any())
+        {
+            var firstCategory = Categories.First();
+            Input.CategoryId = Guid.Parse(firstCategory.Value);
+        }
     }
 
     public async Task<IActionResult> OnPostAsync()

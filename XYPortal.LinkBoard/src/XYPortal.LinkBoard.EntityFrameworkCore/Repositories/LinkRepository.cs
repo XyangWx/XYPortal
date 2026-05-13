@@ -236,6 +236,14 @@ public class LinkRepository
         return query;
     }
 
+    public async Task<int?> GetMaxSortOrderAsync(Guid categoryId, CancellationToken cancellationToken = default)
+    {
+        var dbSet = await GetDbSetAsync();
+        return await dbSet
+            .Where(x => x.CategoryId == categoryId && !x.IsDeleted)
+            .MaxAsync(x => (int?)x.SortOrder, cancellationToken);
+    }
+
 #if DEBUG
     private static string SerializeQuery(
         Guid? categoryId,
@@ -262,7 +270,7 @@ public class LinkRepository
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true,
             });
-        
+
         return objContent;
     }
 #endif

@@ -72,4 +72,10 @@ public class LinkController : LinkBoardController, ILinkAppService
     {
         return _linkAppService.GetMaxLinksAsync();
     }
+
+    [HttpGet("max-index")]
+    public virtual Task<QueryMaxIndexOutput> QueryMaxIndexAsync([FromQuery] QueryMaxIndexInput input)
+    {
+        return _linkAppService.QueryMaxIndexAsync(input);
+    }
 }

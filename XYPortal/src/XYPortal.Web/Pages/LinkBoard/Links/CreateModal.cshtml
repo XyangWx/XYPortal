@@ -9,12 +9,12 @@
 }
 
 <form method="post" asp-page="/LinkBoard/Links/CreateModal">
-    <abp-modal>
+    <abp-modal id="createLinkModal">
         <abp-modal-header title="@L["LinkBoard:NewLink"].Value"></abp-modal-header>
         <abp-modal-body>
             <div class="mb-3">
                 <label asp-for="Input.CategoryId" class="form-label">@L["LinkBoard:Category"]</label>
-                <select asp-for="Input.CategoryId" asp-items="Model.Categories" class="form-select"></select>
+                <select asp-for="Input.CategoryId" asp-items="Model.Categories" class="form-select" id="LinkCategorySelect"></select>
                 <span asp-validation-for="Input.CategoryId" class="text-danger"></span>
             </div>
             <div class="mb-3">
@@ -37,7 +37,7 @@
             </div>
             <div class="mb-3">
                 <label asp-for="Input.SortOrder" class="form-label">@L["LinkBoard:SortOrder"]</label>
-                <input asp-for="Input.SortOrder" type="number" class="form-control" />
+                <input asp-for="Input.SortOrder" type="number" class="form-control" id="LinkSortOrderInput" />
             </div>
             <div class="mb-3 form-check">
                 <input asp-for="Input.IsPublic" class="form-check-input" type="checkbox" />

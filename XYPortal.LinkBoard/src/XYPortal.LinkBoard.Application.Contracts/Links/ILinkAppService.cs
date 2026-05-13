@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -17,4 +16,5 @@ public interface ILinkAppService : IApplicationService
     Task WithdrawAsync(Guid id);
     Task<PagedResultDto<LinkDto>> GetPublicBoardAsync(GetPublicBoardInput input);
     Task<int> GetMaxLinksAsync();
+    Task<QueryMaxIndexOutput> QueryMaxIndexAsync(QueryMaxIndexInput input);
 }
