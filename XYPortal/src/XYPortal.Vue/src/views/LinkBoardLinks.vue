@@ -62,7 +62,7 @@
     >
       <a-form ref="formRef" :model="form" :rules="formRules" layout="vertical">
         <a-form-item label="分类" name="categoryId" required>
-          <a-select v-model:value="form.categoryId" placeholder="请选择分类">
+          <a-select v-model:value="form.categoryId" placeholder="请选择分类" @change="refreshSortOrder">
             <a-select-option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.displayName || cat.name }}</a-select-option>
           </a-select>
         </a-form-item>
@@ -165,6 +165,24 @@ const handleCreate = () => {
   editingItem.value = null;
   Object.assign(form, { categoryId: '', title: '', url: '', description: '', icon: '', sortOrder: 0, isPublic: false });
   modalVisible.value = true;
+};
+
+const refreshSortOrder = async () => {
+  if (!form.categoryId) {
+    form.sortOrder = 0;
+    return;
+  }
+  try {
+    const user = await authService.getUser();
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const response = await axios.get(`${baseUrl}/api/app/link/max-index`, {
+      headers: { Authorization: `Bearer ${user?.access_token}` },
+      params: { categoryId: form.categoryId }
+    });
+    form.sortOrder = response.data.index;
+  } catch (error) {
+    console.error('获取最大排序索引失败:', error);
+  }
 };
 
 const handleAction = async (key: string, record: LinkDto) => {
