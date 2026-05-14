@@ -351,6 +351,9 @@ public class PasswordBookAppService : CrudAppService<PasswordBookEntity, Passwor
     {
         await CheckPasswordBookPermissionAsync();
 
+        // Debug logging
+        Console.WriteLine($"[DEBUG] CreateAsync input: RequireUppercase={input.RequireUppercase}, RequireLowercase={input.RequireLowercase}, RequireDigit={input.RequireDigit}, RequireSpecialChar={input.RequireSpecialChar}");
+
         var passwordFormat = new PasswordFormatRequirement(
             input.MinLength,
             input.MaxLength,

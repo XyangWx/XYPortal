@@ -30,8 +30,14 @@ $(function () {
             description: formData.get('CreateInput.Description') || form.querySelector('[name="CreateInput.Description"]')?.value || null,
             allowedType: parseInt(formData.get('CreateInput.AllowedType') || form.querySelector('[name="CreateInput.AllowedType"]')?.value || 1),
             minLength: parseInt(formData.get('CreateInput.MinLength') || form.querySelector('[name="CreateInput.MinLength"]')?.value || 8),
-            maxLength: parseInt(formData.get('CreateInput.MaxLength') || form.querySelector('[name="CreateInput.MaxLength"]')?.value || 20)
+            maxLength: parseInt(formData.get('CreateInput.MaxLength') || form.querySelector('[name="CreateInput.MaxLength"]')?.value || 20),
+            requireUppercase: form.querySelector('[name="CreateInput.RequireUppercase"]')?.checked || false,
+            requireLowercase: form.querySelector('[name="CreateInput.RequireLowercase"]')?.checked || false,
+            requireDigit: form.querySelector('[name="CreateInput.RequireDigit"]')?.checked || false,
+            requireSpecialChar: form.querySelector('[name="CreateInput.RequireSpecialChar"]')?.checked || false
         };
+
+        console.log('[DEBUG] createPasswordBook input:', JSON.stringify(input, null, 2));
 
         if (!input.name) {
             abp.notify.error('Password book name is required');

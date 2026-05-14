@@ -229,6 +229,28 @@
             </abp-select>
             <abp-input asp-for="CreateInput.MinLength" label="@L["MinLength"]" value="8" />
             <abp-input asp-for="CreateInput.MaxLength" label="@L["MaxLength"]" value="20" />
+            <div class="mb-3">
+                <div class="form-check">
+                    <input type="hidden" name="CreateInput.RequireUppercase" value="false" />
+                    <input type="checkbox" class="form-check-input" id="CreateInput_RequireUppercase" name="CreateInput.RequireUppercase" value="true" checked />
+                    <label class="form-check-label" for="CreateInput_RequireUppercase">@L["RequireUppercase"]</label>
+                </div>
+                <div class="form-check">
+                    <input type="hidden" name="CreateInput.RequireLowercase" value="false" />
+                    <input type="checkbox" class="form-check-input" id="CreateInput_RequireLowercase" name="CreateInput.RequireLowercase" value="true" checked />
+                    <label class="form-check-label" for="CreateInput_RequireLowercase">@L["RequireLowercase"]</label>
+                </div>
+                <div class="form-check">
+                    <input type="hidden" name="CreateInput.RequireDigit" value="false" />
+                    <input type="checkbox" class="form-check-input" id="CreateInput_RequireDigit" name="CreateInput.RequireDigit" value="true" checked />
+                    <label class="form-check-label" for="CreateInput_RequireDigit">@L["RequireDigit"]</label>
+                </div>
+                <div class="form-check">
+                    <input type="hidden" name="CreateInput.RequireSpecialChar" value="false" />
+                    <input type="checkbox" class="form-check-input" id="CreateInput_RequireSpecialChar" name="CreateInput.RequireSpecialChar" value="true" checked />
+                    <label class="form-check-label" for="CreateInput_RequireSpecialChar">@L["RequireSpecialChar"]</label>
+                </div>
+            </div>
         </form>
     </abp-modal-body>
     <abp-modal-footer>

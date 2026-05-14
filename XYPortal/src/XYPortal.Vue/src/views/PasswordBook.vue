@@ -77,6 +77,18 @@
         <a-form-item label="最大长度" name="maxLength">
           <a-input-number v-model:value="form.maxLength" :min="8" :max="200" style="width: 100%" />
         </a-form-item>
+        <a-form-item label="必须包含大写字母" name="requireUppercase">
+          <a-switch v-model:checked="form.requireUppercase" />
+        </a-form-item>
+        <a-form-item label="必须包含小写字母" name="requireLowercase">
+          <a-switch v-model:checked="form.requireLowercase" />
+        </a-form-item>
+        <a-form-item label="必须包含数字" name="requireDigit">
+          <a-switch v-model:checked="form.requireDigit" />
+        </a-form-item>
+        <a-form-item label="必须包含特殊字符" name="requireSpecialChar">
+          <a-switch v-model:checked="form.requireSpecialChar" />
+        </a-form-item>
       </a-form>
       <template #footer>
         <a-button @click="handleCancelModal">取消</a-button>
@@ -299,6 +311,10 @@ const form = reactive({
   allowedType: 1,
   minLength: 8,
   maxLength: 20,
+  requireUppercase: true,
+  requireLowercase: true,
+  requireDigit: true,
+  requireSpecialChar: true,
 });
 
 const formRules = {
@@ -391,7 +407,17 @@ const handleTableChange = (pag: any) => {
 
 const handleCreate = () => {
   editingItem.value = null;
-  Object.assign(form, { name: '', description: '', allowedType: 1, minLength: 8, maxLength: 20 });
+  Object.assign(form, {
+    name: '',
+    description: '',
+    allowedType: 1,
+    minLength: 8,
+    maxLength: 20,
+    requireUppercase: true,
+    requireLowercase: true,
+    requireDigit: true,
+    requireSpecialChar: true,
+  });
   modalVisible.value = true;
 };
 
@@ -415,6 +441,10 @@ const handleSave = async () => {
           allowedType: form.allowedType,
           minLength: form.minLength,
           maxLength: form.maxLength,
+          requireUppercase: form.requireUppercase,
+          requireLowercase: form.requireLowercase,
+          requireDigit: form.requireDigit,
+          requireSpecialChar: form.requireSpecialChar,
         },
         { headers: { Authorization: `Bearer ${user?.access_token}` } }
       );
@@ -428,6 +458,10 @@ const handleSave = async () => {
           allowedType: form.allowedType,
           minLength: form.minLength,
           maxLength: form.maxLength,
+          requireUppercase: form.requireUppercase,
+          requireLowercase: form.requireLowercase,
+          requireDigit: form.requireDigit,
+          requireSpecialChar: form.requireSpecialChar,
         },
         { headers: { Authorization: `Bearer ${user?.access_token}` } }
       );
