@@ -10,9 +10,38 @@ const authConfig = {
   response_type: 'code',
   scope: 'openid profile roles email phone XYPortal',
   userStore: new WebStorageStateStore({ store: window.localStorage }),
+  automaticSilentRenew: true,         // 启用 access token 自动刷新
+  silent_redirect_uri: `${window.location.origin}/silent-renew.html`,
+  silentRequestTimeoutInSeconds: 10,  // silent renew 请求超时时间
+  monitorAccessTokenExpiry: true,     // 监控 access token 过期
 };
 
 const userManager = new UserManager(authConfig);
+
+// 监听 token 刷新事件
+userManager.events.addAccessTokenExpiring(() => {
+  console.log('[Auth] Access token expiring, renew in progress...');
+});
+
+userManager.events.addAccessTokenExpired(() => {
+  console.log('[Auth] Access token expired, user will be logged out');
+  // token 过期后尝试静默刷新，失败则跳转登录
+  userManager.signinSilent().catch(() => {
+    userManager.signinRedirect();
+  });
+});
+
+userManager.events.addUserExpired(() => {
+  console.log('[Auth] User session expired');
+  userManager.signinRedirect();
+});
+
+userManager.events.addUserLoaded((user) => {
+  console.log('[Auth] User loaded:', user?.profile?.sub);
+});
+
+// 启动静默刷新服务
+userManager.startSilentRenew();
 
 const updateAuthState = (user: User | null) => {
   authState.user = user;
@@ -57,9 +86,9 @@ export const authService = {
     updateAuthState(null);
   },
 
-  async signinCallback(): Promise<User> {
+  async signinCallback(): Promise<User | null> {
     const user = await userManager.signinCallback();
-    updateAuthState(user);
+    updateAuthState(user ?? null);
     // 登录成功后立即同步 Profile
     await this.getProfile().catch(() => {});
     return user;
