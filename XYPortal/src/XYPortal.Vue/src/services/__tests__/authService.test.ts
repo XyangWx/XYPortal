@@ -10,7 +10,7 @@ const mockStartSilentRenew = vi.fn();
 const mockEvents = {
   addAccessTokenExpiring: vi.fn(),
   addAccessTokenExpired: vi.fn(),
-  addUserExpired: vi.fn(),
+  addUserUnloaded: vi.fn(),
   addUserLoaded: vi.fn(),
 };
 

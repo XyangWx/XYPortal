@@ -6,20 +6,28 @@
 #   ./build.sh -a "http://api.example.com"        # 只更新 VITE_API_BASE_URL
 #   ./build.sh -o "http://auth.example.com"       # 只更新 VITE_AUTH_SERVER_URL
 #   ./build.sh -a "http://api.example.com" -o "http://auth.example.com"  # 同时更新
+#   ./build.sh --ad                               # 启用 VITE_AUTH_DEBUG=true
 #
 
 set -euo pipefail
 
 A_VALUE=""
 O_VALUE=""
+AD_FLAG=false
 
 # ---------- 解析参数 ----------
-while getopts "a:o:" opt; do
+while getopts "a:o:-:" opt; do
     case "$opt" in
         a) A_VALUE="$OPTARG" ;;
         o) O_VALUE="$OPTARG" ;;
-        *) echo "用法: $0 [-a VITE_API_BASE_URL] [-o VITE_AUTH_SERVER_URL]"
-           exit 1 ;;
+        -)
+            case "$OPTARG" in
+                ad) AD_FLAG=true ;;
+                *)  echo "用法: $0 [-a VITE_API_BASE_URL] [-o VITE_AUTH_SERVER_URL] [--ad]"
+                    exit 1 ;;
+            esac ;;
+        *)  echo "用法: $0 [-a VITE_API_BASE_URL] [-o VITE_AUTH_SERVER_URL] [--ad]"
+            exit 1 ;;
     esac
 done
 
@@ -73,6 +81,15 @@ fi
 
 if [[ -z "$A_VALUE" && -z "$O_VALUE" ]]; then
     echo "未提供参数，使用 .env 中现有配置进行构建"
+fi
+
+# ---------- 处理 --ad 开关 ----------
+if [[ "$AD_FLAG" == "true" ]]; then
+    echo "更新 VITE_AUTH_DEBUG (--ad 开关):"
+    update_env_var "VITE_AUTH_DEBUG" "true" "$ENV_FILE"
+else
+    echo "VITE_AUTH_DEBUG 设置为 false"
+    update_env_var "VITE_AUTH_DEBUG" "false" "$ENV_FILE"
 fi
 
 echo ""
