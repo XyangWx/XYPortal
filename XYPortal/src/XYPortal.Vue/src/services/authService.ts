@@ -2,6 +2,15 @@ import { UserManager, WebStorageStateStore, User } from 'oidc-client-ts';
 import { reactive } from 'vue';
 import axios from 'axios';
 
+const DEBUG = import.meta.env.VITE_AUTH_DEBUG === 'true';
+
+const log = {
+  debug: (...args: any[]) => { if (DEBUG) console.log('[Auth:debug]', ...args); },
+  info: (...args: any[]) => { if (DEBUG) console.info('[Auth:debug]', ...args); },
+  warn: (...args: any[]) => { if (DEBUG) console.warn('[Auth:debug]', ...args); },
+  error: (...args: any[]) => { if (DEBUG) console.error('[Auth:debug]', ...args); },
+};
+
 const authConfig = {
   authority: import.meta.env.VITE_AUTH_SERVER_URL,
   client_id: 'XYPortal_Vue',
@@ -10,9 +19,60 @@ const authConfig = {
   response_type: 'code',
   scope: 'openid profile roles email phone XYPortal',
   userStore: new WebStorageStateStore({ store: window.localStorage }),
+  automaticSilentRenew: true,         // 启用 access token 自动刷新
+  silent_redirect_uri: `${window.location.origin}/silent-renew.html`,
+  silentRequestTimeoutInSeconds: 10,  // silent renew 请求超时时间
+  monitorAccessTokenExpiry: true,     // 监控 access token 过期
 };
 
 const userManager = new UserManager(authConfig);
+
+if (DEBUG) {
+  log.info('Auth service initialized, debug mode enabled');
+  log.info('Auth server:', import.meta.env.VITE_AUTH_SERVER_URL);
+}
+
+// 监听 token 刷新事件
+userManager.events.addAccessTokenExpiring(() => {
+  log.warn('[Access Token 即将过期] 开始自动刷新...');
+  userManager.signinSilent().then((user) => {
+    log.info('[Access Token 刷新成功] expires_at:', user?.expires_at);
+  }).catch((err) => {
+    log.error('[Access Token 刷新失败]', err);
+  });
+});
+
+userManager.events.addAccessTokenExpired(() => {
+  log.warn('[Access Token 已过期] 尝试静默刷新，失败则跳转登录');
+  userManager.signinSilent().then((user) => {
+    log.info('[Access Token 刷新成功]', user?.expires_at);
+  }).catch((err) => {
+    log.error('[Access Token 刷新失败，跳转登录]', err);
+    userManager.signinRedirect();
+  });
+});
+
+userManager.events.addUserUnloaded(() => {
+  log.warn('[User 已从存储移除] 会话过期，跳转登录');
+  userManager.signinRedirect();
+});
+
+userManager.events.addUserLoaded((user) => {
+  log.info('[User 加载成功]', {
+    sub: user?.profile?.sub,
+    preferred_username: user?.profile?.preferred_username,
+    expires_at: user?.expires_at,
+    scopes: user?.scope,
+  });
+});
+
+userManager.events.addSilentRenewError((err) => {
+  log.error('[Silent Renew 错误]', err);
+});
+
+// 启动静默刷新服务
+if (DEBUG) log.info('[启动 Silent Renew]');
+userManager.startSilentRenew();
 
 const updateAuthState = (user: User | null) => {
   authState.user = user;
@@ -40,7 +100,7 @@ export const authState = reactive({
 export const authService = {
   async getUser(): Promise<User | null> {
     const user = await userManager.getUser();
-    updateAuthState(user);
+    updateAuthState(user ?? null);
     if (user) {
       // 异步获取最新的 Profile 以纠正显示名称
       this.getProfile().catch(() => {});
@@ -57,9 +117,9 @@ export const authService = {
     updateAuthState(null);
   },
 
-  async signinCallback(): Promise<User> {
+  async signinCallback(): Promise<User | null> {
     const user = await userManager.signinCallback();
-    updateAuthState(user);
+    updateAuthState(user ?? null);
     // 登录成功后立即同步 Profile
     await this.getProfile().catch(() => {});
     return user;
