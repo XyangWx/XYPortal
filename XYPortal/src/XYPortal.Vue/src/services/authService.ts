@@ -121,6 +121,7 @@ export const authService = {
 
   async logout(): Promise<void> {
     log.info('[Logout] 正在注销...');
+    userManager.stopSilentRenew();
     await userManager.removeUser();
     updateAuthState(null);
     log.info('[Logout] 本地状态已清除，跳转 IdP 注销');

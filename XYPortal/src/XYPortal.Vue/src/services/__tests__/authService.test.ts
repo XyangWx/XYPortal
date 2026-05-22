@@ -7,6 +7,7 @@ const mockSigninCallback = vi.fn().mockResolvedValue(null);
 const mockSignoutRedirect = vi.fn();
 const mockRemoveUser = vi.fn().mockResolvedValue(undefined);
 const mockSigninSilent = vi.fn().mockResolvedValue(null);
+const mockStopSilentRenew = vi.fn();
 const mockStartSilentRenew = vi.fn();
 const mockEvents = {
   addAccessTokenExpiring: vi.fn((handler) => { capturedHandlers.accessTokenExpiring = handler; }),
@@ -34,6 +35,7 @@ vi.mock('oidc-client-ts', () => {
       this.signinSilent = mockSigninSilent;
       this.events = mockEvents;
       this.startSilentRenew = mockStartSilentRenew;
+      this.stopSilentRenew = mockStopSilentRenew;
     }),
     WebStorageStateStore: vi.fn(),
     User: class MockUser {
@@ -184,9 +186,15 @@ describe('authService - Token Refresh Feature', () => {
 
     it('should handle logout correctly', async () => {
       await authService.logout();
+      expect(mockStopSilentRenew).toHaveBeenCalledTimes(1);
       expect(mockRemoveUser).toHaveBeenCalled();
       expect(mockSignoutRedirect).toHaveBeenCalled();
       expect(authState.isAuthenticated).toBe(false);
+    });
+
+    it('should stop silent renew when logging out', async () => {
+      await authService.logout();
+      expect(mockStopSilentRenew).toHaveBeenCalledTimes(1);
     });
   });
 
