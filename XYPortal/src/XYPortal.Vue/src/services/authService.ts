@@ -43,18 +43,23 @@ userManager.events.addAccessTokenExpiring(() => {
 });
 
 userManager.events.addAccessTokenExpired(() => {
-  log.warn('[Access Token 已过期] 尝试静默刷新，失败则跳转登录');
+  log.warn('[Access Token 已过期] 尝试静默刷新，失败则清除本地状态');
   userManager.signinSilent().then((user) => {
     log.info('[Access Token 刷新成功]', user?.expires_at);
   }).catch((err) => {
-    log.error('[Access Token 刷新失败，跳转登录]', err);
-    userManager.signinRedirect();
+    log.error('[Access Token 刷新失败，清除本地状态]', err);
+    userManager.removeUser().then(() => {
+      updateAuthState(null);
+      log.info('[已清除本地用户状态]');
+    });
   });
 });
 
 userManager.events.addUserUnloaded(() => {
-  log.warn('[User 已从存储移除] 会话过期，跳转登录');
-  userManager.signinRedirect();
+  log.warn('[User 已从存储移除] 会话过期');
+  // 不再跳转到登录页，仅清除本地状态，用户可继续在主页以未登录状态浏览
+  updateAuthState(null);
+  log.info('[已清除本地用户状态]');
 });
 
 userManager.events.addUserLoaded((user) => {
@@ -66,9 +71,11 @@ userManager.events.addUserLoaded((user) => {
   });
 });
 
-userManager.events.addSilentRenewError((err) => {
-  log.error('[Silent Renew 错误]', err);
-});
+if (typeof (userManager.events as any).addSilentRenewError === 'function') {
+  (userManager.events as any).addSilentRenewError((err: any) => {
+    log.error('[Silent Renew 错误]', err);
+  });
+}
 
 // 启动静默刷新服务
 if (DEBUG) log.info('[启动 Silent Renew]');
@@ -113,8 +120,12 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
-    await userManager.signoutRedirect();
+    log.info('[Logout] 正在注销...');
+    userManager.stopSilentRenew();
+    await userManager.removeUser();
     updateAuthState(null);
+    log.info('[Logout] 本地状态已清除，跳转 IdP 注销');
+    await userManager.signoutRedirect();
   },
 
   async signinCallback(): Promise<User | null> {

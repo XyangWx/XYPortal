@@ -1,17 +1,26 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 
 // Create mock functions
 const mockGetUser = vi.fn().mockResolvedValue(null);
 const mockSigninRedirect = vi.fn();
 const mockSigninCallback = vi.fn().mockResolvedValue(null);
 const mockSignoutRedirect = vi.fn();
+const mockRemoveUser = vi.fn().mockResolvedValue(undefined);
 const mockSigninSilent = vi.fn().mockResolvedValue(null);
+const mockStopSilentRenew = vi.fn();
 const mockStartSilentRenew = vi.fn();
 const mockEvents = {
-  addAccessTokenExpiring: vi.fn(),
-  addAccessTokenExpired: vi.fn(),
-  addUserUnloaded: vi.fn(),
+  addAccessTokenExpiring: vi.fn((handler) => { capturedHandlers.accessTokenExpiring = handler; }),
+  addAccessTokenExpired: vi.fn((handler) => { capturedHandlers.accessTokenExpired = handler; }),
+  addUserUnloaded: vi.fn((handler) => { capturedHandlers.userUnloaded = handler; }),
   addUserLoaded: vi.fn(),
+};
+
+// Capture registered event handlers for testing
+const capturedHandlers = {
+  accessTokenExpiring: null as ((...args: any[]) => void) | null,
+  accessTokenExpired: null as ((...args: any[]) => void) | null,
+  userUnloaded: null as ((...args: any[]) => void) | null,
 };
 
 // Mock the module
@@ -22,9 +31,11 @@ vi.mock('oidc-client-ts', () => {
       this.signinRedirect = mockSigninRedirect;
       this.signinCallback = mockSigninCallback;
       this.signoutRedirect = mockSignoutRedirect;
+      this.removeUser = mockRemoveUser;
       this.signinSilent = mockSigninSilent;
       this.events = mockEvents;
       this.startSilentRenew = mockStartSilentRenew;
+      this.stopSilentRenew = mockStopSilentRenew;
     }),
     WebStorageStateStore: vi.fn(),
     User: class MockUser {
@@ -175,8 +186,68 @@ describe('authService - Token Refresh Feature', () => {
 
     it('should handle logout correctly', async () => {
       await authService.logout();
+      expect(mockStopSilentRenew).toHaveBeenCalledTimes(1);
+      expect(mockRemoveUser).toHaveBeenCalled();
       expect(mockSignoutRedirect).toHaveBeenCalled();
       expect(authState.isAuthenticated).toBe(false);
+    });
+
+    it('should stop silent renew when logging out', async () => {
+      await authService.logout();
+      expect(mockStopSilentRenew).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Token Expiry and State Clearance', () => {
+    it('should not redirect when user unloaded - only clear local state', async () => {
+      const unloadHandler = capturedHandlers.userUnloaded;
+      expect(unloadHandler).not.toBeNull();
+
+      authState.user = { access_token: 'test' } as any;
+      authState.isAuthenticated = true;
+      authState.displayName = 'Test User';
+
+      await unloadHandler!();
+
+      expect(authState.isAuthenticated).toBe(false);
+      expect(authState.user).toBeNull();
+      expect(authState.displayName).toBe('');
+      expect(mockSigninRedirect).not.toHaveBeenCalled();
+      expect(mockSignoutRedirect).not.toHaveBeenCalled();
+    });
+
+    it('should remove user from storage when access token expired and refresh fails', async () => {
+      const expiredHandler = capturedHandlers.accessTokenExpired;
+      expect(expiredHandler).not.toBeNull();
+
+      mockSigninSilent.mockRejectedValueOnce(new Error('refresh_failed'));
+
+      authState.user = { access_token: 'expired' } as any;
+      authState.isAuthenticated = true;
+
+      await expiredHandler!();
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(mockRemoveUser).toHaveBeenCalled();
+      expect(authState.isAuthenticated).toBe(false);
+      expect(mockSigninRedirect).not.toHaveBeenCalled();
+    });
+
+    it('should not clear state when access token refresh succeeds', async () => {
+      const expiredHandler = capturedHandlers.accessTokenExpired;
+      expect(expiredHandler).not.toBeNull();
+
+      const refreshedUser = { access_token: 'new-token', expires_at: Date.now() + 3600000 };
+      mockSigninSilent.mockResolvedValueOnce(refreshedUser);
+
+      authState.user = { access_token: 'old-token' } as any;
+      authState.isAuthenticated = true;
+
+      await expiredHandler!();
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(mockRemoveUser).not.toHaveBeenCalled();
+      expect(mockSigninRedirect).not.toHaveBeenCalled();
     });
   });
 });
