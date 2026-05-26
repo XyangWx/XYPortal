@@ -6,8 +6,12 @@ namespace XYPortal.Web
 {
 	public static class SameSiteCookiesServiceCollectionExtensions
 	{
-		public static IServiceCollection AddSameSiteCookiePolicy(this IServiceCollection services)
+		private static bool _useSameSitePolicy;
+
+		public static IServiceCollection AddSameSiteCookiePolicy(this IServiceCollection services, bool useSameSitePolicy = false)
 		{
+			_useSameSitePolicy = useSameSitePolicy;
+
 			services.Configure<CookiePolicyOptions>(options =>
 			{
 				options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
@@ -22,6 +26,11 @@ namespace XYPortal.Web
 
 		private static void CheckSameSite(HttpContext httpContext, CookieOptions options)
 		{
+			if (!_useSameSitePolicy)
+			{
+				return;
+			}
+
 			if (options.SameSite == SameSiteMode.None)
 			{
 				var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
@@ -56,11 +65,8 @@ namespace XYPortal.Web
 				return true;
 			}
 
-			// Cover Chrome 50-69, because some versions are broken by SameSite=None, 
-			// and none in this range require it.
-			// Note: this covers some pre-Chromium Edge versions, 
-			// but pre-Chromium Edge does not require SameSite=None.
-			if (userAgent.Contains("Chrome/5") || userAgent.Contains("Chrome/6"))
+			// 🌟 核心修正：使用全局标准的正则，严格拦截 Chrome 50-69 版本，避免误伤 100+ 版本
+			if (System.Text.RegularExpressions.Regex.IsMatch(userAgent, @"Chrome/((5[0-9])|(6[0-9]))\."))
 			{
 				return true;
 			}
