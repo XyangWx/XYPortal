@@ -53,6 +53,8 @@ namespace XYPortal;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class XYPortalAuthServerModule : AbpModule
 {
+    private static bool _useSameSitePolicy;
+
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
         var hostingEnvironment = context.Services.GetHostingEnvironment();
@@ -92,6 +94,9 @@ public class XYPortalAuthServerModule : AbpModule
     {
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
+
+        // 读取 SameSite 策略开关配置
+        _useSameSitePolicy = configuration.GetValue<bool>("App:UseSameSitePolicy", false);
 
         Configure<AbpLocalizationOptions>(options =>
         {
@@ -189,6 +194,11 @@ public class XYPortalAuthServerModule : AbpModule
     // ReSharper disable once UnusedMember.Local
     private void CheckSameSite(HttpContext httpContext, CookieOptions options)
     {
+        if (!_useSameSitePolicy)
+        {
+            return;
+        }
+
         if (options.SameSite != SameSiteMode.None)
         {
             return;
@@ -214,7 +224,8 @@ public class XYPortalAuthServerModule : AbpModule
             return true;
         }
 
-        if (userAgent.Contains("Chrome/5") || userAgent.Contains("Chrome/6"))
+        // 🌟 核心修正：使用全局标准的正则，严格拦截 Chrome 50-69 版本，避免误伤 100+ 版本
+        if (System.Text.RegularExpressions.Regex.IsMatch(userAgent, @"Chrome/((5[0-9])|(6[0-9]))\."))
         {
             return true;
         }
