@@ -120,7 +120,7 @@ public class XYPortalWebModule : AbpModule
 
 		if (!configuration.GetValue<bool>("App:RequireHttps"))
 		{
-			context.Services.AddSameSiteCookiePolicy();
+			context.Services.AddSameSiteCookiePolicy(configuration.GetValue<bool>("App:UseSameSitePolicy", false));
 		}
 
 		ConfigureAuthentication(context);
