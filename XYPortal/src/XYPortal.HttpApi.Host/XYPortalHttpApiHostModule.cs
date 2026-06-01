@@ -202,8 +202,9 @@ public class XYPortalHttpApiHostModule : AbpModule
 
         app.UseSwagger();
         var configuration = context.GetConfiguration();
-        var swaggerDisplay = configuration["App:SwaggerDisplay"];
-        if (string.IsNullOrEmpty(swaggerDisplay) || swaggerDisplay.Equals("true", StringComparison.OrdinalIgnoreCase))
+        var swaggerDisplay = configuration.GetSection("App")?.GetValue<bool?>("SwaggerDisplay");
+        
+        if (swaggerDisplay.HasValue && swaggerDisplay.Value)
         {
             app.UseAbpSwaggerUI(options =>
             {
