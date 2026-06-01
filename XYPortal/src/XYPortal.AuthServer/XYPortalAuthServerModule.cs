@@ -35,6 +35,7 @@ using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 using Volo.Abp.Account.Localization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace XYPortal;
 
@@ -53,7 +54,7 @@ namespace XYPortal;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class XYPortalAuthServerModule : AbpModule
 {
-    private static bool _useSameSitePolicy;
+    private bool _useSameSitePolicy;
 
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
@@ -96,7 +97,7 @@ public class XYPortalAuthServerModule : AbpModule
         var configuration = context.Services.GetConfiguration();
 
         // 读取 SameSite 策略开关配置
-        _useSameSitePolicy = configuration.GetValue<bool>("App:UseSameSitePolicy", false);
+        _useSameSitePolicy = configuration.GetSection("App").GetValue<bool>("UseSameSitePolicy", false);
 
         Configure<AbpLocalizationOptions>(options =>
         {

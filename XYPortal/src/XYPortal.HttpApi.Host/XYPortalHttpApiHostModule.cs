@@ -201,14 +201,18 @@ public class XYPortalHttpApiHostModule : AbpModule
         app.UseAuthorization();
 
         app.UseSwagger();
-        app.UseAbpSwaggerUI(options =>
+        var configuration = context.GetConfiguration();
+        var swaggerDisplay = configuration["App:SwaggerDisplay"];
+        if (string.IsNullOrEmpty(swaggerDisplay) || swaggerDisplay.Equals("true", StringComparison.OrdinalIgnoreCase))
         {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "XYPortal API");
+            app.UseAbpSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "XYPortal API");
 
-            var configuration = context.GetConfiguration();
-            options.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
-            options.OAuthScopes("XYPortal");
-        });
+                options.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
+                options.OAuthScopes("XYPortal");
+            });
+        }
 
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
