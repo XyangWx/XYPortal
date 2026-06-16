@@ -17,7 +17,7 @@ const authConfig = {
   redirect_uri: `${window.location.origin}/signin-oidc`,
   post_logout_redirect_uri: `${window.location.origin}/`,
   response_type: 'code',
-  scope: 'openid profile roles email phone XYPortal',
+  scope: 'openid profile roles email phone offline_access XYPortal',
   userStore: new WebStorageStateStore({ store: window.localStorage }),
   automaticSilentRenew: true,         // 启用 access token 自动刷新
   silent_redirect_uri: `${window.location.origin}/silent-renew.html`,

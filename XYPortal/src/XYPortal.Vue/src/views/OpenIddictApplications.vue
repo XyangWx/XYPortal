@@ -198,7 +198,7 @@ const availableGrantTypes = [
   { value: 'urn:ietf:params:oauth:grant-type:device_code', label: 'Device Code' },
 ];
 
-const wellKnownScopes = ['openid', 'profile', 'email', 'phone', 'address', 'roles'];
+const wellKnownScopes = ['openid', 'profile', 'email', 'phone', 'address', 'roles', 'offline_access'];
 const availableScopes = ref<{ name: string; displayName?: string }[]>(
   wellKnownScopes.map(s => ({ name: s }))
 );
