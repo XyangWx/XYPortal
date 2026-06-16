@@ -11,6 +11,20 @@ const log = {
   error: (...args: any[]) => { if (DEBUG) console.error('[Auth:debug]', ...args); },
 };
 
+/** 取 access_token 前 N 字符用于日志对比(token 太长,只看签名前缀). */
+const tokenFingerprint = (token: string | undefined | null): string => {
+  if (!token) return '<none>';
+  return token.length <= 8 ? token : `${token.slice(0, 8)}…(${token.length})`;
+};
+
+/** 秒数转人类可读 "Xm Ys" / "Xs". */
+const fmtRemaining = (seconds: number): string => {
+  if (seconds < 0) return `${seconds}s (already expired)`;
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return m > 0 ? `${m}m${s}s` : `${s}s`;
+};
+
 const authConfig = {
   authority: import.meta.env.VITE_AUTH_SERVER_URL,
   client_id: 'XYPortal_Vue',
@@ -34,19 +48,65 @@ if (DEBUG) {
 
 // 监听 token 刷新事件
 userManager.events.addAccessTokenExpiring(() => {
-  log.warn('[Access Token 即将过期] 开始自动刷新...');
-  userManager.signinSilent().then((user) => {
-    log.info('[Access Token 刷新成功] expires_at:', user?.expires_at);
-  }).catch((err) => {
-    log.error('[Access Token 刷新失败]', err);
+  const user = userManager.getUser();
+  const nowSec = Math.floor(Date.now() / 1000);
+  const expiresAt = (user as any)?.expires_at as number | undefined;
+  const remaining = expiresAt ? expiresAt - nowSec : undefined;
+  log.warn('[Access Token 即将过期] 开始自动刷新...', {
+    now: new Date(nowSec * 1000).toISOString(),
+    expires_at: expiresAt ? new Date(expiresAt * 1000).toISOString() : '<unknown>',
+    remaining: remaining !== undefined ? fmtRemaining(remaining) : '<unknown>',
+    current_access_token: tokenFingerprint((user as any)?.access_token),
+    silent_redirect_uri: authConfig.silent_redirect_uri,
+    silent_timeout_s: authConfig.silentRequestTimeoutInSeconds,
   });
+  void runSilentRenew();
 });
 
+// 静默续期执行器:统一加计时 + 错误追踪,被 addAccessTokenExpiring / addAccessTokenExpired 共用
+async function runSilentRenew(): Promise<void> {
+  const startedAt = Date.now();
+  log.info('[Silent Renew] 触发 signinSilent(),等待 iframe 完成...', {
+    started_at: new Date(startedAt).toISOString(),
+  });
+  try {
+    const user = await userManager.signinSilent();
+    const elapsed = Date.now() - startedAt;
+    if (!user) {
+      // oidc-client-ts 在 iframe 拿不到新 token 时会 resolve(null) 而不是 reject
+      log.warn('[Silent Renew] signinSilent() resolve(null),未拿到新 user', {
+        elapsed_ms: elapsed,
+      });
+      return;
+    }
+    const newFp = tokenFingerprint((user as any).access_token);
+    const oldFp = tokenFingerprint((userManager.getUser() as any)?.access_token);
+    const expiresAt = (user as any).expires_at as number | undefined;
+    const lifetimeSec = expiresAt ? expiresAt - Math.floor(Date.now() / 1000) : undefined;
+    log.info('[Silent Renew] signinSilent() 成功', {
+      elapsed_ms: elapsed,
+      old_token: oldFp,
+      new_token: newFp,
+      token_changed: oldFp !== newFp,
+      expires_at: expiresAt ? new Date(expiresAt * 1000).toISOString() : '<unknown>',
+      lifetime: lifetimeSec !== undefined ? fmtRemaining(lifetimeSec) : '<unknown>',
+    });
+  } catch (err) {
+    const elapsed = Date.now() - startedAt;
+    log.error('[Silent Renew] signinSilent() rejected', {
+      elapsed_ms: elapsed,
+      error: err,
+    });
+    throw err;
+  }
+}
+
 userManager.events.addAccessTokenExpired(() => {
-  log.warn('[Access Token 已过期] 尝试静默刷新，失败则清除本地状态');
-  userManager.signinSilent().then((user) => {
-    log.info('[Access Token 刷新成功]', user?.expires_at);
-  }).catch((err) => {
+  const user = userManager.getUser();
+  log.warn('[Access Token 已过期] 尝试静默刷新，失败则清除本地状态', {
+    current_access_token: tokenFingerprint((user as any)?.access_token),
+  });
+  runSilentRenew().catch((err) => {
     log.error('[Access Token 刷新失败，清除本地状态]', err);
     userManager.removeUser().then(() => {
       updateAuthState(null);
@@ -62,11 +122,20 @@ userManager.events.addUserUnloaded(() => {
   log.info('[已清除本地用户状态]');
 });
 
+// 区分 silent renew 触发的 user loaded vs 登录/回调触发的 user loaded
+let _lastUserLoadedToken: string | undefined;
 userManager.events.addUserLoaded((user) => {
+  const fp = tokenFingerprint((user as any)?.access_token);
+  const isSilentRenew = !!_lastUserLoadedToken && _lastUserLoadedToken !== fp;
+  _lastUserLoadedToken = fp;
   log.info('[User 加载成功]', {
+    trigger: isSilentRenew ? 'silent_renew' : 'login_or_callback',
     sub: user?.profile?.sub,
     preferred_username: user?.profile?.preferred_username,
-    expires_at: user?.expires_at,
+    expires_at: (user as any)?.expires_at
+      ? new Date(((user as any).expires_at as number) * 1000).toISOString()
+      : '<unknown>',
+    access_token: fp,
     scopes: user?.scope,
   });
 });
@@ -77,8 +146,27 @@ if (typeof (userManager.events as any).addSilentRenewError === 'function') {
   });
 }
 
+if (typeof (userManager.events as any).addSilentRenewSuccess === 'function') {
+  (userManager.events as any).addSilentRenewSuccess((user: any) => {
+    log.info('[Silent Renew Success] 续期完成,新 token 指纹:', tokenFingerprint(user?.access_token), {
+      expires_at: user?.expires_at
+        ? new Date(user.expires_at * 1000).toISOString()
+        : '<unknown>',
+    });
+  });
+}
+
 // 启动静默刷新服务
-if (DEBUG) log.info('[启动 Silent Renew]');
+if (DEBUG) {
+  log.info('[启动 Silent Renew]', {
+    automaticSilentRenew: authConfig.automaticSilentRenew,
+    monitorAccessTokenExpiry: authConfig.monitorAccessTokenExpiry,
+    silent_redirect_uri: authConfig.silent_redirect_uri,
+    silent_timeout_s: authConfig.silentRequestTimeoutInSeconds,
+    scope: authConfig.scope,
+  });
+  log.info('[Silent Renew] startSilentRenew() 已调用,后台定时器运转中');
+}
 userManager.startSilentRenew();
 
 const updateAuthState = (user: User | null) => {
