@@ -13,6 +13,7 @@
         <Project Path="src/XYPortal.EvGRPC.HttpApi.Client/XYPortal.EvGRPC.HttpApi.Client.csproj" />
         <Project Path="src/XYPortal.EvGRPC.Web/XYPortal.EvGRPC.Web.csproj" />
         <Project Path="src/XYPortal.EvGRPC.Installer/XYPortal.EvGRPC.Installer.csproj" />
+        <Project Path="src/XYPortal.EvGRPC.gRPC/XYPortal.EvGRPC.gRPC.csproj" />
     </Folder>
     
     <Folder Name="/test/">
