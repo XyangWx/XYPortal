@@ -18,4 +18,20 @@
     </PackageReference>
   </ItemGroup>
 
+  <!--
+    Generate C# clients from upstream .proto files. ProtoRoot lets us write
+    `import "evgrpc/common.proto"` (as in display.proto) and have protoc
+    resolve it relative to /proto.
+  -->
+  <ItemGroup>
+    <Protobuf Include="proto/evgrpc/*.proto"
+              ProtoRoot="proto"
+              GrpcServices="Client"
+              OutputDir="obj\$(Configuration)\$(TargetFramework)\Generated\EvGrpc" />
+    <Protobuf Include="proto/google/type/*.proto"
+              ProtoRoot="proto"
+              GrpcServices="Client"
+              OutputDir="obj\$(Configuration)\$(TargetFramework)\Generated\Google\Type" />
+  </ItemGroup>
+
 </Project>

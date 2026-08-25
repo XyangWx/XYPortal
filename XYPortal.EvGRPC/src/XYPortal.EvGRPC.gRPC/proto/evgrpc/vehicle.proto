@@ -1,0 +1,62 @@
+syntax = "proto3";
+package evgrpc;
+
+import "google/protobuf/empty.proto";
+import "google/type/date.proto";
+import "evgrpc/common.proto";
+
+// `purchase_date` is a calendar date (no time-of-day, no timezone). It
+// was previously `google.protobuf.Timestamp`, which is a UTC instant —
+// that mismatch forced the C++ handlers to fabricate a midnight-UTC
+// `Timestamp` and then strip the time component back off, hiding the
+// type error. `google.type.Date` is the correct shape and is the type
+// the project's plan document (docs/superpowers/plans/2026-08-18-
+// python-grpc-tests.md) already specified.
+
+message Vehicle {
+  string id = 1;
+  string brand = 2;
+  int32 calibrated_range_km = 3;
+  double battery_capacity_kwh = 4;
+  google.type.Date purchase_date = 5;
+  string license_plate = 6;
+}
+
+message CreateVehicleRequest {
+  string brand = 1;
+  int32 calibrated_range_km = 2;
+  double battery_capacity_kwh = 3;
+  google.type.Date purchase_date = 4;
+  string license_plate = 5;
+}
+
+message GetVehicleRequest { string id = 1; }
+
+message UpdateVehicleRequest {
+  string id = 1;
+  string brand = 2;
+  int32 calibrated_range_km = 3;
+  double battery_capacity_kwh = 4;
+  google.type.Date purchase_date = 5;
+  string license_plate = 6;
+}
+
+message DeleteVehicleRequest { string id = 1; }
+
+message ListVehiclesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListVehiclesResponse {
+  repeated Vehicle vehicles = 1;
+  string next_page_token = 2;
+}
+
+service VehicleService {
+  rpc CreateVehicle(CreateVehicleRequest) returns (Vehicle);
+  rpc GetVehicle(GetVehicleRequest) returns (Vehicle);
+  rpc UpdateVehicle(UpdateVehicleRequest) returns (Vehicle);
+  rpc DeleteVehicle(DeleteVehicleRequest) returns (google.protobuf.Empty);
+  rpc ListVehicles(ListVehiclesRequest) returns (ListVehiclesResponse);
+}
