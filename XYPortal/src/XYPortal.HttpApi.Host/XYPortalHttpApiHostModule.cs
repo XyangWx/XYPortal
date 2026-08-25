@@ -15,7 +15,7 @@ using Microsoft.Extensions.Hosting;
 using XYPortal.EntityFrameworkCore;
 using XYPortal.MultiTenancy;
 using StackExchange.Redis;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Authentication.JwtBearer;
 using Volo.Abp.AspNetCore.Mvc;
