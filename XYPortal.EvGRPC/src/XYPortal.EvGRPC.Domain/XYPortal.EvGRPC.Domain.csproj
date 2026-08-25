@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>XYPortal.EvGRPC</RootNamespace>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="10.6.0"/>
+    <ProjectReference Include="..\XYPortal.EvGRPC.Domain.Shared\XYPortal.EvGRPC.Domain.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

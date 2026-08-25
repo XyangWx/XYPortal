@@ -1,0 +1,62 @@
+{
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "XYPortal.EvGRPC.Domain": {
+      "path": "src/XYPortal.EvGRPC.Domain/XYPortal.EvGRPC.Domain.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.EvGRPC.Application.Contracts": {
+      "path": "src/XYPortal.EvGRPC.Application.Contracts/XYPortal.EvGRPC.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.EvGRPC.Application": {
+      "path": "src/XYPortal.EvGRPC.Application/XYPortal.EvGRPC.Application.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.EvGRPC.EntityFrameworkCore": {
+      "path": "src/XYPortal.EvGRPC.EntityFrameworkCore/XYPortal.EvGRPC.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.EvGRPC.HttpApi": {
+      "path": "src/XYPortal.EvGRPC.HttpApi/XYPortal.EvGRPC.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.EvGRPC.HttpApi.Client": {
+      "path": "src/XYPortal.EvGRPC.HttpApi.Client/XYPortal.EvGRPC.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.EvGRPC.Web": {
+      "path": "src/XYPortal.EvGRPC.Web/XYPortal.EvGRPC.Web.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.EvGRPC.TestBase": {
+      "path": "test/XYPortal.EvGRPC.TestBase/XYPortal.EvGRPC.TestBase.abppkg",
+      "folder": "test"
+    },
+    "XYPortal.EvGRPC.EntityFrameworkCore.Tests": {
+      "path": "test/XYPortal.EvGRPC.EntityFrameworkCore.Tests/XYPortal.EvGRPC.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "XYPortal.EvGRPC.Domain.Tests": {
+      "path": "test/XYPortal.EvGRPC.Domain.Tests/XYPortal.EvGRPC.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "XYPortal.EvGRPC.Application.Tests": {
+      "path": "test/XYPortal.EvGRPC.Application.Tests/XYPortal.EvGRPC.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "XYPortal.EvGRPC.Domain.Shared": {
+      "path": "src/XYPortal.EvGRPC.Domain.Shared/XYPortal.EvGRPC.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "XYPortal.EvGRPC.Installer": {
+       "path": "src/XYPortal.EvGRPC.Installer/XYPortal.EvGRPC.Installer.abppkg",
+       "folder": "src"
+    }
+  }
+}

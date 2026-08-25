@@ -1,0 +1,24 @@
+<Solution>
+    <Configurations>
+        <Platform Name="Any CPU" />
+    </Configurations>
+
+    <Folder Name="/src/">
+        <Project Path="src/XYPortal.EvGRPC.Domain.Shared/XYPortal.EvGRPC.Domain.Shared.csproj" />
+        <Project Path="src/XYPortal.EvGRPC.Domain/XYPortal.EvGRPC.Domain.csproj" />
+        <Project Path="src/XYPortal.EvGRPC.Application.Contracts/XYPortal.EvGRPC.Application.Contracts.csproj" />
+        <Project Path="src/XYPortal.EvGRPC.Application/XYPortal.EvGRPC.Application.csproj" />
+        <Project Path="src/XYPortal.EvGRPC.EntityFrameworkCore/XYPortal.EvGRPC.EntityFrameworkCore.csproj" />
+        <Project Path="src/XYPortal.EvGRPC.HttpApi/XYPortal.EvGRPC.HttpApi.csproj" />
+        <Project Path="src/XYPortal.EvGRPC.HttpApi.Client/XYPortal.EvGRPC.HttpApi.Client.csproj" />
+        <Project Path="src/XYPortal.EvGRPC.Web/XYPortal.EvGRPC.Web.csproj" />
+        <Project Path="src/XYPortal.EvGRPC.Installer/XYPortal.EvGRPC.Installer.csproj" />
+    </Folder>
+    
+    <Folder Name="/test/">
+        <Project Path="test/XYPortal.EvGRPC.TestBase/XYPortal.EvGRPC.TestBase.csproj" />
+        <Project Path="test/XYPortal.EvGRPC.EntityFrameworkCore.Tests/XYPortal.EvGRPC.EntityFrameworkCore.Tests.csproj" />
+        <Project Path="test/XYPortal.EvGRPC.Domain.Tests/XYPortal.EvGRPC.Domain.Tests.csproj" />
+        <Project Path="test/XYPortal.EvGRPC.Application.Tests/XYPortal.EvGRPC.Application.Tests.csproj" />
+    </Folder>
+</Solution>
