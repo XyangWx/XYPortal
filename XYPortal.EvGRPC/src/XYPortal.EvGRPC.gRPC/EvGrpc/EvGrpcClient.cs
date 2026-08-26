@@ -200,4 +200,60 @@ public sealed class EvGrpcClient : IDisposable
             _channel.Value.Dispose();
         }
     }
+
+    // ---------- Charging (continued) ----------
+
+    /// <summary>
+    /// List a vehicle's charging history, paginated and optionally
+    /// filtered by start-time range and charger type. Returns all
+    /// charges when no filter is supplied.
+    /// </summary>
+    public async Task<IReadOnlyList<DomainCharging>> ListChargingsAsync(
+        string vehicleId,
+        DateTimeOffset? startAfter = null,
+        DateTimeOffset? startBefore = null,
+        XYPortal.EvGRPC.Chargings.ChargerType? chargerType = null,
+        string? sourceCategoryId = null,
+        int pageSize = 100,
+        string? pageToken = null,
+        CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(vehicleId))
+            throw new ArgumentException("vehicleId must be non-blank.", nameof(vehicleId));
+        if (pageSize <= 0)
+            throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+        var req = new ListChargingsRequest
+        {
+            VehicleId = vehicleId,
+            PageSize = pageSize,
+            PageToken = pageToken ?? string.Empty,
+        };
+        if (startAfter.HasValue) req.StartAfter = startAfter.Value.ToProtoTimestamp();
+        if (startBefore.HasValue) req.StartBefore = startBefore.Value.ToProtoTimestamp();
+        if (chargerType.HasValue) req.ChargerType = chargerType.Value.ToProto();
+        if (!string.IsNullOrWhiteSpace(sourceCategoryId)) req.SourceCategoryId = sourceCategoryId;
+
+        var response = await _chargings.Value.ListChargingsAsync(req, cancellationToken: ct).ConfigureAwait(false);
+        var list = new List<DomainCharging>(response.Chargings.Count);
+        foreach (var c in response.Chargings) list.Add(c.ToDomain());
+        return list;
+    }
+
+    /// <summary>
+    /// Convenience: the most-recent charging of a single vehicle,
+    /// or null if none recorded. Pulls the first page (largest
+    /// page_size the API accepts) and picks the most recent by
+    /// <c>EndTime</c>; callers can override with a tighter window.
+    /// </summary>
+    public async Task<DomainCharging?> GetLatestChargingAsync(string vehicleId, CancellationToken ct = default)
+    {
+        var all = await ListChargingsAsync(vehicleId, pageSize: 500, pageToken: null, ct: ct).ConfigureAwait(false);
+        DomainCharging? latest = null;
+        foreach (var c in all)
+        {
+            if (latest is null || c.EndTime > latest.EndTime) latest = c;
+        }
+        return latest;
+    }
 }

@@ -21,6 +21,9 @@ public sealed class EvGrpcOptions
     ///   <c>https://evgrpc.example.com:50051</c> (production)
     ///   <c>http://localhost:50051</c> (local dev container)
     /// </summary>
+    /// <summary>appsettings.json section name: <c>EvGrpc</c>.</summary>
+    public const string SectionName = "EvGrpc";
+
     public string Url { get; set; } = string.Empty;
 
     /// <summary>

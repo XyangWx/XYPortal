@@ -19,6 +19,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\XYPortal.EvGRPC.Application.Contracts\XYPortal.EvGRPC.Application.Contracts.csproj" />
+    <!--
+      Web module triggers EvGRPCApplicationModule.OnApplicationInitialization
+      which eagerly builds the gRPC channel. We depend on Application so
+      that module class is in the load order.
+    -->
+    <ProjectReference Include="..\XYPortal.EvGRPC.Application\XYPortal.EvGRPC.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
