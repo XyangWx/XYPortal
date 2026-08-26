@@ -1,7 +1,13 @@
 {
   "culture": "en",
   "texts": {
-    "MyAccount":  "My account",
-    "SamplePageMessage": "A sample page for the EvGRPC module"
+    "MyAccount": "My account",
+    "SamplePageMessage": "A sample page for the EvGRPC module",
+    "Permission:EvGRPC": "EvGRPC",
+    "Permission:Vehicle": "Vehicle management",
+    "Permission:Charging": "Charging management",
+    "Permission:Create": "Create",
+    "Permission:Update": "Update",
+    "Permission:Delete": "Delete"
   }
 }

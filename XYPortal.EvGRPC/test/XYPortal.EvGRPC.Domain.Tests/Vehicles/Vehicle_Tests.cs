@@ -133,6 +133,42 @@ public class Vehicle_Tests
         v.CurrentBatteryPercent(history).ShouldBe(90);
     }
 
+    [Fact]
+    public void Create_factory_skips_id_check()
+    {
+        var v = Vehicle.Create(
+            brand: "BYD",
+            calibratedRangeKm: 500,
+            batteryCapacityKwh: 75.0,
+            purchaseDate: new DateOnly(2024, 1, 15),
+            licensePlate: "京C00001");
+        v.Id.ShouldBe(string.Empty);
+        v.Brand.ShouldBe("BYD");
+    }
+
+    [Fact]
+    public void Create_factory_still_enforces_other_invariants()
+    {
+        Should.Throw<ArgumentException>(() => Vehicle.Create(
+            brand: "",
+            calibratedRangeKm: 500,
+            batteryCapacityKwh: 75.0,
+            purchaseDate: new DateOnly(2024, 1, 15),
+            licensePlate: "京C00001"));
+        Should.Throw<ArgumentOutOfRangeException>(() => Vehicle.Create(
+            brand: "BYD",
+            calibratedRangeKm: -1,
+            batteryCapacityKwh: 75.0,
+            purchaseDate: new DateOnly(2024, 1, 15),
+            licensePlate: "京C00001"));
+        Should.Throw<ArgumentOutOfRangeException>(() => Vehicle.Create(
+            brand: "BYD",
+            calibratedRangeKm: 500,
+            batteryCapacityKwh: 0.0,
+            purchaseDate: new DateOnly(2024, 1, 15),
+            licensePlate: "京C00001"));
+    }
+
     private static Charging MakeCharging(int endPercent) => new(
         id: $"chg-{endPercent}",
         vehicleId: DefaultId,
