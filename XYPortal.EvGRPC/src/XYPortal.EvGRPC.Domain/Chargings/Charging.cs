@@ -130,4 +130,71 @@ public class Charging
             throw new ArgumentOutOfRangeException(paramName, pct,
                 "Battery percent must be in [0, 100].");
     }
+
+    /// <summary>
+    /// Factory for a not-yet-persisted charging. Id is intentionally
+    /// empty — the upstream evGRpc server assigns one on Create.
+    /// All other invariants apply.
+    /// </summary>
+    public static Charging Create(
+        string vehicleId,
+        DateTimeOffset startTime,
+        DateTimeOffset endTime,
+        int startPercent,
+        int endPercent,
+        int startMileageKm,
+        int endMileageKm,
+        double kwhCharged,
+        double cost,
+        double electricityUnitPrice,
+        double? serviceFee,
+        ChargerType chargerType,
+        string sourceCategoryId,
+        string location,
+        string? remark)
+    {
+        var c = new Charging();
+        // Reuse ctor validators by going through a private ctor-
+        // shim. Cheapest path: replicate the invariants here.
+        if (string.IsNullOrWhiteSpace(vehicleId))
+            throw new ArgumentException("vehicleId must be non-blank.", nameof(vehicleId));
+        _ = new ChargingPeriod(startTime, endTime);
+        ValidatePercent(startPercent, nameof(startPercent));
+        ValidatePercent(endPercent, nameof(endPercent));
+        if (endPercent < startPercent)
+            throw new ArgumentException(
+                $"EndPercent ({endPercent}) must be >= StartPercent ({startPercent}).");
+        if (startMileageKm < 0)
+            throw new ArgumentOutOfRangeException(nameof(startMileageKm));
+        if (endMileageKm < startMileageKm)
+            throw new ArgumentOutOfRangeException(nameof(endMileageKm));
+        if (kwhCharged < 0)
+            throw new ArgumentOutOfRangeException(nameof(kwhCharged));
+        if (cost < 0)
+            throw new ArgumentOutOfRangeException(nameof(cost));
+        if (electricityUnitPrice < 0)
+            throw new ArgumentOutOfRangeException(nameof(electricityUnitPrice));
+        if (string.IsNullOrWhiteSpace(sourceCategoryId))
+            throw new ArgumentException("sourceCategoryId must be non-blank.", nameof(sourceCategoryId));
+        if (string.IsNullOrWhiteSpace(location))
+            throw new ArgumentException("location must be non-blank.", nameof(location));
+
+        c.VehicleId = vehicleId;
+        c.StartTime = startTime;
+        c.EndTime = endTime;
+        c.StartPercent = startPercent;
+        c.EndPercent = endPercent;
+        c.StartMileageKm = startMileageKm;
+        c.EndMileageKm = endMileageKm;
+        c.KwhCharged = kwhCharged;
+        c.Cost = cost;
+        c.ElectricityUnitPrice = electricityUnitPrice;
+        c.ServiceFee = serviceFee;
+        c.ChargerType = chargerType;
+        c.SourceCategoryId = sourceCategoryId;
+        c.Location = location;
+        c.Remark = remark;
+        c.Id = string.Empty;
+        return c;
+    }
 }

@@ -60,6 +60,40 @@ public class Vehicle
     }
 
     /// <summary>
+    /// Factory for a not-yet-persisted vehicle. Id is intentionally
+    /// empty — the upstream evGRpc server assigns one on Create.
+    /// All other invariants apply. Use this from the AppService
+    /// layer when forwarding a CreateAsync input.
+    ///
+    /// Implementation note: we set fields directly to bypass the
+    /// public ctor's <c>id</c> non-blank check; the private setters
+    /// are only meant to be touched from inside this factory. The
+    /// domain invariant "id non-blank when persisted" is enforced
+    /// by the only other ctor and the EF parameterless ctor is
+    /// off-limits to application code.
+    /// </summary>
+    public static Vehicle Create(
+        string brand,
+        int calibratedRangeKm,
+        double batteryCapacityKwh,
+        DateOnly purchaseDate,
+        string licensePlate)
+    {
+        var v = new Vehicle();
+        v.Brand = ValidateNonBlank(brand, nameof(brand));
+        ValidateRange(calibratedRangeKm);
+        ValidateCapacity(batteryCapacityKwh);
+        v.PurchaseDate = purchaseDate;
+        v.LicensePlate = ValidateNonBlank(licensePlate, nameof(licensePlate));
+        v.CalibratedRangeKm = calibratedRangeKm;
+        v.BatteryCapacityKwh = batteryCapacityKwh;
+        v.Id = string.Empty; // explicit: not yet persisted
+        return v;
+    }
+
+
+
+    /// <summary>
     /// Update the brand label. Refuses blank input to keep the
     /// "non-blank" invariant.
     /// </summary>
