@@ -13,6 +13,13 @@
     <PackageReference Include="Volo.Abp.Ddd.Application" Version="10.6.0" />
     <ProjectReference Include="..\XYPortal.EvGRPC.Application.Contracts\XYPortal.EvGRPC.Application.Contracts.csproj" />
     <ProjectReference Include="..\XYPortal.EvGRPC.Domain\XYPortal.EvGRPC.Domain.csproj" />
+    <!--
+      Phase 3: Application layer composes EvGRPC service. It depends
+      on the gRPC client (one-way) to call CRUD methods. Reverse
+      direction is forbidden — gRPC project must not depend on
+      Application.Contracts or Application.
+    -->
+    <ProjectReference Include="..\XYPortal.EvGRPC.gRPC\XYPortal.EvGRPC.gRPC.csproj" />
   </ItemGroup>
 
 </Project>
