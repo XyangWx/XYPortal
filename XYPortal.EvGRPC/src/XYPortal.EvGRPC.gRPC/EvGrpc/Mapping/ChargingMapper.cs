@@ -40,7 +40,7 @@ public static class ChargingMapper
     public static Evgrpc.Charging ToProto(this Charging entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        return new Evgrpc.Charging
+        var proto = new Evgrpc.Charging
         {
             Id = entity.Id,
             VehicleId = entity.VehicleId,
@@ -59,12 +59,13 @@ public static class ChargingMapper
             Location = entity.Location,
             Remark = entity.Remark ?? string.Empty,
         };
+        return proto;
     }
 
     public static Evgrpc.CreateChargingRequest ToCreateRequest(this Charging entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        return new Evgrpc.CreateChargingRequest
+        var req = new Evgrpc.CreateChargingRequest
         {
             VehicleId = entity.VehicleId,
             StartTime = entity.StartTime.ToProtoTimestamp(),
@@ -82,6 +83,32 @@ public static class ChargingMapper
             Location = entity.Location,
             Remark = entity.Remark ?? string.Empty,
         };
+        return req;
+    }
+
+    public static Evgrpc.UpdateChargingRequest ToUpdateRequest(this Charging entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+        var req = new Evgrpc.UpdateChargingRequest
+        {
+            Id = entity.Id,
+            VehicleId = entity.VehicleId,
+            StartTime = entity.StartTime.ToProtoTimestamp(),
+            EndTime = entity.EndTime.ToProtoTimestamp(),
+            StartPercent = entity.StartPercent,
+            EndPercent = entity.EndPercent,
+            StartMileageKm = entity.StartMileageKm,
+            EndMileageKm = entity.EndMileageKm,
+            KwhCharged = entity.KwhCharged,
+            Cost = entity.Cost,
+            ElectricityUnitPrice = entity.ElectricityUnitPrice,
+            ServiceFee = entity.ServiceFee,
+            ChargerType = entity.ChargerType.ToProto(),
+            SourceCategoryId = entity.SourceCategoryId,
+            Location = entity.Location,
+            Remark = entity.Remark ?? string.Empty,
+        };
+        return req;
     }
 
     // ----- timestamp helpers -----
