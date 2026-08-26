@@ -172,24 +172,55 @@ public sealed class EvGrpcClient : IDisposable
 
     private GrpcChannel BuildChannel()
     {
-        var credentials = string.IsNullOrWhiteSpace(_options.AccessToken)
-            ? ChannelCredentials.Insecure
-            : ChannelCredentials.Create(
-                new SslCredentials(),
+        // Token delivery is a *per-call* concern (CallCredentials → metadata);
+        // TLS is a *channel* concern (SslCredentials). They were conflated
+        // in Phase 1 (token non-empty → SslCredentials). That made any
+        // http:// URL unreachable the moment a bearer token was configured.
+        //
+        // The correct combination is: pick the channel credential from the
+        // URL scheme; if a token is present, attach it as a per-call
+        // CallCredentials layer over whatever channel credential was chosen.
+        var uri = new Uri(_options.Url);
+        var hasToken = !string.IsNullOrWhiteSpace(_options.AccessToken);
+
+        ChannelCredentials channelCred = uri.Scheme switch
+        {
+            "https" => ChannelCredentials.SecureSsl,
+            _       => ChannelCredentials.Insecure,
+        };
+
+        if (hasToken)
+        {
+            var token = _options.AccessToken!;
+            channelCred = ChannelCredentials.Create(
+                channelCred,
                 CallCredentials.FromInterceptor((_, metadata) =>
                 {
-                    metadata.Add("authorization", $"Bearer {_options.AccessToken}");
+                    metadata.Add("authorization", $"Bearer {token}");
                     return Task.CompletedTask;
                 }));
+        }
 
-        return GrpcChannel.ForAddress(_options.Url, new GrpcChannelOptions
+        var options = new GrpcChannelOptions
         {
-            Credentials = credentials,
+            Credentials = channelCred,
             // 16 MiB matches proto defaults; explicit so future tuning has a hook.
             MaxReceiveMessageSize = 16 * 1024 * 1024,
             MaxSendMessageSize = 16 * 1024 * 1024,
-        });
+        };
+        // Insecure channel + per-RPC bearer requires this opt-in. It is a
+        // documented escape hatch in grpc-dotnet for dev / behind-LB
+        // scenarios (e.g. evGRpc behind nginx with h2c + JWT); production
+        // HTTPS deployments never hit this branch because SecureSsl is
+        // selected by the scheme switch above.
+        if (hasToken && uri.Scheme != "https")
+        {
+            options.UnsafeUseInsecureChannelCallCredentials = true;
+        }
+        return GrpcChannel.ForAddress(_options.Url, options);
     }
+
+
 
     public void Dispose()
     {
