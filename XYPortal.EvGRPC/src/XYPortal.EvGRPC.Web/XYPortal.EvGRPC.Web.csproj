@@ -33,6 +33,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Module self-identifying resource. Keeps
+         GenerateEmbeddedFilesManifest happy in ABP Studio's
+         web projects (which expect at least one embedded
+         resource to produce a manifest). -->
+    <EmbeddedResource Include="Resources\XYPortal.EvGRPC.Web.txt" />
     <EmbeddedResource Include="Pages\**\*.css" />
     <EmbeddedResource Include="Pages\**\*.js" />
     <EmbeddedResource Include="Components\**\*.js" />
