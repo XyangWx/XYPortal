@@ -21,5 +21,6 @@
         <Project Path="test/XYPortal.EvGRPC.EntityFrameworkCore.Tests/XYPortal.EvGRPC.EntityFrameworkCore.Tests.csproj" />
         <Project Path="test/XYPortal.EvGRPC.Domain.Tests/XYPortal.EvGRPC.Domain.Tests.csproj" />
         <Project Path="test/XYPortal.EvGRPC.Application.Tests/XYPortal.EvGRPC.Application.Tests.csproj" />
+        <Project Path="test/XYPortal.EvGRPC.gRPC.Tests/XYPortal.EvGRPC.gRPC.Tests.csproj" />
     </Folder>
 </Solution>

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>XYPortal.EvGRPC</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\XYPortal.EvGRPC.Domain\XYPortal.EvGRPC.Domain.csproj" />
+    <ProjectReference Include="..\..\src\XYPortal.EvGRPC.gRPC\XYPortal.EvGRPC.gRPC.csproj" />
+    <ProjectReference Include="..\XYPortal.EvGRPC.TestBase\XYPortal.EvGRPC.TestBase.csproj" />
+  </ItemGroup>
+
+</Project>
