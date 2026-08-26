@@ -1,0 +1,61 @@
+@page
+@using XYPortal.EvGRPC.Localization
+@using XYPortal.EvGRPC.Web.Pages.Chargings
+@model XYPortal.EvGRPC.Web.Pages.Chargings.IndexModel
+@inject Microsoft.Extensions.Localization.IStringLocalizer<EvGRPCResource> L
+@inject XYPortal.EvGRPC.Vehicles.IVehicleAppService VehicleApp
+@inject XYPortal.EvGRPC.Chargings.IChargingAppService ChargingApp
+
+@{ Layout = "_Layout"; }
+
+<abp-card>
+    <abp-card-header>
+        <abp-row>
+            <abp-column size-md="_6">
+                <abp-card-title>@L["Charging"]</abp-card-title>
+            </abp-column>
+            <abp-column size-md="_6" class="text-end">
+                <abp-button id="NewChargingButton"
+                            text="@L["NewCharging"].Value"
+                            icon="plus"
+                            button-type="Primary" />
+            </abp-column>
+        </abp-row>
+    </abp-card-header>
+    <abp-card-body>
+        <abp-table striped-rows="true" id="ChargingsTable">
+            <thead>
+                <tr>
+                    <th>@L["Actions"]</th>
+                    <th>@L["VehicleId"]</th>
+                    <th>@L["StartTime"]</th>
+                    <th>@L["EndTime"]</th>
+                    <th>@L["StartPercent"]</th>
+                    <th>@L["EndPercent"]</th>
+                    <th>@L["KwhCharged"]</th>
+                    <th>@L["Cost"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model.Chargings)
+                {
+                    <tr>
+                        <td>
+                            <abp-button abp-button-size="Small" id="EditChargingBtn_@c.Id"
+                                        text="@L["Edit"].Value" button-type="Link" />
+                            <abp-button abp-button-size="Small" id="DeleteChargingBtn_@c.Id"
+                                        text="@L["Delete"].Value" button-type="Link" color="Danger" />
+                        </td>
+                        <td>@c.VehicleId</td>
+                        <td>@c.StartTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@c.EndTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@c.StartPercent%</td>
+                        <td>@c.EndPercent%</td>
+                        <td>@c.KwhCharged</td>
+                        <td>@c.Cost</td>
+                    </tr>
+                }
+            </tbody>
+        </abp-table>
+    </abp-card-body>
+</abp-card>

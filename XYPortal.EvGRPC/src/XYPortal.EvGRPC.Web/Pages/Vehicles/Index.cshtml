@@ -1,0 +1,69 @@
+@page
+@using XYPortal.EvGRPC.Localization
+@using XYPortal.EvGRPC.Web.Pages.Vehicles
+@model XYPortal.EvGRPC.Web.Pages.Vehicles.IndexModel
+@inject Microsoft.Extensions.Localization.IStringLocalizer<EvGRPCResource> L
+@inject XYPortal.EvGRPC.Vehicles.IVehicleAppService VehicleApp
+
+@{ Layout = "_Layout"; }
+
+<abp-card>
+    <abp-card-header>
+        <abp-row>
+            <abp-column size-md="_6">
+                <abp-card-title>@L["Vehicle"]</abp-card-title>
+            </abp-column>
+            <abp-column size-md="_6" class="text-end">
+                <abp-button id="NewVehicleButton"
+                            text="@L["NewVehicle"].Value"
+                            icon="plus"
+                            button-type="Primary" />
+            </abp-column>
+        </abp-row>
+    </abp-card-header>
+    <abp-card-body>
+        <abp-table striped-rows="true" id="VehiclesTable">
+            <thead>
+                <tr>
+                    <th>@L["Actions"]</th>
+                    <th>@L["Brand"]</th>
+                    <th>@L["LicensePlate"]</th>
+                    <th>@L["CalibratedRangeKm"]</th>
+                    <th>@L["BatteryCapacityKwh"]</th>
+                    <th>@L["CurrentBattery"]</th>
+                    <th>@L["PurchaseDate"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var v in Model.Vehicles)
+                {
+                    var battery = Model.BatteryByVehicle.TryGetValue(v.Id, out var b) ? b : 0;
+                    var hasBattery = battery > 0;
+                    <tr>
+                        <td>
+                            <abp-button abp-button-size="Small" id="EditVehicleBtn_@v.Id"
+                                        text="@L["Edit"].Value" button-type="Link" />
+                            <abp-button abp-button-size="Small" id="DeleteVehicleBtn_@v.Id"
+                                        text="@L["Delete"].Value" button-type="Link" color="Danger" />
+                        </td>
+                        <td>@v.Brand</td>
+                        <td>@v.LicensePlate</td>
+                        <td>@v.CalibratedRangeKm</td>
+                        <td>@v.BatteryCapacityKwh</td>
+                        <td>
+                            @if (hasBattery)
+                            {
+                                <span class="badge bg-success">@battery%</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@L["NoData"]</span>
+                            }
+                        </td>
+                        <td>@v.PurchaseDate.ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+            </tbody>
+        </abp-table>
+    </abp-card-body>
+</abp-card>

@@ -1,0 +1,24 @@
+@page
+@using XYPortal.EvGRPC.Localization
+@using XYPortal.EvGRPC.Web.Pages.Vehicles
+@model XYPortal.EvGRPC.Web.Pages.Vehicles.CreateModalModel
+@inject Microsoft.Extensions.Localization.IStringLocalizer<EvGRPCResource> L
+
+@{ Layout = null; }
+
+<abp-dynamic-form abp-model="@Model.Vehicle" id="CreateVehicleForm">
+    <abp-modal id="CreateVehicleModal" centered="true" title="@L["NewVehicle"]">
+        <abp-form-content />
+        <div class="mt-3">
+            <abp-input asp-for="@Model.Vehicle.Brand" />
+            <abp-input asp-for="@Model.Vehicle.CalibratedRangeKm" />
+            <abp-input asp-for="@Model.Vehicle.BatteryCapacityKwh" />
+            <abp-input asp-for="@Model.Vehicle.PurchaseDate" type="date" />
+            <abp-input asp-for="@Model.Vehicle.LicensePlate" />
+        </div>
+    </abp-modal>
+    <abp-modal-footer>
+        <abp-button button-type="Secondary" text="@L["Cancel"].Value" data-bs-dismiss="modal" />
+        <abp-button id="CreateVehicleSubmit" button-type="Primary" text="@L["Save"].Value" />
+    </abp-modal-footer>
+</abp-dynamic-form>
