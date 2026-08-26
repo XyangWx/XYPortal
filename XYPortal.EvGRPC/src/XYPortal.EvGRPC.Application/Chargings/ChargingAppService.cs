@@ -6,19 +6,19 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
-using XYPortal.EvGRPC.EvGrpc;
+using XYPortal.EvGRPC.Application.EvGrpc;
 using DomainCharging = XYPortal.EvGRPC.Chargings.Charging;
 
 namespace XYPortal.EvGRPC.Chargings;
 
 public class ChargingAppService : EvGRPCAppService, IChargingAppService
 {
-    private readonly EvGrpcClient _client;
+    private readonly IEvGrpcClient _client;
     private readonly ChargingMappers _mappers;
     private readonly ILogger<ChargingAppService> _logger;
 
     public ChargingAppService(
-        EvGrpcClient client,
+        IEvGrpcClient client,
         ChargingMappers mappers,
         ILogger<ChargingAppService> logger)
     {

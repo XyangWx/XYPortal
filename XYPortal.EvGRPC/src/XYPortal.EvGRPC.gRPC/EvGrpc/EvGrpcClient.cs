@@ -26,9 +26,16 @@ namespace XYPortal.EvGRPC.EvGrpc;
 /// because <c>GrpcChannel</c> is designed for long-lived reuse — a
 /// new channel per RPC would defeat the multiplexed HTTP/2 keep-alive.
 ///
-/// Phase 3.5 will add JWT metadata injection from the current user;
-/// for now <c>EvGrpc:AccessToken</c> (static, from configuration)
-/// is the only auth path.
+/// <para>
+/// <b>Per-call auth:</b> the channel carries an injected
+/// <see cref="MetadataFactory"/> hook. Every RPC asks the factory
+/// for fresh gRPC metadata (typically a bearer token) right before
+/// dispatch. The hook is async-aware, so it can resolve the current
+/// user's token from the active DI scope (e.g.
+/// <c>ICurrentPrincipalAccessor</c>). The default factory is a
+/// no-op; production wires it via <c>EvGrpcClientDecorator</c> in
+/// the Application layer.
+/// </para>
 /// </summary>
 public sealed class EvGrpcClient : IDisposable
 {
@@ -38,6 +45,15 @@ public sealed class EvGrpcClient : IDisposable
     private readonly Lazy<VehicleService.VehicleServiceClient> _vehicles;
     private readonly Lazy<ChargingService.ChargingServiceClient> _chargings;
     private bool _disposed;
+
+    /// <summary>
+    /// Hook for per-RPC metadata injection. Default is no-op
+    /// (empty Metadata); the decorator replaces this at decoration
+    /// time so that every RPC carries the current user's bearer
+    /// token, not whatever the channel ctor saw at startup.
+    /// </summary>
+    public Func<CancellationToken, Task<Metadata>> MetadataFactory { get; set; }
+        = _ => Task.FromResult(new Metadata());
 
     public EvGrpcClient(
         IOptions<EvGrpcOptions> options,
@@ -76,13 +92,22 @@ public sealed class EvGrpcClient : IDisposable
         return true;
     }
 
+    private async Task<CallOptions> BuildCallOptionsAsync(CancellationToken ct)
+    {
+        var md = await MetadataFactory(ct).ConfigureAwait(false);
+        var deadline = DateTime.UtcNow.AddSeconds(30);
+        return new CallOptions(headers: md, deadline: DateTime.UtcNow.AddSeconds(30), cancellationToken: ct);
+    }
+
     // ---------- Vehicle ----------
 
     public async Task<DomainVehicle> CreateVehicleAsync(DomainVehicle vehicle, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(vehicle);
-        var request = vehicle.ToCreateRequest();
-        var response = await _vehicles.Value.CreateVehicleAsync(request, cancellationToken: ct).ConfigureAwait(false);
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
+        var response = await _vehicles.Value
+            .CreateVehicleAsync(vehicle.ToCreateRequest(), opts)
+            .ConfigureAwait(false);
         return response.ToDomain();
     }
 
@@ -90,8 +115,9 @@ public sealed class EvGrpcClient : IDisposable
     {
         if (string.IsNullOrWhiteSpace(id))
             throw new ArgumentException("id must be non-blank.", nameof(id));
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
         var response = await _vehicles.Value
-            .GetVehicleAsync(new GetVehicleRequest { Id = id }, cancellationToken: ct)
+            .GetVehicleAsync(new GetVehicleRequest { Id = id }, opts)
             .ConfigureAwait(false);
         return response.ToDomain();
     }
@@ -99,8 +125,10 @@ public sealed class EvGrpcClient : IDisposable
     public async Task<DomainVehicle> UpdateVehicleAsync(DomainVehicle vehicle, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(vehicle);
-        var request = vehicle.ToUpdateRequest();
-        var response = await _vehicles.Value.UpdateVehicleAsync(request, cancellationToken: ct).ConfigureAwait(false);
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
+        var response = await _vehicles.Value
+            .UpdateVehicleAsync(vehicle.ToUpdateRequest(), opts)
+            .ConfigureAwait(false);
         return response.ToDomain();
     }
 
@@ -108,8 +136,9 @@ public sealed class EvGrpcClient : IDisposable
     {
         if (string.IsNullOrWhiteSpace(id))
             throw new ArgumentException("id must be non-blank.", nameof(id));
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
         await _vehicles.Value
-            .DeleteVehicleAsync(new DeleteVehicleRequest { Id = id }, cancellationToken: ct)
+            .DeleteVehicleAsync(new DeleteVehicleRequest { Id = id }, opts)
             .ConfigureAwait(false);
     }
 
@@ -117,6 +146,7 @@ public sealed class EvGrpcClient : IDisposable
     {
         if (pageSize <= 0)
             throw new ArgumentOutOfRangeException(nameof(pageSize));
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
         var response = await _vehicles.Value
             .ListVehiclesAsync(
                 new ListVehiclesRequest
@@ -124,7 +154,7 @@ public sealed class EvGrpcClient : IDisposable
                     PageSize = pageSize,
                     PageToken = pageToken ?? string.Empty,
                 },
-                cancellationToken: ct)
+                opts)
             .ConfigureAwait(false);
         var list = new List<DomainVehicle>(response.Vehicles.Count);
         foreach (var v in response.Vehicles) list.Add(v.ToDomain());
@@ -136,8 +166,10 @@ public sealed class EvGrpcClient : IDisposable
     public async Task<DomainCharging> CreateChargingAsync(DomainCharging charging, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(charging);
-        var request = charging.ToCreateRequest();
-        var response = await _chargings.Value.CreateChargingAsync(request, cancellationToken: ct).ConfigureAwait(false);
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
+        var response = await _chargings.Value
+            .CreateChargingAsync(charging.ToCreateRequest(), opts)
+            .ConfigureAwait(false);
         return response.ToDomain();
     }
 
@@ -145,8 +177,9 @@ public sealed class EvGrpcClient : IDisposable
     {
         if (string.IsNullOrWhiteSpace(id))
             throw new ArgumentException("id must be non-blank.", nameof(id));
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
         var response = await _chargings.Value
-            .GetChargingAsync(new GetChargingRequest { Id = id }, cancellationToken: ct)
+            .GetChargingAsync(new GetChargingRequest { Id = id }, opts)
             .ConfigureAwait(false);
         return response.ToDomain();
     }
@@ -154,8 +187,10 @@ public sealed class EvGrpcClient : IDisposable
     public async Task<DomainCharging> UpdateChargingAsync(DomainCharging charging, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(charging);
-        var request = charging.ToUpdateRequest();
-        var response = await _chargings.Value.UpdateChargingAsync(request, cancellationToken: ct).ConfigureAwait(false);
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
+        var response = await _chargings.Value
+            .UpdateChargingAsync(charging.ToUpdateRequest(), opts)
+            .ConfigureAwait(false);
         return response.ToDomain();
     }
 
@@ -163,9 +198,54 @@ public sealed class EvGrpcClient : IDisposable
     {
         if (string.IsNullOrWhiteSpace(id))
             throw new ArgumentException("id must be non-blank.", nameof(id));
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
         await _chargings.Value
-            .DeleteChargingAsync(new DeleteChargingRequest { Id = id }, cancellationToken: ct)
+            .DeleteChargingAsync(new DeleteChargingRequest { Id = id }, opts)
             .ConfigureAwait(false);
+    }
+
+    public async Task<IReadOnlyList<DomainCharging>> ListChargingsAsync(
+        string vehicleId,
+        DateTimeOffset? startAfter = null,
+        DateTimeOffset? startBefore = null,
+        XYPortal.EvGRPC.Chargings.ChargerType? chargerType = null,
+        string? sourceCategoryId = null,
+        int pageSize = 100,
+        string? pageToken = null,
+        CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(vehicleId))
+            throw new ArgumentException("vehicleId must be non-blank.", nameof(vehicleId));
+        if (pageSize <= 0)
+            throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+        var req = new ListChargingsRequest
+        {
+            VehicleId = vehicleId,
+            PageSize = pageSize,
+            PageToken = pageToken ?? string.Empty,
+        };
+        if (startAfter.HasValue) req.StartAfter = startAfter.Value.ToProtoTimestamp();
+        if (startBefore.HasValue) req.StartBefore = startBefore.Value.ToProtoTimestamp();
+        if (chargerType.HasValue) req.ChargerType = chargerType.Value.ToProto();
+        if (!string.IsNullOrWhiteSpace(sourceCategoryId)) req.SourceCategoryId = sourceCategoryId;
+
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
+        var response = await _chargings.Value.ListChargingsAsync(req, opts).ConfigureAwait(false);
+        var list = new List<DomainCharging>(response.Chargings.Count);
+        foreach (var c in response.Chargings) list.Add(c.ToDomain());
+        return list;
+    }
+
+    public async Task<DomainCharging?> GetLatestChargingAsync(string vehicleId, CancellationToken ct = default)
+    {
+        var all = await ListChargingsAsync(vehicleId, pageSize: 500, pageToken: null, ct: ct).ConfigureAwait(false);
+        DomainCharging? latest = null;
+        foreach (var c in all)
+        {
+            if (latest is null || c.EndTime > latest.EndTime) latest = c;
+        }
+        return latest;
     }
 
     // ---------- Channel plumbing ----------
@@ -220,8 +300,6 @@ public sealed class EvGrpcClient : IDisposable
         return GrpcChannel.ForAddress(_options.Url, options);
     }
 
-
-
     public void Dispose()
     {
         if (_disposed) return;
@@ -230,61 +308,5 @@ public sealed class EvGrpcClient : IDisposable
         {
             _channel.Value.Dispose();
         }
-    }
-
-    // ---------- Charging (continued) ----------
-
-    /// <summary>
-    /// List a vehicle's charging history, paginated and optionally
-    /// filtered by start-time range and charger type. Returns all
-    /// charges when no filter is supplied.
-    /// </summary>
-    public async Task<IReadOnlyList<DomainCharging>> ListChargingsAsync(
-        string vehicleId,
-        DateTimeOffset? startAfter = null,
-        DateTimeOffset? startBefore = null,
-        XYPortal.EvGRPC.Chargings.ChargerType? chargerType = null,
-        string? sourceCategoryId = null,
-        int pageSize = 100,
-        string? pageToken = null,
-        CancellationToken ct = default)
-    {
-        if (string.IsNullOrWhiteSpace(vehicleId))
-            throw new ArgumentException("vehicleId must be non-blank.", nameof(vehicleId));
-        if (pageSize <= 0)
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-
-        var req = new ListChargingsRequest
-        {
-            VehicleId = vehicleId,
-            PageSize = pageSize,
-            PageToken = pageToken ?? string.Empty,
-        };
-        if (startAfter.HasValue) req.StartAfter = startAfter.Value.ToProtoTimestamp();
-        if (startBefore.HasValue) req.StartBefore = startBefore.Value.ToProtoTimestamp();
-        if (chargerType.HasValue) req.ChargerType = chargerType.Value.ToProto();
-        if (!string.IsNullOrWhiteSpace(sourceCategoryId)) req.SourceCategoryId = sourceCategoryId;
-
-        var response = await _chargings.Value.ListChargingsAsync(req, cancellationToken: ct).ConfigureAwait(false);
-        var list = new List<DomainCharging>(response.Chargings.Count);
-        foreach (var c in response.Chargings) list.Add(c.ToDomain());
-        return list;
-    }
-
-    /// <summary>
-    /// Convenience: the most-recent charging of a single vehicle,
-    /// or null if none recorded. Pulls the first page (largest
-    /// page_size the API accepts) and picks the most recent by
-    /// <c>EndTime</c>; callers can override with a tighter window.
-    /// </summary>
-    public async Task<DomainCharging?> GetLatestChargingAsync(string vehicleId, CancellationToken ct = default)
-    {
-        var all = await ListChargingsAsync(vehicleId, pageSize: 500, pageToken: null, ct: ct).ConfigureAwait(false);
-        DomainCharging? latest = null;
-        foreach (var c in all)
-        {
-            if (latest is null || c.EndTime > latest.EndTime) latest = c;
-        }
-        return latest;
     }
 }

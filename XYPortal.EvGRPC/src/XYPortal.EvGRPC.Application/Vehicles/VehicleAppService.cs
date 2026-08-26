@@ -6,7 +6,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
-using XYPortal.EvGRPC.EvGrpc;
+using XYPortal.EvGRPC.Application.EvGrpc;
 using XYPortal.EvGRPC.Vehicles;
 
 namespace XYPortal.EvGRPC.Vehicles;
@@ -23,12 +23,12 @@ namespace XYPortal.EvGRPC.Vehicles;
 /// </summary>
 public class VehicleAppService : EvGRPCAppService, IVehicleAppService
 {
-    private readonly EvGrpcClient _client;
+    private readonly IEvGrpcClient _client;
     private readonly VehicleMappers _vehicleMappers;
     private readonly ILogger<VehicleAppService> _logger;
 
     public VehicleAppService(
-        EvGrpcClient client,
+        IEvGrpcClient client,
         VehicleMappers vehicleMappers,
         ILogger<VehicleAppService> logger)
     {
