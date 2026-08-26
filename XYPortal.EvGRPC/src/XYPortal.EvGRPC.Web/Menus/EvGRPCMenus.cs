@@ -1,10 +1,8 @@
-﻿namespace XYPortal.EvGRPC.Web.Menus;
+namespace XYPortal.EvGRPC.Web.Menus;
 
 public class EvGRPCMenus
 {
     public const string Prefix = "EvGRPC";
-
-    //Add your menu items here...
-    //public const string Home = Prefix + ".MyNewMenuItem";
-
+    public const string Vehicles = Prefix + ".Vehicles";
+    public const string Chargings = Prefix + ".Chargings";
 }
