@@ -21,6 +21,7 @@ namespace XYPortal.EvGRPC.EvGrpc.Tests;
 public class EvGrpcClientDecorator_Tests
 {
     [Theory]
+    [InlineData("AccessToken", "token-via-AccessToken")]
     [InlineData("access_token", "token-via-access_token")]
     [InlineData("oidc_access_token", "token-via-oidc")]
     [InlineData("openid_access_token", "token-via-openid")]

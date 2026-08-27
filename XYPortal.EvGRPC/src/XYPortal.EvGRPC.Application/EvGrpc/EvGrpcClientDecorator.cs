@@ -75,9 +75,10 @@ public sealed class EvGrpcClientDecorator : IEvGrpcClient, IDisposable
         // Probe several claim-name conventions; XYPortal modules differ
         // depending on which OpenIddict integration shipped. The first
         // hit wins; otherwise the static fallback applies.
-        var token = TryClaim("access_token")
-                    ?? TryClaim("oidc_access_token")
-                    ?? TryClaim("openid_access_token")
+        var token = TryClaim("AccessToken")             // ASP.NET Core OpenIdConnect / cookie auth convention
+                    ?? TryClaim("access_token")         // OpenIddict RFC-style
+                    ?? TryClaim("oidc_access_token")     // OpenIddict common name
+                    ?? TryClaim("openid_access_token")   // legacy fallback
                     ?? _staticOptions.AccessToken
                     ?? string.Empty;
 
