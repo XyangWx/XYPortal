@@ -1,0 +1,31 @@
+# GitLab CI: detect accidental edits to vendored .proto files
+# that were not accompanied by an update of .upstream.sha256.
+#
+# Source of truth: XYPortal.EvGRPC/src/.../proto/evgrpc/.upstream.sha256
+# Helper script:     scripts/proto-drift-check.sh
+# Plan ref:          plan-evgrpc.md Step 1.3 + Step 4.5
+
+stages:
+  - lint
+
+# alpine is enough — the drift check is a pure bash + sha256sum
+# script. No .NET SDK required. Keeps the job fast (≤ 5s typical).
+default:
+  image: alpine:latest
+
+evgrpc-proto-drift:
+  stage: lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - XYPortal.EvGRPC/src/XYPortal.EvGRPC.gRPC/proto/**/*
+        - scripts/proto-drift-check.sh
+        - .gitlab-ci.yml
+    - if: $CI_COMMIT_BRANCH =~ /^(master|main|develop)$/
+      changes:
+        - XYPortal.EvGRPC/src/XYPortal.EvGRPC.gRPC/proto/**/*
+        - scripts/proto-drift-check.sh
+        - .gitlab-ci.yml
+  script:
+    - bash scripts/proto-drift-check.sh
+  allow_failure: false
