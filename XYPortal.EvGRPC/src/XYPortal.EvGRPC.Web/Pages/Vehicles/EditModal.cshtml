@@ -10,7 +10,8 @@
     <abp-modal id="EditVehicleModal" centered="true" title="@L["EditVehicle"]">
         <abp-form-content />
         <div class="mt-3">
-            <input type="hidden" asp-for="@Model.Vehicle.Id" />
+            @* id is the route parameter, not part of the DTO *@
+            <input type="hidden" name="id" value="@ViewContext.RouteData.Values["id"]" />
             <abp-input asp-for="@Model.Vehicle.Brand" />
             <abp-input asp-for="@Model.Vehicle.CalibratedRangeKm" />
             <abp-input asp-for="@Model.Vehicle.BatteryCapacityKwh" />

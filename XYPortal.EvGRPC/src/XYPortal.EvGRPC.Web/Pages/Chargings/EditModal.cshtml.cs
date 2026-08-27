@@ -4,14 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Volo.Abp;
 using XYPortal.EvGRPC.Chargings;
 
 namespace XYPortal.EvGRPC.Web.Pages.Chargings;
 
 public class EditModalModel : EvGRPCPageModel
 {
+    /// <summary>
+    /// Re-uses the Application.Contracts DTO so ASP.NET model
+    /// binding + the existing data annotations ([Required],
+    /// [Range], [StringLength]) automatically repopulate the form
+    /// on validation failure.
+    /// </summary>
     [BindProperty]
-    public UpdateChargingDto Charging { get; set; } = new();
+    public CreateUpdateChargingDto Charging { get; set; } = new();
 
     public List<SelectListItem> ChargerTypes { get; private set; } = new();
 
@@ -25,9 +32,8 @@ public class EditModalModel : EvGRPCPageModel
     public async Task OnGetAsync(string id)
     {
         var dto = await _service.GetAsync(id);
-        Charging = new UpdateChargingDto
+        Charging = new CreateUpdateChargingDto
         {
-            Id = dto.Id,
             VehicleId = dto.VehicleId,
             StartTime = dto.StartTime,
             EndTime = dto.EndTime,
@@ -51,46 +57,19 @@ public class EditModalModel : EvGRPCPageModel
             .ToList();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(string id)
     {
-        await _service.UpdateAsync(Charging.Id, new CreateUpdateChargingDto
+        try
         {
-            VehicleId = Charging.VehicleId,
-            StartTime = Charging.StartTime,
-            EndTime = Charging.EndTime,
-            StartPercent = Charging.StartPercent,
-            EndPercent = Charging.EndPercent,
-            StartMileageKm = Charging.StartMileageKm,
-            EndMileageKm = Charging.EndMileageKm,
-            KwhCharged = Charging.KwhCharged,
-            Cost = Charging.Cost,
-            ElectricityUnitPrice = Charging.ElectricityUnitPrice,
-            ServiceFee = Charging.ServiceFee,
-            ChargerType = Charging.ChargerType,
-            SourceCategoryId = Charging.SourceCategoryId,
-            Location = Charging.Location,
-            Remark = Charging.Remark,
-        });
-        return NoContent();
-    }
-
-    public class UpdateChargingDto
-    {
-        public string Id { get; set; } = string.Empty;
-        public string VehicleId { get; set; } = string.Empty;
-        public DateTimeOffset StartTime { get; set; }
-        public DateTimeOffset EndTime { get; set; }
-        public int StartPercent { get; set; }
-        public int EndPercent { get; set; }
-        public int StartMileageKm { get; set; }
-        public int EndMileageKm { get; set; }
-        public double KwhCharged { get; set; }
-        public double Cost { get; set; }
-        public double ElectricityUnitPrice { get; set; }
-        public double? ServiceFee { get; set; }
-        public ChargerType ChargerType { get; set; }
-        public string SourceCategoryId { get; set; } = string.Empty;
-        public string Location { get; set; } = string.Empty;
-        public string? Remark { get; set; }
+            await _service.UpdateAsync(id, Charging);
+        }
+        catch (UserFriendlyException ex)
+        {
+            Alerts.Danger(ex.Message);
+            return Page();   // re-render with user's input preserved
+        }
+        // Post-Redirect-Get: return to the charging list page,
+        // preserving the per-vehicle filter.
+        return LocalRedirect(Url.Page("/Index", new { vehicleId = Charging.VehicleId })!);
     }
 }

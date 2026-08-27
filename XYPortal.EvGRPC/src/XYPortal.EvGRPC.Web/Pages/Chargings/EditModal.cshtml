@@ -10,7 +10,8 @@
     <abp-modal id="EditChargingModal" centered="true" size="Large" title="@L["EditCharging"]">
         <abp-form-content />
         <div class="mt-3">
-            <input type="hidden" asp-for="@Model.Charging.Id" />
+            @* id is the route parameter, not part of the DTO *@
+            <input type="hidden" name="id" value="@ViewContext.RouteData.Values["id"]" />
             <input type="hidden" asp-for="@Model.Charging.VehicleId" />
             <abp-input asp-for="@Model.Charging.StartTime" type="datetime-local" />
             <abp-input asp-for="@Model.Charging.EndTime" type="datetime-local" />

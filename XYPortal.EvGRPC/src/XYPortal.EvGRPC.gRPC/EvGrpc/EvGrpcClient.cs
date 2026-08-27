@@ -9,9 +9,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using XYPortal.EvGRPC.Chargings;
+using XYPortal.EvGRPC.SourceCategories;
 using XYPortal.EvGRPC.EvGrpc.Mapping;
 // Alias to disambiguate from Evgrpc.{Vehicle,Charging} proto classes.
 using DomainVehicle = XYPortal.EvGRPC.Vehicles.Vehicle;
+using DomainSourceCategory = XYPortal.EvGRPC.SourceCategories.SourceCategory;
 using DomainCharging = XYPortal.EvGRPC.Chargings.Charging;
 
 namespace XYPortal.EvGRPC.EvGrpc;
@@ -44,6 +46,7 @@ public sealed class EvGrpcClient : IDisposable
     private readonly Lazy<GrpcChannel> _channel;
     private readonly Lazy<VehicleService.VehicleServiceClient> _vehicles;
     private readonly Lazy<ChargingService.ChargingServiceClient> _chargings;
+    private readonly Lazy<SourceCategoryService.SourceCategoryServiceClient> _sourceCategories;
     private bool _disposed;
 
     /// <summary>
@@ -77,6 +80,9 @@ public sealed class EvGrpcClient : IDisposable
             isThreadSafe: true);
         _chargings = new Lazy<ChargingService.ChargingServiceClient>(
             () => new ChargingService.ChargingServiceClient(_channel.Value),
+            isThreadSafe: true);
+        _sourceCategories = new Lazy<SourceCategoryService.SourceCategoryServiceClient>(
+            () => new SourceCategoryService.SourceCategoryServiceClient(_channel.Value),
             isThreadSafe: true);
     }
 
@@ -246,6 +252,46 @@ public sealed class EvGrpcClient : IDisposable
             if (latest is null || c.EndTime > latest.EndTime) latest = c;
         }
         return latest;
+    }
+
+
+    // ---------- SourceCategory ----------
+
+    public async Task<DomainSourceCategory> CreateSourceCategoryAsync(DomainSourceCategory category, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(category);
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
+        var req = new CreateSourceCategoryRequest { Name = category.Name };
+        var resp = await _sourceCategories.Value.CreateSourceCategoryAsync(req, opts).ConfigureAwait(false);
+        return resp.ToDomain();
+    }
+
+    /// <summary>
+    /// Convenience: create-and-return in one call. Useful for the
+    /// CreateCharging path where the smoke probe needs a fresh
+    /// foreign key to a real source_category row.
+    /// </summary>
+    public async Task<DomainSourceCategory> CreateSourceCategoryAsync(string name, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("name must be non-blank.", nameof(name));
+        return await CreateSourceCategoryAsync(DomainSourceCategory.Create(name), ct).ConfigureAwait(false);
+    }
+
+    public async Task<IReadOnlyList<DomainSourceCategory>> SearchSourceCategoryAsync(string? prefix, int limit = 50, CancellationToken ct = default)
+    {
+        if (limit <= 0)
+            throw new ArgumentOutOfRangeException(nameof(limit));
+        var opts = await BuildCallOptionsAsync(ct).ConfigureAwait(false);
+        var req = new SearchSourceCategoryRequest
+        {
+            Prefix = prefix ?? string.Empty,
+            Limit = limit,
+        };
+        var resp = await _sourceCategories.Value.SearchSourceCategoryAsync(req, opts).ConfigureAwait(false);
+        var list = new List<DomainSourceCategory>(resp.Matches.Count);
+        foreach (var c in resp.Matches) list.Add(c.ToDomain());
+        return list;
     }
 
     // ---------- Channel plumbing ----------

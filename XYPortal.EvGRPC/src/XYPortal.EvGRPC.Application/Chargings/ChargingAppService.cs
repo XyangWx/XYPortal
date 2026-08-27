@@ -76,6 +76,12 @@ public class ChargingAppService : EvGRPCAppService, IChargingAppService
             var created = await _client.CreateChargingAsync(entity);
             return _mappers.Map(created);
         }
+        catch (ArgumentException ex)
+        {
+            // Domain invariant violation (e.g. blank vehicleId, end
+            // percent below start percent, end time before start time).
+            throw new UserFriendlyException(ex.Message, "EvGRPC:ValidationError");
+        }
         catch (RpcException ex)
         {
             throw TranslateRpcException(ex, nameof(CreateAsync), input.VehicleId);
@@ -105,6 +111,10 @@ public class ChargingAppService : EvGRPCAppService, IChargingAppService
                 remark: input.Remark);
             var updated = await _client.UpdateChargingAsync(entity);
             return _mappers.Map(updated);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new UserFriendlyException(ex.Message, "EvGRPC:ValidationError");
         }
         catch (RpcException ex)
         {

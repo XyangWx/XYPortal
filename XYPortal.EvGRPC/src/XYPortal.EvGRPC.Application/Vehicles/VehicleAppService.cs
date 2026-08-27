@@ -76,6 +76,13 @@ public class VehicleAppService : EvGRPCAppService, IVehicleAppService
             var created = await _client.CreateVehicleAsync(entity);
             return _vehicleMappers.Map(created);
         }
+        catch (ArgumentException ex)
+        {
+            // Domain invariant violation (e.g. blank brand, negative
+            // range). Translate to UserFriendlyException so the Razor
+            // EditModal can surface it via Alerts.Danger.
+            throw new UserFriendlyException(ex.Message, "EvGRPC:ValidationError");
+        }
         catch (RpcException ex)
         {
             throw TranslateRpcException(ex, nameof(CreateAsync), input.LicensePlate);
@@ -95,6 +102,10 @@ public class VehicleAppService : EvGRPCAppService, IVehicleAppService
                 licensePlate: input.LicensePlate);
             var updated = await _client.UpdateVehicleAsync(entity);
             return _vehicleMappers.Map(updated);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new UserFriendlyException(ex.Message, "EvGRPC:ValidationError");
         }
         catch (RpcException ex)
         {
