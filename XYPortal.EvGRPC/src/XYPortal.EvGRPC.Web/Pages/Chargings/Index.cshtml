@@ -3,8 +3,6 @@
 @using XYPortal.EvGRPC.Web.Pages.Chargings
 @model XYPortal.EvGRPC.Web.Pages.Chargings.IndexModel
 @inject Microsoft.Extensions.Localization.IStringLocalizer<EvGRPCResource> L
-@inject XYPortal.EvGRPC.Vehicles.IVehicleAppService VehicleApp
-@inject XYPortal.EvGRPC.Chargings.IChargingAppService ChargingApp
 
 @{ Layout = "_Layout"; }
 
@@ -41,10 +39,22 @@
                 {
                     <tr>
                         <td>
-                            <abp-button abp-button-size="Small" id="EditChargingBtn_@c.Id"
-                                        text="@L["Edit"].Value" button-type="Link" />
-                            <abp-button abp-button-size="Small" id="DeleteChargingBtn_@c.Id"
-                                        text="@L["Delete"].Value" button-type="Link" color="Danger" />
+                            <a abp-button="Secondary" abp-button-size="Small"
+                               asp-page="/Chargings/EditModal" asp-page-handler="Edit" asp-route-id="@c.Id">
+                                <i class="fa fa-edit"></i> @L["Edit"].Value
+                            </a>
+                            <form method="post"
+                                  asp-page-handler="Delete"
+                                  asp-route-id="@c.Id"
+                                  data-confirm="@L["ConfirmDelete"].Value"
+                                  class="d-inline-block">
+                                @Html.AntiForgeryToken()
+                                <abp-button button-type="Danger"
+                                            button-size="Small"
+                                            type="submit"
+                                            icon="trash"
+                                            text="@L["Delete"].Value" />
+                            </form>
                         </td>
                         <td>@c.VehicleId</td>
                         <td>@c.StartTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
@@ -59,3 +69,11 @@
         </abp-table>
     </abp-card-body>
 </abp-card>
+
+<script>
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (ev) {
+            if (!window.confirm(form.dataset.confirm)) ev.preventDefault();
+        });
+    });
+</script>

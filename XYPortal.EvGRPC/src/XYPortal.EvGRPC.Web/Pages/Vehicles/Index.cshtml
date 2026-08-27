@@ -41,10 +41,29 @@
                     var hasBattery = battery > 0;
                     <tr>
                         <td>
-                            <abp-button abp-button-size="Small" id="EditVehicleBtn_@v.Id"
-                                        text="@L["Edit"].Value" button-type="Link" />
-                            <abp-button abp-button-size="Small" id="DeleteVehicleBtn_@v.Id"
-                                        text="@L["Delete"].Value" button-type="Link" color="Danger" />
+                            @*
+                                Each row gets its own anti-forgery-token-protected form
+                                that POSTs to OnPostDeleteAsync. No JS required:
+                                users without JS still see the native browser
+                                dialog. With JS we layer a confirm() over the
+                                native dialog using the data-confirm attribute.
+                            *@
+                            <form method="post"
+                                  asp-page-handler="Delete"
+                                  asp-route-id="@v.Id"
+                                  data-confirm="@L["ConfirmDelete"].Value"
+                                  class="d-inline-block">
+                                @Html.AntiForgeryToken()
+                                <abp-button button-type="Danger"
+                                            button-size="Small"
+                                            type="submit"
+                                            icon="trash"
+                                            text="@L["Delete"].Value" />
+                            </form>
+                            <a abp-button="Secondary" abp-button-size="Small"
+                               asp-page="/Vehicles/EditModal" asp-page-handler="Edit" asp-route-id="@v.Id">
+                                <i class="fa fa-edit"></i> @L["Edit"].Value
+                            </a>
                         </td>
                         <td>@v.Brand</td>
                         <td>@v.LicensePlate</td>
@@ -67,3 +86,16 @@
         </abp-table>
     </abp-card-body>
 </abp-card>
+
+@*
+    Native confirm() — no JS deps. The handler `OnPostDeleteAsync`
+    re-renders the list (RedirectToPage) and the user sees an ABP
+    alert on failure; on success the row is gone.
+*@
+<script>
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (ev) {
+            if (!window.confirm(form.dataset.confirm)) ev.preventDefault();
+        });
+    });
+</script>
